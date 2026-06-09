@@ -3,14 +3,20 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "SLIDES"
-version = "0.0.6"
+name = "slides-rigid"
+version = "0.1.0"
 authors = [
   { name="Andrea Silva", email="ansilva@sissa.it" },
 ]
 description = "SuperLubric Interface DESigner: statics and dynamics of 2D rigid cluster over a substrate."
 readme = "README.md"
 requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "scipy",
+    "numba",
+    "monty",
+]
 keywords = ["simulation", "physics", "friction", "nanoscale-molecular-dynamics"]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -19,6 +25,12 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Physics",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
 ]
 
 [project.urls]
