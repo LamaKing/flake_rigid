@@ -151,10 +151,11 @@ def _particle_en_gaussian_core(pos, pos_torque, basis,
                 g = np.exp(-rr * rr / (2. * sigma * sigma))
                 en[i] += -epsilon * g
                 if rr > 0.:
-                    # dV/dr = epsilon * g * r / sigma^2,  then project.
+                    # F = -dV/dr: V = -epsilon*g, so dV/dr = epsilon*g*r/sigma^2 > 0,
+                    # meaning the force is inward (toward the well centre).
                     scale = epsilon * g / (sigma * sigma)
-                    F_site[i, 0] += scale * rx
-                    F_site[i, 1] += scale * ry
+                    F_site[i, 0] -= scale * rx
+                    F_site[i, 1] -= scale * ry
                 # At rr == 0 force is exactly zero by symmetry; skip.
 
             elif rr < b:
@@ -167,7 +168,7 @@ def _particle_en_gaussian_core(pos, pos_torque, basis,
                 # F = -dV/dr = epsilon * (g' * f + g * f') projected onto x,y
                 # g' = g * r / sigma^2  (with sign: d/dr of -epsilon*g*f)
                 gp = g * rr / (sigma * sigma)   # |dg/dr|
-                force_r = epsilon * (gp * f - g * df)  # radial magnitude
+                force_r = -epsilon * (gp * f - g * df)  # radial magnitude; minus because V=-epsilon*g*f
                 if rr > 0.:
                     F_site[i, 0] += force_r * rx / rr
                     F_site[i, 1] += force_r * ry / rr
