@@ -1,339 +1,567 @@
-import json
+#!/usr/bin/env python3
+"""
+Substrate potential functions for rigid-cluster simulations.
+
+Each substrate type exposes two public functions:
+    particle_en_<type>  --  per-particle energy, force, torque contribution
+    calc_en_<type>      --  total (summed) energy, force, torque on CM
+
+Both return (energy, force, torque).  The particle-level functions are useful
+for diagnostics and testing; production code typically calls calc_en_<type>
+through the substrate_from_params factory.
+
+Coordinate convention
+---------------------
+All positions are 2-D Cartesian (x, y).  The cluster CM is at pos_cm; the
+rigid-body orientation is handled externally.  Torque is computed about
+pos_torque (normally the CM).
+
+Units: consistent with the calling code -- distances in micron, forces in fN,
+energies in zJ, angles in radians internally (degrees at the MD level).
+
+JIT notes
+---------
+The inner loops are compiled with Numba @njit.  This means:
+  - No NumPy fancy indexing or boolean masks inside jitted functions.
+  - Explicit for-loops over particles -- Numba handles these efficiently.
+  - Functions passed to @njit callers must themselves be @njit.
+The non-jitted wrappers (calc_en_*) handle array allocation and call the
+jitted core.
+"""
+
 import numpy as np
 from numpy import pi, sqrt
+from numba import njit
 
 
-"""
-Functions to create substrate potentials
-"""
+# ============================================================
+# Lattice metric matrices
+# ============================================================
 
-# --- calcolates simple matrix for mapping clusters colloids into primitive cell and viceversa.
-# Square lattice matrix
 def calc_matrices_square(R):
-    """Metric matrices of square lattice of spacing R.
+    """Metric matrices for a square lattice of spacing R.
 
-    Return 2x2 matrices to map to unit cell (u) and inverse (u_inv), back to real space."""
-    area = R*R
-    u     = np.array([[1,0], [0,1]])*R/area
-    u_inv = np.array([[1,0], [0,1]])*R
+    Returns (u, u_inv): 2x2 matrices that map real-space displacements to
+    fractional coordinates and back.
+    """
+    area = R * R
+    u     = np.array([[1., 0.], [0., 1.]]) * (R / area)
+    u_inv = np.array([[1., 0.], [0., 1.]]) * R
     return u, u_inv
-# Triangle lattice matrix
+
+
 def calc_matrices_triangle(R):
-    """Metric matrices of triangular lattice of spacing R.
+    """Metric matrices for a triangular lattice of spacing R.
 
-    Return 2x2 matrices to map to unit cell (u) and inverse (u_inv), back to real space."""
-    area = R*R*sqrt(3)/2.
-    # NN along y
-    #u     = np.array([[1,0], [-1./2, sqrt(3)/2]])*R/area
-    #u_inv = np.array([[sqrt(3)/2,0], [1/2,1]])*R
-    # NN along x (like tool_create_hex/circ)
-    u =     np.array([[sqrt(3)/2.,0.5], [0,1]])*R/area
-    u_inv = np.array([[1,-0.5],            [0.0, sqrt(3)/2.]])*R
+    Nearest-neighbour direction is along x (consistent with the cluster
+    creation conventions in tool_create_cluster).
+    """
+    area = R * R * sqrt(3.) / 2.
+    u     = np.array([[sqrt(3.) / 2., 0.5 ], [0.,  1.       ]]) * (R / area)
+    u_inv = np.array([[1.,           -0.5 ], [0.,  sqrt(3.) / 2.]]) * R
     return u, u_inv
-# Arbitraty lattice matrix from primitive vectors
-def calc_matrices_bvect(b1, b2):
-    """Metric matrices from primitive lattice vectors b1, b2.
 
-    Return 2x2 matrices to map to unit cell (u) and inverse (u_inv), back to real space."""
-    St = np.array([b1, b2])
-    u = np.linalg.inv(St).T
+
+def calc_matrices_bvect(b1, b2):
+    """Metric matrices from two arbitrary primitive lattice vectors.
+
+    Args:
+        b1, b2: array-like, shape (2,).
+
+    Returns (u, u_inv) such that u @ r gives fractional coordinates and
+    u_inv @ frac gives real-space coordinates.
+    """
+    St = np.array([b1, b2], dtype=float)
+    u     = np.linalg.inv(St).T
     u_inv = St.T
     return u, u_inv
-# ----------------------
 
-# --- Tanh substrate
-def particle_en_tanh(pos, pos_torque, basis, a, b, ww, epsilon, u, u_inv):
-    """Calculate energy, forces and torque on each particle.
 
-    Substrate energy is modelled as a lattice of tanh-shaped wells.
+# ============================================================
+# Gaussian substrate
+# ============================================================
 
-    Inputs are:
-    - pos: position of particles in rigid cluster, as (N,2) array.
-    - pos_torque: reference point (1,2 array) to compute the torque (usually CM).
-    - basis: list of position of the substrate basis (N,2 array).
+def gaussian(x, mu, sigma):
+    """Unnormalised Gaussian: exp(-(x-mu)^2 / (2*sigma^2)).
 
-    Well specific inputs (usually passed as *en_input):
-    - a, b: beginning and end of tanh well (W=-epsilon for r<a, W=0 for x>b).
-    - ww: shape factor for the tanh potential.
-    - epsilon: depth of the well.
-    - u, u_inv: matrices to map to subsrtate unit cell (see calc_matrices_bvect)
-
-    Returns (for each particle) energy (N array), force (N,2), torque (N)
+    Kept public because tool_reciprocal_space.py uses it directly.
+    Not normalised by design -- it represents a well *shape*, not a PDF.
     """
-    en = np.zeros(shape=(pos.shape[0]))
-    F = np.zeros(shape=(pos.shape[0],2))
-    tau = np.zeros(shape=(pos.shape[0]))
+    return np.exp(-np.square(x - mu) / (2. * np.square(sigma)))
 
-    # For each crystal basis position
+
+@njit
+def _particle_en_gaussian_core(pos, pos_torque, basis,
+                                a, b, sigma, epsilon,
+                                u, u_inv):
+    """JIT core for Gaussian-well substrate.
+
+    The well is:
+        V(r) = -epsilon * exp(-r^2 / (2*sigma^2))          for r <= a  (bulk)
+        V(r) = -epsilon * exp(-r^2 / (2*sigma^2)) * f(rho) for a < r < b  (tail)
+        V(r) = 0                                            for r >= b  (outside)
+
+    where rho = (r-a)/(b-a) in [0,1] and f is the C^2 smoothstep:
+        f(rho) = 1 - 10*rho^3 + 15*rho^4 - 6*rho^5
+
+    The tail ensures the potential and its first two derivatives go to zero
+    smoothly at r=b, avoiding discontinuous forces.
+
+    Args:
+        pos:        (N, 2) particle positions.
+        pos_torque: (2,)   reference point for torque (usually CM).
+        basis:      (M, 2) positions of the crystal basis sites.
+        a, b:       inner radius (no damping) and cutoff radius.
+        sigma:      width of the Gaussian well.
+        epsilon:    depth of the well (positive = attractive).
+        u, u_inv:   (2, 2) metric matrices from calc_matrices_bvect.
+
+    Returns:
+        en:  (N,) potential energy per particle.
+        F:   (N, 2) force on each particle.
+        tau: (N,) torque contribution per particle about pos_torque.
+    """
+    N = pos.shape[0]
+    en  = np.zeros(N)
+    F   = np.zeros((N, 2))
+    tau = np.zeros(N)
+
     for r in basis:
-        # map to substrate cell
-        posp = np.dot(u, (pos-r).T).T # Fast numpy dot with different convention on row/cols
-        posp -= np.floor(posp + 0.5) # Map back to substrate
-        pospp = np.dot(u_inv, posp.T).T # back to real space
-        posR = np.linalg.norm(pospp, axis=1) # Radial
+        # F_site accumulates forces from this basis site only.
+        # We need this separate from F to compute the torque correctly:
+        # tau += r_from_app x F_site, NOT r_from_app x F_total.
+        F_site = np.zeros((N, 2))
 
-        # --> particles in the flat bottom (force and torque are zero)
-        en[posR <= a] = -epsilon # energy inside flat bottom region
-        # --> particles in the curved region (see X. Cao Phys. Rev. E 103, 1 (2021))
-        inside = np.logical_and(posR<b, posR>a) # numpy mask vector
-        Rin = posR[inside]
-        rho = (Rin-a)/(b-a) # Reduce coordinate rho in [0,1]
-        # Energy
-        en[inside] += epsilon/2.*(np.tanh((rho-ww)/rho/(1-rho))-1.)
-        # Force F = - grad(E)
-        ff = (rho-ww)/rho/(1-rho)
-        ass = (np.cosh(ff)*(1-rho)*rho)**2
-        vecF = -epsilon/2*(rho*rho+ww-2*ww*rho)/ass
-        vecF /= (b-a) # Go from rho to r again
-        # Project to x and y
-        F[inside,0] += vecF*pospp[inside,0]/Rin
-        F[inside,1] += vecF*pospp[inside,1]/Rin
-        # Torque tau = r vec F (with pos_torque application point)
-        tau += np.cross(pos-r-pos_torque, F)
-        # --> particles in the flat top have 0 energy (force and torque are zero). So do nothing.
+        for i in range(N):
+            # Map particle into the substrate unit cell (fractional coords).
+            dx = pos[i, 0] - r[0]
+            dy = pos[i, 1] - r[1]
+            fx = u[0, 0] * dx + u[0, 1] * dy
+            fy = u[1, 0] * dx + u[1, 1] * dy
+            # Fold back to [-0.5, 0.5) -- nearest image in substrate cell.
+            fx -= np.floor(fx + 0.5)
+            fy -= np.floor(fy + 0.5)
+            # Back to real space (shortest vector to substrate site).
+            rx = u_inv[0, 0] * fx + u_inv[0, 1] * fy
+            ry = u_inv[1, 0] * fx + u_inv[1, 1] * fy
+            rr = sqrt(rx * rx + ry * ry)
 
-    # Return energy, F and torque
+            if rr <= a:
+                # Bulk region: full Gaussian, no damping.
+                g = np.exp(-rr * rr / (2. * sigma * sigma))
+                en[i] += -epsilon * g
+                if rr > 0.:
+                    # dV/dr = epsilon * g * r / sigma^2,  then project.
+                    scale = epsilon * g / (sigma * sigma)
+                    F_site[i, 0] += scale * rx
+                    F_site[i, 1] += scale * ry
+                # At rr == 0 force is exactly zero by symmetry; skip.
+
+            elif rr < b:
+                # Tail region: Gaussian * smoothstep.
+                rho  = (rr - a) / (b - a)
+                f    =  1. - 10.*rho**3 + 15.*rho**4 -  6.*rho**5
+                df   = (-30.*rho**2 + 60.*rho**3 - 30.*rho**4) / (b - a)
+                g    = np.exp(-rr * rr / (2. * sigma * sigma))
+                en[i] += -epsilon * g * f
+                # F = -dV/dr = epsilon * (g' * f + g * f') projected onto x,y
+                # g' = g * r / sigma^2  (with sign: d/dr of -epsilon*g*f)
+                gp = g * rr / (sigma * sigma)   # |dg/dr|
+                force_r = epsilon * (gp * f - g * df)  # radial magnitude
+                if rr > 0.:
+                    F_site[i, 0] += force_r * rx / rr
+                    F_site[i, 1] += force_r * ry / rr
+
+            # rr >= b: zero energy and force, nothing to add.
+
+        # Torque about pos_torque from this basis site's forces.
+        # tau_i = (pos_i - pos_torque) x F_site_i  (2-D cross product -> scalar)
+        for i in range(N):
+            arm_x = pos[i, 0] - pos_torque[0]
+            arm_y = pos[i, 1] - pos_torque[1]
+            tau[i] += arm_x * F_site[i, 1] - arm_y * F_site[i, 0]
+
+        # Accumulate site forces into total force array.
+        for i in range(N):
+            F[i, 0] += F_site[i, 0]
+            F[i, 1] += F_site[i, 1]
+
     return en, F, tau
 
-def calc_en_tanh(pos, pos_torque, basis, a, b, ww, epsilon, u, u_inv):
-    """Calculate energy, forces and torque on CM.
-
-    Substrate energy is modelled as a lattice of tanh-shaped wells.
-
-    See corresponding particle function for details on parameters.
-
-    Return total energy (scalar) force (2d vector) torque (scalar).
-    """
-    # This might be very slow. Test a bit.
-    en, F, tau = particle_en_tanh(pos, pos_torque, basis, a, b, ww, epsilon, u, u_inv)
-    return np.sum(en), np.sum(F, axis=0), np.sum(tau)
-# ----------------------
-
-# --- Gaussian substrate
-# Non normalised
-def gaussian(x, mu, sigma):
-    return np.exp(-np.square(x - mu) / (2 * np.square(sigma)))
-# Normalised by width (sigma)
-#def gaussian(x, mu, sig):
-#    return np.exp(-np.power(x - mu, 2.) / (2 * np.power(sigma, 2.))) / (2. * np.pi * np.power(sigma, 2.))
 
 def particle_en_gaussian(pos, pos_torque, basis, a, b, sigma, epsilon, u, u_inv):
-    """Calculate energy, forces and torque on each particle.
+    """Per-particle energy, force, and torque for a Gaussian-well substrate.
 
-    Substrate energy is modelled as a lattice of gaussian-shaped wells.
+    See _particle_en_gaussian_core for the potential definition.
 
-    Inputs are:
-    - pos: position of particles in rigid cluster, as (N,2) array.
-    - pos_torque: reference point (1,2 array) to compute the torque (usually CM).
-    - basis: list of position of the substrate basis (N,2 array).
+    Args:
+        pos:        (N, 2) ndarray -- particle positions.
+        pos_torque: (2,)   ndarray -- torque reference point (usually CM).
+        basis:      list of (2,) arrays -- substrate basis site positions.
+        a:          float -- inner cutoff (bulk region ends here).
+        b:          float -- outer cutoff (tail region ends here).
+        sigma:      float -- Gaussian width.
+        epsilon:    float -- well depth (positive = attractive).
+        u, u_inv:   (2,2) ndarrays -- metric matrices from calc_matrices_bvect.
 
-    Well specific inputs (usually passed as *en_input):
-    - a, b: beginning and end of tempered region (W=0 for x>b).
-    - sigma: width of the gaussian.
-    - epsilon: depth of the well.
-    - u, u_inv: matrices to map to subsrtate unit cell (see calc_matrices_bvect)
-
-    Returns (for each particle) energy (N array), force (N,2), torque (N)
+    Returns:
+        en:  (N,) ndarray -- potential energy per particle.
+        F:   (N, 2) ndarray -- force on each particle.
+        tau: (N,) ndarray -- torque contribution per particle.
     """
-    en = np.zeros(shape=(pos.shape[0]))
-    F = np.zeros(shape=(pos.shape[0],2))
-    tau = np.zeros(shape=(pos.shape[0]))
+    basis_arr = np.array(basis, dtype=np.float64)
+    return _particle_en_gaussian_core(
+        np.asarray(pos, dtype=np.float64),
+        np.asarray(pos_torque, dtype=np.float64),
+        basis_arr, a, b, sigma, epsilon,
+        np.asarray(u, dtype=np.float64),
+        np.asarray(u_inv, dtype=np.float64),
+    )
 
-    for r in basis:
-        posp = np.dot(u, (pos-r).T).T # Fast numpy dot with different convention on row/cols
-        posp -= np.floor(posp + 0.5) # Map back to substrate
-        pospp = np.dot(u_inv, posp.T).T # back to real space
-        posR = np.linalg.norm(pospp, axis=1) # Radial
-
-        bulk, tail = posR<=a, np.logical_and(posR>a, posR<b) # Mask positions: bulk no damping, tail damped
-
-        Rtail = posR[tail] # position in tail
-        rho = (Rtail-a)/(b-a) # Reduce coordinate rho in [0,1]
-        ftail = (1 - 10*rho**3 + 15*rho**4 - 6*rho**5)  # Damping f -> [1,0]
-        dftail = (-30*rho**2 + 60*rho**3 - 30*rho**4)/(b-a) # Derivative of f
-
-        # Energy
-        en[bulk] += -epsilon*gaussian(posR[bulk], 0, sigma) # Bulk
-        en[tail] += -epsilon*gaussian(Rtail, 0, sigma)*ftail # Tail
-        # Forces bulk F = -dE/dr
-        bulk = np.logical_and(posR<=a, posR != 0) # Exclude singular point in origin where F=0
-        F[bulk, 0] = -epsilon*gaussian(posR[bulk],0,sigma) * (posR[bulk]/np.power(sigma, 2.))*pospp[bulk,0]/posR[bulk]
-        F[bulk, 1] = -epsilon*gaussian(posR[bulk],0,sigma) * (posR[bulk]/np.power(sigma, 2.))*pospp[bulk,1]/posR[bulk]
-        # Forces tail F = -d(E*f)/dr = - (E'*f + E*f')
-        f1 = epsilon*gaussian(Rtail, 0, sigma)*dftail # E f'
-        f2 = -ftail*epsilon*gaussian(Rtail,0,sigma) * (Rtail / np.power(sigma, 2.)) # E' f
-        F[tail, 0] += (f1+f2) * pospp[tail,0]/posR[tail]
-        F[tail, 1] += (f1+f2) * pospp[tail,1]/posR[tail]
-        # Torque
-        tau += np.cross(pos-r-pos_torque, F)
-
-    return en, F, tau
 
 def calc_en_gaussian(pos, pos_torque, basis, a, b, sigma, epsilon, u, u_inv):
-    """Calculate energy, forces and torque on CM.
+    """Total energy, force, and torque on the CM for a Gaussian-well substrate.
 
-    See corresponding particle function for details on parameters.
+    Sums particle_en_gaussian over all particles.
 
-    Return total energy (scalar) force (2d vector) torque (scalar).
+    Returns:
+        (float, (2,) ndarray, float) -- total energy, total force, total torque.
     """
-    en, F, tau = particle_en_gaussian(pos, pos_torque, basis, a, b, sigma, epsilon, u, u_inv)
+    en, F, tau = particle_en_gaussian(pos, pos_torque, basis,
+                                       a, b, sigma, epsilon, u, u_inv)
     return np.sum(en), np.sum(F, axis=0), np.sum(tau)
-# ----------------------
-
-# --- Sinusoidal arbitrary substrate
-# !! This is implemented a bit differently: we do not need information about the unit cell, and  it might not even exists, in the quasi-crystal case.
-# Coefficients for reciprical space
-# from Vanossi, Manini, Tosatti www.pnas.org/cgi/doi/10.1073/pnas.1213930109 PNAS∣October 9, 2012∣vol. 109∣no. 41∣16429–16433
-# n, c_n, alpha_n = 2, 1, 0 # Lines
-# n, c_n, alpha_n = 3, 4/3, 0 # Tri
-# n, c_n, alpha_n = 4, np.sqrt(2), pi/4 # Square
-# n, c_n, alpha_n = 5, 2, 0 # Qausi-cristal
-# n, c_n, alpha_n = 6, 4/np.sqrt(3), -pi/6
-def get_ks(R, n, c_n, alpha_n):
-    """Compute wave vectors k of interfering plane waves
-
-    Coefficients for reciprical space
-    from Vanossi, Manini, Tosatti www.pnas.org/cgi/doi/10.1073/pnas.1213930109 PNAS∣October 9, 2012∣vol. 109∣no. 41∣16429–16433
-
-    Lines: n, c_n, alpha_n = 2, 1, 0
-
-    Triangular: n, c_n, alpha_n = 3, 4/3, 0
-
-    Square: n, c_n, alpha_n = 4, np.sqrt(2), pi/4
-
-    Quasi-crystal 5-fold sym: n, c_n, alpha_n = 5, 2, 0
-
-    Quasi-crystal 6-fold sym: n, c_n, alpha_n = 6, 4/np.sqrt(3), -pi/6
-
-"""
-    return np.array([c_n*pi/R*np.array([np.cos(2*pi/n*l+alpha_n), np.sin(2*pi/n*l+alpha_n)])
-                     for l in range(n)])
-
-def particle_en_sin(pos, pos_torque, basis, ks, epsilon):
-    """Calculate energy, forces and torque on each particle.
-
-    Substrate energy is modelled as sum of plane waves defined by the reciprocal vecotrs ks.
 
 
-    Inputs are:
-    - pos: position of particles in rigid cluster, as (N,2) array.
-    - pos_torque: reference point (1,2 array) to compute the torque (usually CM).
-    - basis: list of position of the substrate basis (N,2 array).
+# ============================================================
+# Tanh substrate
+# ============================================================
 
-    Well specific inputs (usually passed as *en_input):
-    - ks: list of wavevector generating the potential.
-    - epsilon: depth of the potential.
+@njit
+def _particle_en_tanh_core(pos, pos_torque, basis,
+                            a, b, ww, epsilon,
+                            u, u_inv):
+    """JIT core for tanh-shaped substrate wells.
 
-    Returns (for each particle) energy (N array), force (N,2), torque (N)
+    The well profile (following Cao, Phys. Rev. E 103, 2021):
+        V = -epsilon                                      for r <= a  (flat bottom)
+        V = epsilon/2 * (tanh((rho-ww)/(rho*(1-rho))) - 1)  for a < r < b
+        V = 0                                             for r >= b
+
+    where rho = (r-a)/(b-a) in (0,1).  The parameter ww controls the
+    steepness of the wall: smaller ww -> steeper outer wall.
+
+    Args:
+        pos, pos_torque, basis: same as Gaussian core.
+        a:       inner flat-bottom radius.
+        b:       outer cutoff radius.
+        ww:      shape parameter (wall steepness).
+        epsilon: well depth.
+        u, u_inv: metric matrices.
+
+    Returns:
+        en, F, tau: same shapes as Gaussian core.
     """
+    N = pos.shape[0]
+    en  = np.zeros(N)
+    F   = np.zeros((N, 2))
+    tau = np.zeros(N)
 
-    F = np.zeros(shape=(pos.shape[0],2))
-    en = np.zeros(pos.shape[0])
-    tau = np.zeros(pos.shape[0])
-    n = len(ks) # Number of plane waves
     for r in basis:
-        x, y = (pos-r)[:,0], (pos-r)[:,1]
-        # energy
-        exp_list = np.array([np.exp(1j*(x*k[0]+y*k[1]))
-                             for k in ks])
-        en += -epsilon/n**2*np.abs(np.sum(exp_list, axis=0))**2
-        # force
-        t1  = np.sum(np.array([np.cos(x*k[0]+y*k[1]) for k in ks]), axis=0)
-        t2x = np.sum(np.array([k[0]*np.sin(x*k[0]+y*k[1]) for k in ks]), axis=0)
-        t2y = np.sum(np.array([k[1]*np.sin(x*k[0]+y*k[1]) for k in ks]), axis=0)
-        t3  = np.sum(np.array([np.sin(x*k[0]+y*k[1]) for k in ks]), axis=0)
-        t4x = np.sum(np.array([k[0]*np.cos(x*k[0]+y*k[1]) for k in ks]), axis=0)
-        t4y = np.sum(np.array([k[1]*np.cos(x*k[0]+y*k[1]) for k in ks]), axis=0)
-        F[:,0] += -epsilon*2/n**2*(t1*t2x-t3*t4x)
-        F[:,1] += -epsilon*2/n**2*(t1*t2y-t3*t4y)
-        # torque
-        tau += np.cross(pos-r-pos_torque, F)
+        F_site = np.zeros((N, 2))
+
+        for i in range(N):
+            dx = pos[i, 0] - r[0]
+            dy = pos[i, 1] - r[1]
+            fx = u[0, 0] * dx + u[0, 1] * dy
+            fy = u[1, 0] * dx + u[1, 1] * dy
+            fx -= np.floor(fx + 0.5)
+            fy -= np.floor(fy + 0.5)
+            rx = u_inv[0, 0] * fx + u_inv[0, 1] * fy
+            ry = u_inv[1, 0] * fx + u_inv[1, 1] * fy
+            rr = sqrt(rx * rx + ry * ry)
+
+            if rr <= a:
+                en[i] += -epsilon
+                # Flat bottom: force is zero.
+
+            elif rr < b:
+                rho = (rr - a) / (b - a)
+                arg = (rho - ww) / (rho * (1. - rho))
+                en[i] += epsilon / 2. * (np.tanh(arg) - 1.)
+                # Derivative of tanh term with respect to rho:
+                # d/drho [ (rho-ww)/(rho*(1-rho)) ] = (rho^2 + ww - 2*ww*rho) / (rho*(1-rho))^2
+                # Force = -dV/dr = -(dV/drho)*(1/(b-a))
+                cosh_arg = np.cosh(arg)
+                darg_drho = (rho * rho + ww - 2. * ww * rho) / (rho * (1. - rho)) ** 2
+                dV_drho   = epsilon / 2. / (cosh_arg * cosh_arg) * darg_drho
+                force_r   = -dV_drho / (b - a)  # radial force component
+                if rr > 0.:
+                    F_site[i, 0] += force_r * rx / rr
+                    F_site[i, 1] += force_r * ry / rr
+
+        for i in range(N):
+            arm_x = pos[i, 0] - pos_torque[0]
+            arm_y = pos[i, 1] - pos_torque[1]
+            tau[i] += arm_x * F_site[i, 1] - arm_y * F_site[i, 0]
+
+        for i in range(N):
+            F[i, 0] += F_site[i, 0]
+            F[i, 1] += F_site[i, 1]
 
     return en, F, tau
 
+
+def particle_en_tanh(pos, pos_torque, basis, a, b, ww, epsilon, u, u_inv):
+    """Per-particle energy, force, and torque for a tanh-well substrate.
+
+    Args:
+        pos:        (N, 2) ndarray -- particle positions.
+        pos_torque: (2,)   ndarray -- torque reference point.
+        basis:      list of (2,) arrays -- substrate basis site positions.
+        a:          float -- flat-bottom radius.
+        b:          float -- outer cutoff radius.
+        ww:         float -- wall shape parameter.
+        epsilon:    float -- well depth.
+        u, u_inv:   (2, 2) ndarrays -- metric matrices.
+
+    Returns:
+        en, F, tau: same as particle_en_gaussian.
+    """
+    basis_arr = np.array(basis, dtype=np.float64)
+    return _particle_en_tanh_core(
+        np.asarray(pos, dtype=np.float64),
+        np.asarray(pos_torque, dtype=np.float64),
+        basis_arr, a, b, ww, epsilon,
+        np.asarray(u, dtype=np.float64),
+        np.asarray(u_inv, dtype=np.float64),
+    )
+
+
+def calc_en_tanh(pos, pos_torque, basis, a, b, ww, epsilon, u, u_inv):
+    """Total energy, force, and torque on the CM for a tanh-well substrate.
+
+    Returns:
+        (float, (2,) ndarray, float) -- total energy, total force, total torque.
+    """
+    en, F, tau = particle_en_tanh(pos, pos_torque, basis,
+                                   a, b, ww, epsilon, u, u_inv)
+    return np.sum(en), np.sum(F, axis=0), np.sum(tau)
+
+
+# ============================================================
+# Sinusoidal (plane-wave) substrate
+# ============================================================
+
+def get_ks(R, n, c_n, alpha_n):
+    """Wave vectors for an n-fold symmetric sinusoidal substrate.
+
+    Constructs n plane waves whose interference gives a potential with the
+    desired lattice symmetry.  Coefficients from:
+        Vanossi, Manini, Tosatti, PNAS 109, 16429 (2012).
+
+    Preset recipes:
+        Lines        : n=2, c_n=1,            alpha_n=0
+        Triangular   : n=3, c_n=4/3,          alpha_n=0
+        Square       : n=4, c_n=sqrt(2),      alpha_n=pi/4
+        Quasicrystal5: n=5, c_n=2,            alpha_n=0
+        Quasicrystal6: n=6, c_n=4/sqrt(3),    alpha_n=-pi/6
+
+    Args:
+        R:       float -- lattice spacing.
+        n:       int   -- number of plane waves (fold symmetry).
+        c_n:     float -- amplitude pre-factor for |k|.
+        alpha_n: float -- overall rotation of the wave-vector star [radians].
+
+    Returns:
+        ks: (n, 2) ndarray of wave vectors.
+    """
+    return np.array([
+        c_n * pi / R * np.array([np.cos(2. * pi / n * l + alpha_n),
+                                  np.sin(2. * pi / n * l + alpha_n)])
+        for l in range(n)
+    ])
+
+
+@njit
+def _particle_en_sin_core(pos, pos_torque, basis, ks, epsilon):
+    """JIT core for sinusoidal (plane-wave interference) substrate.
+
+    The potential is:
+        V(r) = -epsilon/n^2 * |sum_l exp(i k_l . r)|^2
+
+    which expands to a sum of cosines.  The pre-factor ensures V ranges
+    from -epsilon (at a potential minimum) to 0 (at a saddle/maximum)
+    regardless of n.
+
+    Forces follow from F = -grad V.
+
+    Args:
+        pos:        (N, 2) particle positions.
+        pos_torque: (2,)   torque reference point.
+        basis:      (M, 2) substrate basis positions.
+        ks:         (n, 2) wave vectors from get_ks.
+        epsilon:    float  well depth.
+
+    Returns:
+        en, F, tau: shapes (N,), (N,2), (N,).
+    """
+    N    = pos.shape[0]
+    nk   = ks.shape[0]
+    en   = np.zeros(N)
+    F    = np.zeros((N, 2))
+    tau  = np.zeros(N)
+    inv_n2 = 1. / (nk * nk)
+
+    for r in basis:
+        F_site = np.zeros((N, 2))
+
+        for i in range(N):
+            x = pos[i, 0] - r[0]
+            y = pos[i, 1] - r[1]
+
+            # Energy: -epsilon/n^2 * |sum exp(i k.r)|^2
+            # = -epsilon/n^2 * (sum cos(k.r))^2 + (sum sin(k.r))^2)
+            sum_cos = 0.
+            sum_sin = 0.
+            for l in range(nk):
+                phase = ks[l, 0] * x + ks[l, 1] * y
+                sum_cos += np.cos(phase)
+                sum_sin += np.sin(phase)
+            en[i] += -epsilon * inv_n2 * (sum_cos * sum_cos + sum_sin * sum_sin)
+
+            # Force: F = -dV/dr
+            # dV/dx = -epsilon/n^2 * 2*(sum_cos * sum(k_x sin) - sum_sin * sum(k_x cos))
+            sum_kx_sin = 0.
+            sum_ky_sin = 0.
+            sum_kx_cos = 0.
+            sum_ky_cos = 0.
+            for l in range(nk):
+                phase = ks[l, 0] * x + ks[l, 1] * y
+                s = np.sin(phase)
+                c = np.cos(phase)
+                sum_kx_sin += ks[l, 0] * s
+                sum_ky_sin += ks[l, 1] * s
+                sum_kx_cos += ks[l, 0] * c
+                sum_ky_cos += ks[l, 1] * c
+
+            # F = -dV/dr: note sign and factor of 2
+            F_site[i, 0] += -epsilon * 2. * inv_n2 * (
+                sum_cos * sum_kx_sin - sum_sin * sum_kx_cos
+            )
+            F_site[i, 1] += -epsilon * 2. * inv_n2 * (
+                sum_cos * sum_ky_sin - sum_sin * sum_ky_cos
+            )
+
+        for i in range(N):
+            arm_x = pos[i, 0] - pos_torque[0]
+            arm_y = pos[i, 1] - pos_torque[1]
+            tau[i] += arm_x * F_site[i, 1] - arm_y * F_site[i, 0]
+
+        for i in range(N):
+            F[i, 0] += F_site[i, 0]
+            F[i, 1] += F_site[i, 1]
+
+    return en, F, tau
+
+
+def particle_en_sin(pos, pos_torque, basis, ks, epsilon):
+    """Per-particle energy, force, and torque for a plane-wave substrate.
+
+    Args:
+        pos:        (N, 2) ndarray -- particle positions.
+        pos_torque: (2,)   ndarray -- torque reference point.
+        basis:      list of (2,) arrays -- substrate basis site positions.
+        ks:         (n, 2) ndarray  -- wave vectors (from get_ks).
+        epsilon:    float           -- well depth.
+
+    Returns:
+        en, F, tau: same shapes as particle_en_gaussian.
+    """
+    basis_arr = np.array(basis, dtype=np.float64)
+    return _particle_en_sin_core(
+        np.asarray(pos, dtype=np.float64),
+        np.asarray(pos_torque, dtype=np.float64),
+        basis_arr,
+        np.asarray(ks, dtype=np.float64),
+        float(epsilon),
+    )
+
+
 def calc_en_sin(pos, pos_torque, basis, ks, epsilon):
-    """Calculate energy, forces and torque on CM.
+    """Total energy, force, and torque on the CM for a plane-wave substrate.
 
-    Substrate energy is modelled as sum of plane waves defined by the reciprocal vecotrs ks.
-
-    See corresponding particle function for details on parameters.
-
-    Return total energy (scalar) force (2d vector) torque (scalar).
+    Returns:
+        (float, (2,) ndarray, float) -- total energy, total force, total torque.
     """
     en, F, tau = particle_en_sin(pos, pos_torque, basis, ks, epsilon)
     return np.sum(en), np.sum(F, axis=0), np.sum(tau)
 
-# ----------------------
 
-# --- Sinusoidal triangular substrate
-# Shortcut for the one we use the most
-def particle_en_sin_tri(pos, pos_torque, basis, R, epsilon, u, u_inv):
-    """Calculate energy, forces and torque on each particle.
+# ============================================================
+# Factory: build substrate from parameter dictionary
+# ============================================================
 
-    !!! Coefficients are for triangular lattice only !!!
-    Substrate energy is modelled as sum of three plane waves."""
-    F = np.zeros(shape=(pos.shape[0],2))
-    en = np.zeros(pos.shape[0])
-    tau = np.zeros(pos.shape[0])
-
-    for r in basis:
-        # map to substrate cell
-        posp = np.dot(u, (pos-r).T).T
-        posp -= np.floor(posp + 0.5)
-        pospp = np.dot(u_inv, posp.T).T
-        x, y = pospp[:,0], pospp[:,1]
-
-        # energy
-        txy = np.cos((2*pi)/(sqrt(3)*R)*Y)*np.cos((2*pi)/R*X)
-        ty = np.cos((4*pi)/(sqrt(3)*R)*Y)
-        en = epsilon*-1/9*(3+4*txy+2*ty)
-        # force
-        fx = 2*pi/R
-        fy = 2*pi/(R*sqrt(3))
-        pre = -epsilon*8*pi/(9*R)
-        F[:,0] = pre*np.cos(fy*Y)*np.sin(fx*X)
-        F[:,1] = pre/sqrt(3)*np.sin(fy*Y)*(np.cos(fx*X)+2*np.cos(fy*Y))
-        # torque
-        tau = np.cross(pos-r-pos_torque, F)
-
-    return en, F, tau
-
-def calc_en_sin_tri(pos, pos_torque, basis, a, epsilon, u, u_inv):
-    """Calculate energy, forces and torque on CM.
-
-    !!! Coefficients are for triangular lattice only !!!
-    Substrate energy is modelled as sum of three plane waves."""
-    en, F, tau = particle_en_sin_tri(pos, pos_torque, basis, a, epsilon, u, u_inv)
-    return np.sum(en), np.sum(F, axis=0), np.sum(tau)
-# ----------------------
-
-# --- Initialise the energy function from parameter file
 def substrate_from_params(params):
-    """Initialise a substrate from a parameter dictionary (usually from JSON file)
+    """Build substrate energy functions from a parameter dictionary.
 
-    Returns the functions computing the particle-wise and total energy, and the list of potential-specific paramters to pass to these functions.
+    This is the standard entry point for production use.  The dictionary
+    is typically loaded from a JSON input file.
+
+    Supported well shapes and required keys:
+
+        'gaussian':  epsilon, sigma, a, b, b1, b2, sub_basis
+        'tanh':      epsilon, wd (=ww), a, b, b1, b2, sub_basis
+        'sin':       epsilon, ks, sub_basis
+
+    For 'gaussian' and 'tanh', b1 and b2 are the primitive lattice vectors
+    used to build the metric matrices (via calc_matrices_bvect).
+
+    For 'sin', ks should be a pre-computed (n, 2) array (e.g. from get_ks).
+    No metric matrices are needed because the plane-wave potential is
+    already periodic by construction.
+
+    Args:
+        params: dict with at least 'well_shape', 'epsilon', 'sub_basis',
+                and shape-specific keys listed above.
+
+    Returns:
+        pen_func:  particle-level function (pos, pos_torque, *en_inputs).
+        en_func:   total function        (pos, pos_torque, *en_inputs).
+        en_inputs: list of positional arguments to pass after pos_torque.
+
+    Raises:
+        NotImplementedError: if well_shape is not recognised.
     """
+    epsilon    = params['epsilon']
+    well_shape = params['well_shape']
+    basis      = params['sub_basis']
 
-
-    # Read params
-    epsilon, well_shape =  params['epsilon'], params['well_shape']
-    basis = params['sub_basis']
-    # define well shape
     if well_shape == 'gaussian':
-        pen_func, en_func = particle_en_gaussian, calc_en_gaussian
-        sigma, a, b = params['sigma'], params['a'], params['b']
+        sigma = params['sigma']
+        a, b  = params['a'], params['b']
         u, u_inv = calc_matrices_bvect(params['b1'], params['b2'])
+        pen_func = particle_en_gaussian
+        en_func  = calc_en_gaussian
         en_inputs = [basis, a, b, sigma, epsilon, u, u_inv]
+
     elif well_shape == 'tanh':
-        pen_func, en_func = particle_en_tanh, calc_en_tanh
-        wd, a, b = params['wd'], params['a'], params['b']
+        ww   = params['wd']   # 'wd' is the historical key; ww in the code
+        a, b = params['a'], params['b']
         u, u_inv = calc_matrices_bvect(params['b1'], params['b2'])
-        en_inputs = [basis, a, b, wd, epsilon, u, u_inv]
+        pen_func = particle_en_tanh
+        en_func  = calc_en_tanh
+        en_inputs = [basis, a, b, ww, epsilon, u, u_inv]
+
     elif well_shape == 'sin':
-        pen_func, en_func = particle_en_sin, calc_en_sin
-        ks = params['ks']
+        ks = np.asarray(params['ks'], dtype=np.float64)
+        pen_func = particle_en_sin
+        en_func  = calc_en_sin
         en_inputs = [basis, ks, epsilon]
+
     else:
-        raise NotImplementedError("Well shape %s not implemented" % well_shape)
+        raise NotImplementedError(
+            "Unknown well shape '%s'.  Supported: 'gaussian', 'tanh', 'sin'."
+            % well_shape
+        )
 
     return pen_func, en_func, en_inputs
