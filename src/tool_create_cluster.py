@@ -1,455 +1,572 @@
 #!/usr/bin/env python3
+"""
+Cluster creation utilities for rigid-cluster simulations.
 
-import sys, argparse
-from argparse import RawTextHelpFormatter
+A cluster is always an (N, 2) float64 ndarray of (x, y) positions with the
+center of mass at the origin.  Nothing else -- no (N,6) legacy format, no
+hidden state, no file intermediaries in the shape functions.
+
+The cluster is built from a Bravais lattice defined by two primitive vectors
+a1, a2 (each shape (2,)).  N1, N2 count unit cells along each direction and
+control the cluster size.  The precise meaning of N1, N2 depends on shape:
+
+    circle       : encloses N1*N2 particles at correct areal density
+    hexagon      : N1 particles per edge of the hexagon
+    rectangle    : N1 (N2) cells along the a1 (a2) direction
+    triangle     : triangle spanned by N1*a1, N2*a2
+    parallelogram: sqrt(N1*N2) x sqrt(N1*N2) lattice (sqrt must be odd int)
+    ellipse      : search grid; semi-axes rx, ry given in physical units
+
+Units follow the calling code; no unit conversion is done here.
+
+ASE and Shapely are optional dependencies -- their imports are guarded and
+raise ImportError with installation hints if absent.
+"""
+
 import numpy as np
+from numpy import pi, sqrt
 
-"""
-Function to create finite-size flakes from lattices.
-"""
 
-def calc_cluster_langevin(eta, pos):
-    """Compute the effective translational and rotational damping acting on a CM of a cluster of N particles"""
+# ============================================================
+# Rotation
+# ============================================================
 
-    N = pos.shape[0] # Size of the cluster
-    # CM translational viscosity [fKg/ms]
-    etat_eff = eta*N
-    # CM rotational viscosity [micron^2*fKg/ms]
-    etar_eff = eta*np.sum(pos**2) # Prop to N^2. Varying with shape.
-    #etar_eff = eta*N**2 # Not varying with shape.
-    return etat_eff, etar_eff
+def rotate(pos, angle_deg, center=(0, 0)):
+    """Rotate positions counter-clockwise by angle_deg degrees about center.
 
-def save_xyz(pos, outfname='cluster.xyz', elem='X'):
-    """Save cluster as xyz in given file (default 'cluster.xyz')"""
-    N = pos.shape[0]
-    xyz_out = open(outfname, 'w')
-    xyz_out.write(str(N) + '\n#\n')
-    for i in range(N):
-        print(elem + " %20.15f %20.15f %20.15f" % tuple(pos[i,:3]), file=xyz_out)
-    xyz_out.close()
+    Args:
+        pos:       (N, 2) array-like -- input positions.
+        angle_deg: float             -- rotation angle in degrees (ACW positive).
+        center:    (2,) array-like   -- rotation center (default origin).
 
-def load_cluster(input_hex, angle=0, center=False):
-    """Load cluster form numpy file data. Optionally adjust CM and rotate."""
+    Returns:
+        (N, 2) float64 ndarray -- rotated positions.
+    """
+    pos    = np.asarray(pos, dtype=np.float64)
+    center = np.asarray(center, dtype=np.float64)
+    theta  = angle_deg * pi / 180.0
+    c, s   = np.cos(theta), np.sin(theta)
+    R      = np.array([[c, -s], [s, c]])
+    # Translate to origin, rotate, translate back.
+    return (R @ (pos - center).T).T + center
 
-    #pos = np.loadtxt(input_hex)
-    pos = np.load(input_hex)
-    if center: pos -= np.average(pos, axis=0 )
-    pos = rotate(pos, angle)
+
+# ============================================================
+# Shape-specific internal builders
+# ============================================================
+
+def _make_cluster_circle(a1, a2, N1, N2):
+    """Build a circular cluster of approximately N1*N2 particles.
+
+    Radius R = sqrt(N1*N2*|a1 x a2|/pi) so that the disk area equals the
+    area of N1*N2 unit cells, giving the correct areal density regardless of
+    lattice geometry.
+
+    Args:
+        a1, a2: (2,) float64 -- primitive lattice vectors.
+        N1, N2: int          -- grid repetitions (control total particle count).
+
+    Returns:
+        (N, 2) float64 ndarray, CM at origin.
+    """
+    cell_area = abs(a1[0]*a2[1] - a1[1]*a2[0])
+    R2        = N1 * N2 * cell_area / pi  # R^2; avoids the sqrt in the loop
+    M         = 2 * (N1 + N2)
+
+    pts = []
+    for i in range(-M, M + 1):
+        for j in range(-M, M + 1):
+            x = j*a1[0] + i*a2[0]
+            y = j*a1[1] + i*a2[1]
+            if x*x + y*y < R2:
+                pts.append([x, y])
+
+    pos = np.array(pts, dtype=np.float64)
+    pos -= np.mean(pos, axis=0)
     return pos
 
-def get_rotomatr(angle):
-    """Get ACW rotation matrix of an angle [degree] """
-    roto_mtr = np.array([[np.cos(angle/180*np.pi), np.sin(angle/180*np.pi)],
-                         [-np.sin(angle/180*np.pi), np.cos(angle/180*np.pi)]])
-    return roto_mtr
 
-def rotate(pos, angle, c=[0,0]):
-    """Rotate positions pos of angle [degree] with respect to center c (default 0,0)"""
-    # Equivalent to EP below, but faster. Or should be! - AS
-    #for i in range(pos.shape[0]):
-    #    newx = pos[i,0] * np.cos(angle/180*np.pi) - pos[i,1] * np.sin(angle/180*np.pi)
-    #    newy = pos[i,0] * np.sin(angle/180*np.pi) + pos[i,1] * np.cos(angle/180*np.pi)
-    #    pos[i,0] = newx
-    #    pos[i,1] = newy
-    roto_mtr = np.array([[np.cos(angle/180*np.pi), -np.sin(angle/180*np.pi)],
-                         [np.sin(angle/180*np.pi), np.cos(angle/180*np.pi)]])
-    pos = np.dot(roto_mtr, (pos-c).T).T # NumPy inverted convention on row/col
-    return pos + c
+def _make_cluster_hexagon(a1, a2, N1, N2):
+    """Build a hexagonal cluster with N1 particles per edge.
 
-def create_cluster(input_cluster, angle=0):
-    """Create clusters taking as input the two primitive vectors a1 and a2 and the indices of lattice points.
-    Put center of mass in zero."""
+    The index-space loop follows the shape of a 2D hexagon aligned with the
+    a1 direction.  Works for any lattice but is most naturally a regular
+    hexagon for the triangular lattice.
 
-    file = open(input_cluster, 'r')
-    N = int(file.readline())
-    a1 = [float(x) for x in file.readline().split()]
-    a2 = [float(x) for x in file.readline().split()]
-    pos = np.zeros((N,2))
-    for i in range(N):
-        index = [float(x) for x in file.readline().split()]
-        pos[i,0] = index[0]*a1[0]+index[1]*a2[0]
-        pos[i,1] = index[0]*a1[1]+index[1]*a2[1]
-    pos -= np.average(pos,axis=0)
-    pos = rotate(pos, angle)
-    return pos
+    Args:
+        a1, a2: (2,) float64 -- primitive lattice vectors.
+        N1, N2: int          -- N1 controls the hexagon side length.
 
-def create_input_hex(N1, N2, clgeom_fname='in.hex', a1=np.array([4.45, 0]), a2=np.array([-4.45/2, 4.45*np.sqrt(3)/2])):
-    """Create input file in EP .hex format
-
-    Cluster is created from Bravais lattice a1 a2 with N1 repetition along a1 and N2 repetitions along N2.
-    Default is Xin colloids: triangular with spacing 4.45"""
-
-    clgeom_file = open(clgeom_fname, 'w')
-    print("%i %i" % (N1, N2), file=clgeom_file)
-    print("%15.10g %15.10g" % (a1[0], a1[1]), file=clgeom_file)
-    print("%15.10g %15.10g" % (a2[0], a2[1]), file=clgeom_file)
-    clgeom_file.close() # Close file so MD function can read it
-
-    return clgeom_fname
-
-def load_input_hex(instream):
-    """Load .hex file defining lattice and size"""
-    N1, N2 = [int(x) for x in instream.readline().split()]
-    a1 = np.array([float(x) for x in instream.readline().split()])
-    a2 = np.array([float(x) for x in instream.readline().split()])
-    return N1, N2, a1, a2
-
-def create_cluster_circle(input_hex, outstream=sys.stdout, X0=0, Y0=0):
-    """Circle cluster
-
-    The 6 dimensions are for backward compatibility with EP."""
-    # Load lattice
-    infile = open(input_hex, 'r')
-    N1, N2, a1, a2 = load_input_hex(infile)
-    infile.close()
-    a1norm, a2norm = np.linalg.norm(a1), np.linalg.norm(a2)
-
-    # Create the positions
-    pos, ipos = np.zeros((0,6)), np.zeros((0,2), dtype='int')
-    iN = 0
-    for i in range(-N1*2+1, N1*2+1):
-        for j in range(-N2*2+1, N2*2+1):
-            X = j*a1[0]+i*a2[0]
-            Y = j*a1[1]+i*a2[1]
-            if ((X*X + Y*Y) < N1/2*N2/2*a1norm*a2norm):
-                pos = np.append(pos,[[X,Y,0,0,0,0]], axis=0)
-                ipos = np.append(ipos,[[j, i]], axis=0)
-                iN = iN+1
-    # Save the positions
-    print(iN, file=outstream)
-    print(a1[0], a1[1], file=outstream)
-    print(a2[0], a2[1], file=outstream)
-    for i in range(iN):
-        print(ipos[i,0], ipos[i,1], file=outstream)
-    # CM in X0,Y0
-    pos = pos - np.mean(pos,axis=0) + np.array([X0, Y0, 0.0, 0.0, 0.0, 0.0], dtype=float)
-    return pos
-
-def create_cluster_hex(input_hex, outstream=sys.stdout, X0=0, Y0=0):
-    """Hexagonal cluster
-
-    The 6 dimensions are for backward compatibility with EP."""
-    # Load lattice
-    file = open(input_hex, 'r')
-    N1, N2, a1, a2 = load_input_hex(file)
-    file.close()
-
-    N = int(N1*N2+((N2-1)*N2)/2+N2*(N1-1)+((N1-2)*(N1-1))/2)
-    pos = np.zeros((N,6))
-    # Create and print at the same time
-    iN = 0
-    print('{}'.format(N), file=outstream)
-    print('{} {}'.format(a1[0], a1[1]), file=outstream)
-    print('{} {}'.format(a2[0], a2[1]), file=outstream)
+    Returns:
+        (N, 2) float64 ndarray, CM at origin.
+    """
+    pts = []
+    # Lower half (including equator): each row gains one extra particle.
     for i in range(N2):
-        for j in range(N1+i):
-            pos[iN,0] = j*a1[0]+i*a2[0]
-            pos[iN,1] = j*a1[1]+i*a2[1]
-            print('{} {}'.format(i, j), file=outstream)
-            iN = iN+1
-    for i in range(N2,(N2+N1-1)):
-        for j in range(N1+N2-2,i-N2,-1):
-            pos[iN,0] = j*a1[0]+i*a2[0]
-            pos[iN,1] = j*a1[1]+i*a2[1]
-            print('{} {}'.format(i,j), file=outstream)
-            iN = iN+1
-    # CM in X0,Y0
-    pos = pos - np.mean(pos,axis=0) + np.array([X0, Y0, 0.0, 0.0, 0.0, 0.0], dtype=float)
-    return pos
+        for j in range(N1 + i):
+            pts.append([j*a1[0] + i*a2[0], j*a1[1] + i*a2[1]])
+    # Upper half: each row loses one particle.
+    for i in range(N2, N2 + N1 - 1):
+        for j in range(N1 + N2 - 2, i - N2, -1):
+            pts.append([j*a1[0] + i*a2[0], j*a1[1] + i*a2[1]])
 
-def create_cluster_special(input_hex, outstream=sys.stdout, X0=0, Y0=0):
-    """Special-parall cluster. See paper on XXX.
-
-    The 6 dimensions are for backward compatibility with EP."""
-    file = open(input_hex, 'r')
-    N1, N2, a1, a2 = load_input_hex(file)
-    file.close()
-
-    if N1!=N2: raise ValueError("Need same N for special rect")
-    if (np.sqrt(N1)-1)/2 % 1 > 1e-10: raise ValueError("Need N so that (sqrt(N)-1)/2 is integer! Now %.5g" % ((np.sqrt(N1)-1)/2))
-    a1norm, a2norm = np.linalg.norm(a1), np.linalg.norm(a2)
-    # Create
-    pos, ipos = np.zeros((0,6)), np.zeros((0,2), dtype='int')
-    iN = 0
-    for i in np.arange(-(np.sqrt(N1)-1)/2, (np.sqrt(N1)-1)/2+1):
-        for j in np.arange(-(np.sqrt(N2)-1)/2, (np.sqrt(N2)-1)/2+1):
-            X = j*a1[0]+i*a2[0]
-            Y = j*a1[1]+i*a2[1]
-            if (np.abs(X) < N1/2*a1norm) and (np.abs(Y) < N2/2*a2norm):
-                pos = np.append(pos,[[X,Y,0,0,0,0]], axis=0)
-                ipos = np.append(ipos,[[j, i]], axis=0)
-                iN = iN+1
-    # Save
-    print(iN, file=outstream)
-    print(a1[0], a1[1], file=outstream)
-    print(a2[0], a2[1], file=outstream)
-    for i in range(iN):
-        print(ipos[i,0], ipos[i,1], file=outstream)
-    # CM in X0,Y0
-    pos = pos - np.mean(pos,axis=0) + np.array([X0, Y0, 0.0, 0.0, 0.0, 0.0], dtype=float)
+    pos = np.array(pts, dtype=np.float64)
+    pos -= np.mean(pos, axis=0)
     return pos
 
 
-def create_cluster_rect(input_hex, outstream=sys.stdout, X0=0, Y0=0):
-    """Rectangular cluster
+def _make_cluster_rectangle(a1, a2, N1, N2):
+    """Build a rectangular cluster fitting N1 x N2 unit cells.
 
-    The 6 dimensions are for backward compatibility with EP."""
-    file = open(input_hex, 'r')
-    N1, N2, a1, a2 = load_input_hex(file)
-    file.close()
+    Includes lattice points with |x| < N1/2 * |a1| and |y| < N2/2 * |a2|.
+    This is an exact rectangle only for orthogonal lattices; for oblique
+    lattices it is an approximation of a rectangular region.
+
+    Args:
+        a1, a2: (2,) float64 -- primitive lattice vectors.
+        N1, N2: int          -- half-widths in units of |a1|, |a2|.
+
+    Returns:
+        (N, 2) float64 ndarray, CM at origin.
+    """
     a1norm = np.linalg.norm(a1)
     a2norm = np.linalg.norm(a2)
-    # Calculate
-    pos, ipos = np.zeros((0,6)), np.zeros((0,2), dtype='int')
-    iN = 0
-    for i in range(-N1*2+1, N1*2+1):
-        for j in range(-N2*2+1, N2*2+1):
-            X = j*a1[0]+i*a2[0]
-            Y = j*a1[1]+i*a2[1]
-            if (np.abs(X) < N1/2*a1norm) and (np.abs(Y) < N2/2*a2norm):
-                pos = np.append(pos,[[X,Y,0,0,0,0]], axis=0)
-                ipos = np.append(ipos,[[j, i]], axis=0)
-                iN = iN+1
-    # Save
-    print(iN, file=outstream)
-    print(a1[0], a1[1], file=outstream)
-    print(a2[0], a2[1], file=outstream)
-    for i in range(iN):
-        print(ipos[i,0], ipos[i,1], file=outstream)
-    # CM in X0,Y0
-    pos = pos - np.mean(pos,axis=0) + np.array([X0, Y0, 0.0, 0.0, 0.0, 0.0], dtype=float)
+    xlim   = N1 / 2.0 * a1norm
+    ylim   = N2 / 2.0 * a2norm
+    M      = 2 * (N1 + N2)
+
+    pts = []
+    for i in range(-M, M + 1):
+        for j in range(-M, M + 1):
+            x = j*a1[0] + i*a2[0]
+            y = j*a1[1] + i*a2[1]
+            if abs(x) < xlim and abs(y) < ylim:
+                pts.append([x, y])
+
+    pos = np.array(pts, dtype=np.float64)
+    pos -= np.mean(pos, axis=0)
     return pos
 
-def create_cluster_tri(input_hex, outstream=sys.stdout, X0=0, Y0=0):
-    """Triangular cluster
 
-    The 6 dimensions are for backward compatibility with EP."""
-    file = open(input_hex, 'r')
-    N1, N2, a1, a2 = load_input_hex(file)
-    file.close()
+def _make_cluster_triangle(a1, a2, N1, N2):
+    """Build a triangular cluster using barycentric coordinates.
 
-    # Create with baricentric coordinates
-    x1, y1 = N1*a1
-    x2, y2 = N2*a2
-    x3, y3 = -(N1*a1+N2*a2)
-    pos = np.zeros((0,6))
-    ipos = np.zeros((0,2), dtype='int')
-    iN = 0
-    for i in range(-N1*2+1, N1*2+1):
-        for j in range(-N2*2+1, N2*2+1):
-            x = j*a1[0]+i*a2[0]
-            y = j*a1[1]+i*a2[1]
-            denom = ((y2 - y3)*(x1 - x3) + (x3 - x2)*(y1 - y3))
-            a = ((y2 - y3)*(x - x3) + (x3 - x2)*(y - y3)) / denom
-            b = ((y3 - y1)*(x - x3) + (x1 - x3)*(y - y3)) / denom
-            c = 1 - a - b
-            if ((0 < a and a < 1)
-                and (0 < b and b < 1)
-                and (0 < c and c< 1)):
-                pos = np.append(pos,[[x,y,0,0,0,0]], axis=0)
-                ipos = np.append(ipos,[[j, i]], axis=0)
-                iN = iN+1
-    # Save
-    print(iN, file=outstream)
-    print(a1[0], a1[1], file=outstream)
-    print(a2[0], a2[1], file=outstream)
-    for i in range(iN):
-        print(ipos[i,0], ipos[i,1], file=outstream)
-    pos = pos - np.mean(pos,axis=0) + np.array([X0, Y0, 0.0, 0.0, 0.0, 0.0], dtype=float)
+    The triangle has vertices N1*a1, N2*a2, and -(N1*a1 + N2*a2).
+    Barycentric filtering ensures a clean triangular boundary for any lattice.
+
+    Args:
+        a1, a2: (2,) float64 -- primitive lattice vectors.
+        N1, N2: int          -- scale the triangle vertices.
+
+    Returns:
+        (N, 2) float64 ndarray, CM at origin.
+    """
+    x1, y1 =  N1 * a1
+    x2, y2 =  N2 * a2
+    x3, y3 = -(N1*a1 + N2*a2)
+    denom  = (y2 - y3)*(x1 - x3) + (x3 - x2)*(y1 - y3)
+    M      = 2 * (N1 + N2)
+
+    pts = []
+    for i in range(-M, M + 1):
+        for j in range(-M, M + 1):
+            x = j*a1[0] + i*a2[0]
+            y = j*a1[1] + i*a2[1]
+            # Barycentric coordinates of (x,y) w.r.t. the three vertices.
+            ba = ((y2 - y3)*(x - x3) + (x3 - x2)*(y - y3)) / denom
+            bb = ((y3 - y1)*(x - x3) + (x1 - x3)*(y - y3)) / denom
+            bc = 1.0 - ba - bb
+            if 0.0 < ba < 1.0 and 0.0 < bb < 1.0 and 0.0 < bc < 1.0:
+                pts.append([x, y])
+
+    pos = np.array(pts, dtype=np.float64)
+    pos -= np.mean(pos, axis=0)
     return pos
 
-def cluster_inhex_Nl(N1, N2,  a1=np.array([4.45, 0]), a2=np.array([-4.45/2, 4.45*np.sqrt(3)/2]),
-                     clgeom_fname="input_pos.hex", cluster_f=create_cluster_circle, X0=0, Y0=0):
-    """Create a cluster from lattice details (equivalent to .hex file) and specific shape function.
 
-    The .hex file will be created and removed using tempfile.
-    Returns only xy positions.
+def _make_cluster_parallelogram(a1, a2, N1, N2):
+    """Build the special parallelogram from Nanoscale 2022 (Section V.A, eq. 16).
 
-    Default values relate to Xin/EP colloids [Nat. Phys 2019, PRE 2021] and circular shape"""
-    from tempfile import NamedTemporaryFile
-    clgeom_file = open(clgeom_fname, 'w') # Save position file for MD/static/driver module to read it
-    with NamedTemporaryFile(prefix='hex', suffix='tmp', delete=True) as tmp: # write input on tempfile. Delete once used
-        tmp.write(bytes("%i %i\n" % (N1, N2), encoding='utf-8'))
-        tmp.write(bytes("%15.10g %15.10g\n" % (a1[0], a1[1]), encoding='utf-8'))
-        tmp.write(bytes("%15.10g %15.10g\n" % (a2[0], a2[1]), encoding='utf-8'))
-        tmp.seek(0) # Reset 'reading needle'
-        pos = cluster_f(tmp.name, clgeom_file, X0=X0, Y0=Y0)[:,:2] # Pass name of tempfile to create function. Only keep xy pos.
-    clgeom_file.close() # Close file so MD function can read it
+    Positions: R_j = j1*a1 + j2*a2  with
+        j1, j2 in {-(n-1)/2, ..., 0, ..., (n-1)/2},  n = sqrt(N1*N2).
 
-    return pos, clgeom_fname
+    n must be an odd integer; otherwise the lattice lacks the j=0 site that
+    centres the CM at the origin.  The shape admits a closed-form weight
+    function W that makes scaling-law analysis tractable.
 
-def cluster_from_params(params):
-    """Create cluster from parameters in dictionary.
+    Args:
+        a1, a2: (2,) float64 -- primitive lattice vectors.
+        N1, N2: int          -- N1*N2 is the total number of particles.
 
-    Return xy positions"""
+    Returns:
+        (N1*N2, 2) float64 ndarray, CM at origin.
 
-    # Read params
-    clt_shape = params['cluster_shape'] # Select function associate to different cluster shape
-    # define cluster shape
-    if clt_shape == 'circle':
-        create_cluster = create_cluster_circle
-    elif clt_shape == 'hexagon':
-        create_cluster = create_cluster_hex
-    elif clt_shape == 'rectangle':
-        create_cluster = create_cluster_rect
-    elif clt_shape == 'triangle':
-        create_cluster = create_cluster_tri
-    elif clt_shape == 'special':
-        create_cluster = create_cluster_special
-    elif clt_shape == 'polygon':
-        # Get poly
-        poly = get_poly(params['cl_poly'])
-        direction = params['direction'] if 'direction' in params.keys() else 0
-        return cluster_poly(poly, params, direction) # Create cluster by masking poly
-    else:
-        raise NotImplementedError("Shape %s not implemented" % clt_shape)
-    # Define cluster
-    a1, a2, = np.array(params['a1']), np.array(params['a2'])
-    N1, N2 = params['N1'], params['N2']
-    from tempfile import NamedTemporaryFile
-    with NamedTemporaryFile(prefix='inhex', suffix='tmp', delete=True) as tmp: # write input on tempfile. Delete once used
-        pos, _ = cluster_inhex_Nl(N1, N2, a1=a1, a2=a2, clgeom_fname=tmp.name, cluster_f=create_cluster)
+    Raises:
+        ValueError: if sqrt(N1*N2) is not an odd integer.
+    """
+    N    = N1 * N2
+    sqN  = sqrt(float(N))
+    n    = int(round(sqN))
+    if abs(sqN - n) > 1e-9 or n % 2 == 0:
+        raise ValueError(
+            "Parallelogram requires sqrt(N1*N2) to be an odd integer; "
+            "got N1=%d, N2=%d => sqrt(N1*N2) = %.6g." % (N1, N2, sqN)
+        )
 
-    pos = add_basis(pos, params['cl_basis'])
+    half = (n - 1) // 2
+    pts  = []
+    for i in range(-half, half + 1):
+        for j in range(-half, half + 1):
+            pts.append([j*a1[0] + i*a2[0], j*a1[1] + i*a2[1]])
+
+    pos = np.array(pts, dtype=np.float64)
+    # CM is exactly zero by symmetry (sum of j over symmetric range = 0),
+    # but subtract mean anyway to absorb floating-point rounding.
+    pos -= np.mean(pos, axis=0)
     return pos
 
-def get_poly(points, scale=1, tho=0, c=[0,0], shift=0, cm=False):
-    """Get a polygon (Shapely obejct) from a set of points.
 
-    Optinally rotate, scale and shfit"""
-    from tool_create_cluster import rotate
-    from shapely.geometry import Polygon
-    points = scale*np.asarray(points) # scale the points
-    if cm: points -= np.mean(points) # rotate around the cm
-    points = rotate(points, tho, c) # rotate the cutting poligon
-    points += np.asarray(shift) # shift, useful to tailor the masking
-    return Polygon(points) # Get a handy poligon object
+def _make_cluster_ellipse(a1, a2, N1, N2, rx, ry):
+    """Build an elliptical cluster with semi-axes rx and ry.
 
-def cluster_poly(polygon, params, direction=0):
-    """Use a polygon (shapely object) to mask a lattice (defined in params).
+    Includes all lattice points satisfying (x/rx)^2 + (y/ry)^2 < 1.
+    N1, N2 control the grid search radius; increase them if the ellipse
+    extends beyond 2*(N1+N2) lattice spacings.
 
-    Direction = 0: select the interior of the polygon (use bounds of polygon to define lattice big enough for mask)
-    Direction = 1: select the exterior of the polygon (up to the N1 N2 in params)
+    Args:
+        a1, a2: (2,) float64 -- primitive lattice vectors.
+        N1, N2: int          -- search grid half-size.
+        rx:     float        -- semi-axis along x (same units as a1, a2).
+        ry:     float        -- semi-axis along y.
 
-    Return xy pos"""
-    # Build a grid large enough for the polygon.
-    # Is grid shape specify?
-    if 'masked_shape' not in params.keys(): params['cluster_shape'] = 'rectangle'
-    else: params['cluster_shape'] = params['masked_shape']
-    if direction == 0: # Get minimum size for
-        l = np.max([np.linalg.norm(params['a1']), np.linalg.norm(params['a2'])])
-        Nlbound = 3*int(np.ceil(np.max(np.abs(polygon.bounds)/l)))
-        params['N1'], params['N2'] = Nlbound, Nlbound
-    pos = cluster_from_params(params)
-    if 'theta' in params.keys(): pos = rotate(pos, params['theta']) # rotate the lattice
+    Returns:
+        (N, 2) float64 ndarray, CM at origin.
+    """
+    M   = 2 * (N1 + N2)
+    rx2 = rx * rx
+    ry2 = ry * ry
 
-    # Mask: direction = 0 include, direction = 1 exclude
-    from shapely.geometry import MultiPoint
-    Ppos = MultiPoint(pos) # Needs to be a set of point
-    # This might be slow for large polygons
-    mask = np.array([int(polygon.contains(i)) - bool(direction) # For each point, ask if it's in/out
-                     for i in Ppos.geoms],
-                    dtype=bool)
-    # Masked positions
-    return pos[mask]
+    pts = []
+    for i in range(-M, M + 1):
+        for j in range(-M, M + 1):
+            x = j*a1[0] + i*a2[0]
+            y = j*a1[1] + i*a2[1]
+            if x*x / rx2 + y*y / ry2 < 1.0:
+                pts.append([x, y])
+
+    pos = np.array(pts, dtype=np.float64)
+    pos -= np.mean(pos, axis=0)
+    return pos
+
+
+# ============================================================
+# Public factory
+# ============================================================
+
+_SHAPE_FUNCS = {
+    'circle':        _make_cluster_circle,
+    'hexagon':       _make_cluster_hexagon,
+    'rectangle':     _make_cluster_rectangle,
+    'triangle':      _make_cluster_triangle,
+    'parallelogram': _make_cluster_parallelogram,
+    'ellipse':       _make_cluster_ellipse,
+}
+
+
+def make_cluster(a1, a2, N1, N2, shape='circle', **shape_kwargs):
+    """Build a finite-size 2D lattice cluster of the requested shape.
+
+    Args:
+        a1, a2:       array-like (2,) -- primitive lattice vectors.
+        N1, N2:       int             -- grid repetitions (shape-dependent meaning).
+        shape:        str             -- one of 'circle', 'hexagon', 'rectangle',
+                                        'triangle', 'parallelogram', 'ellipse'.
+        **shape_kwargs:               -- extra arguments forwarded to the internal
+                                        builder.  Currently used only for 'ellipse'
+                                        (rx, ry: float semi-axes in physical units).
+
+    Returns:
+        (N, 2) float64 ndarray -- particle positions with CM at origin.
+
+    Raises:
+        ValueError:         if shape is not recognised, or if shape constraints
+                            are violated (e.g. parallelogram with even sqrt(N)).
+    """
+    if shape not in _SHAPE_FUNCS:
+        raise ValueError(
+            "Unknown shape '%s'.  Supported: %s."
+            % (shape, ', '.join(sorted(_SHAPE_FUNCS)))
+        )
+    a1 = np.asarray(a1, dtype=np.float64)
+    a2 = np.asarray(a2, dtype=np.float64)
+    return _SHAPE_FUNCS[shape](a1, a2, int(N1), int(N2), **shape_kwargs)
+
+
+# ============================================================
+# I/O
+# ============================================================
+
+def save_cluster(pos, filename):
+    """Save cluster positions as a .npy file.
+
+    Args:
+        pos:      (N, 2) array-like -- particle positions.
+        filename: str               -- output path (extension added by np.save).
+    """
+    np.save(filename, np.asarray(pos, dtype=np.float64))
+
+
+def load_cluster(filename, angle_deg=0):
+    """Load cluster from .npy file, optionally rotate, then re-centre CM.
+
+    Args:
+        filename:  str   -- path to .npy file (with or without '.npy').
+        angle_deg: float -- ACW rotation applied before recentring (degrees).
+
+    Returns:
+        (N, 2) float64 ndarray, CM at origin.
+    """
+    pos = np.load(filename).astype(np.float64)
+    if angle_deg != 0.0:
+        pos = rotate(pos, angle_deg)
+    pos -= np.mean(pos, axis=0)
+    return pos
+
+
+def save_xyz(pos, filename, elem='X'):
+    """Write an XYZ file for visualisation (z coordinate set to zero).
+
+    Args:
+        pos:      (N, 2) array-like -- particle positions.
+        filename: str               -- output path.
+        elem:     str               -- element symbol written in each line.
+    """
+    pos = np.asarray(pos, dtype=np.float64)
+    N   = pos.shape[0]
+    with open(filename, 'w') as f:
+        f.write('%d\n#\n' % N)
+        for i in range(N):
+            f.write('%s %20.15f %20.15f %20.15f\n' % (elem, pos[i, 0], pos[i, 1], 0.0))
+
+
+# ============================================================
+# Utilities
+# ============================================================
 
 def add_basis(lat_pos, basis):
-    """Add a crystal basis to a simple Bravais lattice"""
-    pos = lat_pos[:, np.newaxis,:] +  basis
-    return np.reshape(pos, (pos.shape[0]*pos.shape[1], 2))
+    """Tile a Bravais lattice with a crystal basis.
 
-def params_from_ASE(ase_geom, cut_z=0, tol=0.9):
-    """Create JSON parameters to create clusters from ASE Atoms object.
+    Each lattice point is displaced by every basis vector; the results are
+    flattened into a single (N*M, 2) array.
 
-    Assume this is already a 2D surface oriented along z to extract 2x2 matrix:
-    From:
-      a b 0
-      c d 0
-      0 0 1
-    Take:
-      a b
-      c d
-    Positions are flattend out: (x,y) from (x,y,z)
+    Args:
+        lat_pos: (N, 2) array-like -- Bravais lattice positions.
+        basis:   (M, 2) array-like -- basis site offsets relative to each
+                                      lattice point.
 
-    Return parameters dictionary and list of z coordinates considered"""
+    Returns:
+        (N*M, 2) float64 ndarray.
+    """
+    lat_pos = np.asarray(lat_pos, dtype=np.float64)
+    basis   = np.asarray(basis,   dtype=np.float64)
+    # Broadcasting: (N, 1, 2) + (M, 2) -> (N, M, 2) -> (N*M, 2)
+    expanded = lat_pos[:, np.newaxis, :] + basis
+    return expanded.reshape(expanded.shape[0] * expanded.shape[1], 2)
 
-    # Extarct 2D sys
-    cell2d = ase_geom.cell.array[[0,1], :2]
-    pos2d = ase_geom.positions[:,:2]
-    # Mask single layer
-    pos_z = ase_geom.positions[:,2]
-    #pos_z -= np.min(pos_z)
-    if cut_z == 0:
-        cut_z = np.std(pos_z)
-        print('No cut_z given, used std=%.4g' % cut_z, file=sys.stderr)
-    mask = pos_z<cut_z*tol
-    pos2d = pos2d[mask]
-    print('%s: Selcted %i atoms at z:' % (__name__, len(pos_z[mask])), pos_z[mask], file=sys.stderr)
-    if len(pos2d) == 0: raise RuntimeError('No atoms selected (cut_z=%.4g tol=%.4g)' % (cut_z, tol))
-    params = {
-        'a1': list(cell2d[0]),
-        'a2': list(cell2d[1]),
-        'cl_basis': [list(v) for v in pos2d], # Json encoder can't cope with numpy. Annoying.
-    }
-    return params, pos_z[mask]
 
-def params_from_poscar(poscar_fname, cut_z=0):
-    """Create JSON parameters to create clusters from POSCAR file.
+def calc_cluster_langevin(eta, pos):
+    """Effective translational and rotational damping for overdamped dynamics.
 
-    Use ASE to read.
+    For a cluster of N identical particles with friction coefficient eta:
+        etat_eff = eta * N               (translational, scales as N)
+        etar_eff = eta * sum_i |r_i|^2  (rotational, varies with shape)
 
-    Return parameters file."""
+    Args:
+        eta: float        -- single-particle friction coefficient.
+        pos: (N, 2) ndarray -- particle positions (CM at origin).
 
-    import ase
-    ase_geom = ase.io.read(poscar_fname)
-    return params_from_ASE(ase_geom, cut_z)
+    Returns:
+        (etat_eff, etar_eff): floats.
+    """
+    pos      = np.asarray(pos, dtype=np.float64)
+    N        = pos.shape[0]
+    etat_eff = eta * N
+    etar_eff = eta * np.sum(pos * pos)
+    return etat_eff, etar_eff
 
-if __name__ == "__main__":
 
-    #-------------------------------------------------------------------------------
-    # Argument parser
-    #-------------------------------------------------------------------------------
-    parser = argparse.ArgumentParser(description="""CLI to create finite size cluster
+# ============================================================
+# From parameter dictionary
+# ============================================================
 
-    Read an in.hex input file and create a cluster of the given shape (default circle).
+def cluster_from_params(params):
+    """Build a cluster from a parameter dictionary (for JSON input files).
 
-    Print on stdout:
-    - line 1: the number of particles
-    - line 2: the first lattice vector a1
-    - line 3: the second lattice vector a2
-    - from 4: the indeces i,j of the the current particle with position r = i*a1 + j*a2""",
-    formatter_class=RawTextHelpFormatter)
-    # Positional arguments
-    parser.add_argument('filename',
-                        type=str,
-                        help='in.hex input file. First line containes repetitions N1 N2 along first and second lattice vectors. Second line is first 2D lattice vector, third line is second 2D lattice vector.')
-    # Optional args
-    parser.add_argument('--shape', '-s',
-                        dest='clt_shape', type=str, default='circle',
-                        help='Shape of the cluster')
-    parser.add_argument('--xy',
-                        dest='xy', type=float, nargs=2, default=[0.0, 0.0],
-                        help='x,y coordinates of the center of mass')
+    Required keys:
+        a1, a2:         primitive lattice vectors.
+        N1, N2:         grid repetitions.
+        cluster_shape:  shape string as in make_cluster, plus 'polygon'.
 
-    #-------------------------------------------------------------------------------
-    # Initialize and check variables
-    #-------------------------------------------------------------------------------
-    args = parser.parse_args(sys.argv[1:])
+    Optional keys:
+        cl_basis:  list of (2,) offsets for a multi-site basis
+                   (default [[0,0]] -- single-site Bravais lattice).
+        cl_poly:   vertex list for polygon masking (required if shape='polygon').
+        direction: polygon masking direction -- 0 interior, 1 exterior.
+        theta:     float, rotation in degrees applied after cluster creation.
+        rx, ry:    semi-axes for ellipse shape.
 
-    input_hex = args.filename
-    X0 = 0.0
-    Y0 = 0.0
-    clt_shape = args.clt_shape
-    if clt_shape == 'circle':
-        create_cluster_func = create_cluster_circle
-    elif clt_shape == 'hexagon':
-        create_cluster_func = create_cluster_hex
-    elif clt_shape == 'rect':
-        create_cluster_func = create_cluster_rect
-    elif clt_shape == 'tri':
-        create_cluster_func = create_cluster_tri
+    Returns:
+        (N, 2) float64 ndarray, CM at origin.
+    """
+    a1    = np.array(params['a1'], dtype=np.float64)
+    a2    = np.array(params['a2'], dtype=np.float64)
+    N1    = params['N1']
+    N2    = params['N2']
+    shape = params['cluster_shape']
+
+    if shape == 'polygon':
+        poly      = get_poly(params['cl_poly'])
+        direction = params.get('direction', 0)
+        return cluster_poly(poly, params, direction)
+
+    shape_kwargs = {}
+    if shape == 'ellipse':
+        shape_kwargs['rx'] = float(params['rx'])
+        shape_kwargs['ry'] = float(params['ry'])
+    pos = make_cluster(a1, a2, N1, N2, shape=shape, **shape_kwargs)
+
+    basis = np.array(params.get('cl_basis', [[0.0, 0.0]]), dtype=np.float64)
+    pos   = add_basis(pos, basis)
+    # Re-centre: add_basis may shift CM if basis is asymmetric.
+    pos  -= np.mean(pos, axis=0)
+
+    if 'theta' in params:
+        pos = rotate(pos, float(params['theta']))
+
+    return pos
+
+
+# ============================================================
+# Polygon masking (Shapely optional dependency)
+# ============================================================
+
+def get_poly(points, scale=1, tho=0, c=(0, 0), shift=0, cm=False):
+    """Build a Shapely Polygon from a list of vertices.
+
+    Optionally scale, rotate, and shift the polygon before returning.
+
+    Args:
+        points: array-like (M, 2) -- polygon vertices.
+        scale:  float             -- uniform scale factor.
+        tho:    float             -- rotation angle in degrees (ACW).
+        c:      (2,)              -- rotation centre.
+        shift:  float or (2,)    -- translation applied after rotation.
+        cm:     bool              -- if True, translate vertices so their
+                                    mean is at the origin before rotating.
+
+    Returns:
+        shapely.geometry.Polygon
+    """
+    try:
+        from shapely.geometry import Polygon
+    except ImportError:
+        raise ImportError(
+            "Shapely is required for polygon masking. "
+            "Install with: pip install shapely"
+        )
+    pts = scale * np.asarray(points, dtype=np.float64)
+    if cm:
+        pts -= np.mean(pts, axis=0)
+    pts  = rotate(pts, tho, c)
+    pts += np.asarray(shift, dtype=np.float64)
+    return Polygon(pts)
+
+
+def cluster_poly(polygon, params, direction=0):
+    """Mask a lattice with a Shapely polygon.
+
+    Args:
+        polygon:   shapely.geometry.Polygon -- masking region.
+        params:    dict -- cluster parameters (see cluster_from_params).
+        direction: int  -- 0 = keep interior, 1 = keep exterior.
+
+    Returns:
+        (N, 2) float64 ndarray.
+    """
+    try:
+        from shapely.geometry import MultiPoint
+    except ImportError:
+        raise ImportError(
+            "Shapely is required for polygon masking. "
+            "Install with: pip install shapely"
+        )
+    # Build the background grid.  If not specified, use rectangle large enough
+    # to cover the polygon bounding box.
+    working_params = dict(params)
+    if 'masked_shape' not in working_params:
+        working_params['cluster_shape'] = 'rectangle'
     else:
-        raise ValueError("Shape %s not implemented" % clt_shape)
+        working_params['cluster_shape'] = working_params['masked_shape']
 
-    X0, Y0 = args.xy
-    create_cluster_func(input_hex, X0=X0, Y0=Y0)
+    if direction == 0:
+        a1 = np.array(params['a1'])
+        a2 = np.array(params['a2'])
+        l  = max(np.linalg.norm(a1), np.linalg.norm(a2))
+        Nl = 3 * int(np.ceil(np.max(np.abs(polygon.bounds)) / l))
+        working_params['N1'] = Nl
+        working_params['N2'] = Nl
+
+    pos = cluster_from_params(working_params)
+    if 'theta' in params:
+        pos = rotate(pos, float(params['theta']))
+
+    mpts = MultiPoint(pos)
+    mask = np.array(
+        [int(polygon.contains(pt)) - bool(direction) for pt in mpts.geoms],
+        dtype=bool,
+    )
+    return pos[mask]
+
+
+# ============================================================
+# POSCAR / ASE loader (ASE optional dependency)
+# ============================================================
+
+def cluster_from_poscar(filename, cut_z=0, tol=0.9):
+    """Load a 2D cluster from a POSCAR file via ASE.
+
+    Assumes a surface slab oriented along z.  Selects atoms in the bottom
+    layer by z-coordinate threshold and projects to (x, y).
+
+    Args:
+        filename: str   -- path to POSCAR file.
+        cut_z:    float -- z threshold; atoms with z < cut_z*tol are kept.
+                          If 0, defaults to one standard deviation of all z.
+        tol:      float -- fractional tolerance on cut_z (default 0.9).
+
+    Returns:
+        (N, 2) float64 ndarray, CM at origin.
+
+    Raises:
+        ImportError:  if ASE is not installed.
+        RuntimeError: if no atoms pass the z filter.
+    """
+    try:
+        import ase.io
+    except ImportError:
+        raise ImportError(
+            "ASE is required for cluster_from_poscar. "
+            "Install with: pip install ase"
+        )
+    geom  = ase.io.read(filename)
+    pos_z = geom.positions[:, 2]
+    if cut_z == 0:
+        cut_z = float(np.std(pos_z))
+    mask  = pos_z < cut_z * tol
+    pos2d = geom.positions[mask, :2].astype(np.float64)
+    if len(pos2d) == 0:
+        raise RuntimeError(
+            "No atoms selected (cut_z=%.4g, tol=%.4g)." % (cut_z, tol)
+        )
+    pos2d -= np.mean(pos2d, axis=0)
+    return pos2d
