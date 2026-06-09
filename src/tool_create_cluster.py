@@ -532,20 +532,27 @@ def cluster_poly(polygon, params, direction=0):
 # POSCAR / ASE loader (ASE optional dependency)
 # ============================================================
 
-def cluster_from_poscar(filename, cut_z=0, tol=0.9):
-    """Load a 2D cluster from a POSCAR file via ASE.
+def params_from_poscar(filename, cut_z=0, tol=0.9):
+    """Extract lattice parameters from a POSCAR file via ASE.
 
-    Assumes a surface slab oriented along z.  Selects atoms in the bottom
-    layer by z-coordinate threshold and projects to (x, y).
+    Reads the primitive vectors and atomic basis from a 2D slab POSCAR.
+    The returned dict can be passed directly to cluster_from_params to
+    create a cluster of any shape with the correct lattice geometry.
+
+    The POSCAR must have the 2D periodicity in the first two lattice
+    vectors (a, b); the third vector c must be along z. All z information
+    is discarded -- the geometry is projected to the (x, y) plane.
+    If the slab has multiple layers, use cut_z to select one.
 
     Args:
         filename: str   -- path to POSCAR file.
-        cut_z:    float -- z threshold; atoms with z < cut_z*tol are kept.
-                          If 0, defaults to one standard deviation of all z.
+        cut_z:    float -- keep only atoms with z < cut_z. If 0 (default),
+                          uses one standard deviation of z as threshold.
         tol:      float -- fractional tolerance on cut_z (default 0.9).
 
     Returns:
-        (N, 2) float64 ndarray, CM at origin.
+        dict with keys: 'a1', 'a2', 'cl_basis'
+        pos_z: (M,) array of z coordinates of discarded atoms (for inspection).
 
     Raises:
         ImportError:  if ASE is not installed.
@@ -555,18 +562,36 @@ def cluster_from_poscar(filename, cut_z=0, tol=0.9):
         import ase.io
     except ImportError:
         raise ImportError(
-            "ASE is required for cluster_from_poscar. "
+            "ASE is required for params_from_poscar. "
             "Install with: pip install ase"
         )
+
     geom  = ase.io.read(filename)
+    cell  = geom.cell[:]
+
+    # Primitive vectors from the POSCAR cell (rows of cell matrix).
+    a1 = cell[0, :2].tolist()
+    a2 = cell[1, :2].tolist()
+
+    # Select atoms in the target layer by z threshold.
     pos_z = geom.positions[:, 2]
     if cut_z == 0:
-        cut_z = float(np.std(pos_z))
+        cut_z = float(np.mean(pos_z) - np.std(pos_z))
     mask  = pos_z < cut_z * tol
-    pos2d = geom.positions[mask, :2].astype(np.float64)
+    pos2d = geom.positions[mask, :2]
     if len(pos2d) == 0:
         raise RuntimeError(
-            "No atoms selected (cut_z=%.4g, tol=%.4g)." % (cut_z, tol)
+            "No atoms selected with cut_z=%.4g, tol=%.4g. "
+            "Check the z coordinates of your slab." % (cut_z, tol)
         )
-    pos2d -= np.mean(pos2d, axis=0)
-    return pos2d
+
+    # Express basis in fractional coordinates of a1, a2, then back to
+    # Cartesian -- this ensures basis vectors are within the unit cell.
+    L     = np.array([a1, a2], dtype=np.float64)
+    frac  = np.linalg.solve(L.T, pos2d.T).T
+    frac -= np.floor(frac)           # fold into [0, 1)
+    basis = (frac @ L).tolist()
+
+    params = {'a1': a1, 'a2': a2, 'cl_basis': basis}
+    pos_z_ignored = geom.positions[~mask, 2]
+    return params, pos_z_ignored
