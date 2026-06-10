@@ -13,14 +13,17 @@ the results.
 
 Grid coordinate convention
 --------------------------
-Fractional coordinates (dda1, dda2) in [0, 1) x [0, 1) are converted to
-real-space CM positions via:
+For Bravais-lattice substrates (gaussian, tanh), fractional coordinates
+(dda1, dda2) in [0, 1) x [0, 1) are converted to real-space CM positions via:
 
     pos_cm = u_inv @ np.array([dda1, dda2])
 
 where u_inv is the 2x2 matrix from calc_matrices_bvect (columns are the
-primitive vectors).  For sinusoidal substrates without an explicit unit
-cell, pass np.eye(2) to obtain a Cartesian grid.
+primitive vectors).
+
+For sinusoidal substrates (no unique unit cell) and quasicrystal variants
+(no unit cell at all), pass a pre-built Cartesian grid directly via
+pos_cm_grid and leave u_inv=None.
 
 Parallelism
 -----------
@@ -47,6 +50,7 @@ def _eval_point(args):
 def translational_map(pos, calc_en_f, en_params, u_inv,
                       n_x, n_y,
                       frac_x=(0., 1.), frac_y=(0., 1.),
+                      pos_cm_grid=None,
                       n_jobs=1):
     """Energy landscape as a function of CM position at fixed orientation.
 
@@ -54,34 +58,57 @@ def translational_map(pos, calc_en_f, en_params, u_inv,
     if a non-zero theta is desired).
 
     Args:
-        pos:       (N, 2) ndarray  -- cluster positions in cluster frame.
-        calc_en_f: callable        -- total energy function from substrate_from_params.
-        en_params: list            -- extra arguments for calc_en_f.
-        u_inv:     (2, 2) ndarray  -- metric matrix; use np.eye(2) for sin substrates.
-        n_x:       int             -- grid points along first fractional axis.
-        n_y:       int             -- grid points along second fractional axis.
-        frac_x:    (float, float)  -- fractional range along a1 (default 0 to 1).
-        frac_y:    (float, float)  -- fractional range along a2 (default 0 to 1).
-        n_jobs:    int             -- joblib parallel workers (1 = serial).
+        pos:          (N, 2) ndarray       -- cluster positions in cluster frame.
+        calc_en_f:    callable             -- total energy function from substrate_from_params.
+        en_params:    list                 -- extra arguments for calc_en_f.
+        u_inv:        (2, 2) ndarray or None
+                                           -- metric matrix used to map fractional
+                                              coordinates to Cartesian.  Ignored
+                                              (may be None) when pos_cm_grid is
+                                              supplied.
+        n_x:          int                  -- grid points along first fractional axis;
+                                              ignored when pos_cm_grid is supplied.
+        n_y:          int                  -- grid points along second fractional axis;
+                                              ignored when pos_cm_grid is supplied.
+        frac_x:       (float, float)       -- fractional range along a1 (default 0 to 1);
+                                              ignored when pos_cm_grid is supplied.
+        frac_y:       (float, float)       -- fractional range along a2 (default 0 to 1);
+                                              ignored when pos_cm_grid is supplied.
+        pos_cm_grid:  (M, 2) ndarray or None
+                                           -- explicit CM positions in real space.
+                                              When not None, bypasses all grid
+                                              construction from u_inv/n_x/n_y/frac_*.
+                                              Recommended for sinusoidal substrates
+                                              (no unique unit cell) and for
+                                              quasicrystal symmetries (no unit cell
+                                              at all).
+        n_jobs:       int                  -- joblib parallel workers (1 = serial).
 
     Returns:
         dict with keys:
-            'pos_cm'  : (n_x*n_y, 2) -- CM positions in real space.
-            'energy'  : (n_x*n_y,)
-            'force'   : (n_x*n_y, 2)
-            'torque'  : (n_x*n_y,)
+            'pos_cm'  : (M, 2)  -- CM positions in real space.
+            'energy'  : (M,)
+            'force'   : (M, 2)
+            'torque'  : (M,)
     """
-    u_inv = np.asarray(u_inv, dtype=np.float64)
-    pos   = np.asarray(pos,   dtype=np.float64)
+    pos = np.asarray(pos, dtype=np.float64)
 
-    da1_vals = np.linspace(frac_x[0], frac_x[1], n_x, endpoint=True)
-    da2_vals = np.linspace(frac_y[0], frac_y[1], n_y, endpoint=True)
-
-    grid_pos_cm = np.array([
-        u_inv @ np.array([da1, da2])
-        for da1 in da1_vals
-        for da2 in da2_vals
-    ])
+    if pos_cm_grid is not None:
+        grid_pos_cm = np.asarray(pos_cm_grid, dtype=np.float64)
+    else:
+        if u_inv is None:
+            raise ValueError(
+                "u_inv must be provided when pos_cm_grid is None. "
+                "For sin substrates supply a Cartesian grid via pos_cm_grid."
+            )
+        u_inv = np.asarray(u_inv, dtype=np.float64)
+        da1_vals = np.linspace(frac_x[0], frac_x[1], n_x, endpoint=True)
+        da2_vals = np.linspace(frac_y[0], frac_y[1], n_y, endpoint=True)
+        grid_pos_cm = np.array([
+            u_inv @ np.array([da1, da2])
+            for da1 in da1_vals
+            for da2 in da2_vals
+        ])
 
     tasks = [(pos, cm, calc_en_f, en_params) for cm in grid_pos_cm]
     results = _run_tasks(tasks, n_jobs)

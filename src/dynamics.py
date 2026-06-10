@@ -257,6 +257,15 @@ def run_md(pos, calc_en_f, en_params,
             UserWarning, stacklevel=2
         )
 
+    # theta0 is in degrees -- consistent with the rest of the public API.
+    # Values outside [-720, 720] almost certainly indicate a radians-vs-degrees
+    # mistake (the whole 2pi range is only ~6.28).
+    if abs(theta0) > 720.0:
+        warnings.warn(
+            "theta0=%.4g looks suspiciously large. "
+            "run_md expects degrees, not radians." % theta0,
+            UserWarning, stacklevel=2
+        )
     x0 = np.array([pos_cm0[0], pos_cm0[1], np.deg2rad(theta0)], dtype=np.float64)
 
     params = make_params_array(eta_t, eta_r, Fx, Fy, Tau, kBT, dt)

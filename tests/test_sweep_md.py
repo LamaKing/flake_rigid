@@ -260,8 +260,12 @@ def test_loky_faster_than_explicit_loop(substrate, cluster):
         t_loky = time() - t0
 
     speedup = t_loop / max(t_loky, 1e-6)
-    print("\nexplicit loop %.1fs  |  loky n_jobs=2 %.1fs  |  speedup %.2fx"
-          % (t_loop, t_loky, speedup), file=sys.stderr, flush=True)
+    # Print to stdout so `pytest -s` shows it alongside pass/fail.
+    print("\n--- parallel benchmark ---")
+    print("explicit loop : %.2f s" % t_loop)
+    print("loky n_jobs=2 : %.2f s" % t_loky)
+    print("speedup       : %.2fx" % speedup)
+    print("--------------------------", flush=True)
 
     assert t_loky < t_loop * 0.85, (
         "loky n_jobs=2 (%.1fs) not faster than explicit loop (%.1fs) "

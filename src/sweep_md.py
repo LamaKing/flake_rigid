@@ -16,6 +16,7 @@ Public API
     mean_velocity  -- post_fn factory: mean |v_cm| over a tail window.
     drift_velocity -- post_fn factory: net CM displacement / total time.
     load_sweep     -- reload a saved sweep from disk.
+    filter_sweep   -- remove None-result entries from load_sweep output.
 
 I/O convention
 --------------
@@ -104,17 +105,17 @@ def _yaml_safe(params):
 # I/O helpers
 # ============================================================
 
-def _save_run(run_dir, traj_dict, run_params):
+def _save_run(run_dir, traj_dict, run_params, save_traj=True):
     """Save one run to run_dir.
 
-    Writes traj.h5 and params.yaml.  Creates run_dir if absent.
-    If traj_dict is None (output_fn was used in the run), only params.yaml
-    is written.
+    Always writes params.yaml.  Writes traj.h5 only when save_traj=True
+    and traj_dict is not None.
 
     Args:
         run_dir:    str  -- path to the run directory.
         traj_dict:  dict or None -- trajectory arrays from run_md.
         run_params: dict -- full kwarg dict used for this run.
+        save_traj:  bool -- if True (default), write traj.h5.
     """
     try:
         from drift.slides_io import save_trajectory, save_params
@@ -126,7 +127,7 @@ def _save_run(run_dir, traj_dict, run_params):
 
     os.makedirs(run_dir, exist_ok=True)
 
-    if traj_dict is not None:
+    if save_traj and traj_dict is not None:
         save_trajectory(traj_dict, os.path.join(run_dir, 'traj.h5'))
 
     save_params(_yaml_safe(run_params), os.path.join(run_dir, 'params.yaml'))
@@ -165,22 +166,33 @@ def _load_run(run_dir):
 def load_sweep(outdir):
     """Load all runs from a sweep output directory.
 
-    Scans for run_NNNN/ subdirectories in numeric order, loads each with
-    _load_run, and returns a list in the same order as the original sweep.
-    Runs whose directory is missing or incomplete are skipped with a warning.
+    Scans for run_NNNN/ subdirectories in numeric order.  Every directory
+    that matches the pattern produces one entry in the returned list -- runs
+    are never silently dropped.  Missing or incomplete runs produce an entry
+    with result=None and a WARNING; the caller is responsible for filtering
+    (see filter_sweep).
 
     Args:
         outdir: str -- directory written by sweep_md with save=True.
 
     Returns:
-        list of dict, each with keys 'params' and 'result' (full traj dict).
+        list of dict, one per run_NNNN directory found, each with keys:
+            'params':  dict of run parameters, or None if params.yaml absent.
+            'result':  full traj dict, or None if traj.h5 absent.
+            'run_dir': absolute path to the run_NNNN directory.
 
     Example:
-        results = load_sweep('output/my_sweep')
+        raw     = load_sweep('output/my_sweep')
+        results = filter_sweep(raw)
         for r in results:
             print(r['params']['Fx'], r['result']['energy'][-1])
     """
     import re
+    try:
+        from drift.slides_io import load_trajectory, load_params
+    except ImportError:
+        raise ImportError("slides_io is required for load_sweep.")
+
     pattern = re.compile(r'^run_(\d{4})$')
 
     entries = sorted(
@@ -189,17 +201,76 @@ def load_sweep(outdir):
     )
 
     results = []
+    n_ok = n_missing_traj = n_bad = 0
+
     for entry in entries:
-        run_dir = os.path.join(outdir, entry)
-        try:
-            traj_dict, run_params = _load_run(run_dir)
-            results.append({'params': run_params, 'result': traj_dict})
-        except Exception as exc:
+        run_dir     = os.path.join(outdir, entry)
+        params_path = os.path.join(run_dir, 'params.yaml')
+        traj_path   = os.path.join(run_dir, 'traj.h5')
+
+        if not os.path.isfile(params_path):
             warnings.warn(
-                "Skipping %s: %s" % (run_dir, exc),
+                "%s: params.yaml not found; params and result will be None."
+                % entry,
                 UserWarning, stacklevel=2
             )
+            results.append({'params': None, 'result': None, 'run_dir': run_dir})
+            n_bad += 1
+            continue
+
+        run_params = load_params(params_path)
+
+        if not os.path.isfile(traj_path):
+            warnings.warn(
+                "%s: traj.h5 not found; result will be None." % entry,
+                UserWarning, stacklevel=2
+            )
+            results.append({'params': run_params, 'result': None,
+                            'run_dir': run_dir})
+            n_missing_traj += 1
+            continue
+
+        traj_dict, _ = load_trajectory(traj_path)
+        results.append({'params': run_params, 'result': traj_dict,
+                        'run_dir': run_dir})
+        n_ok += 1
+
+    n_total = len(entries)
+    summary = (
+        "load_sweep: loaded %d complete runs, %d missing traj, "
+        "%d missing params, out of %d directories found."
+        % (n_ok, n_missing_traj, n_bad, n_total)
+    )
+    _log.info(summary)
+    print(summary, flush=True)
+
     return results
+
+
+def filter_sweep(loaded, warn_fraction=0.1):
+    """Remove None-result entries from load_sweep output.
+
+    Emits a WARNING if the fraction of None entries exceeds warn_fraction
+    (default 10%).
+
+    Args:
+        loaded:        list from load_sweep.
+        warn_fraction: float -- threshold for the warning.
+
+    Returns:
+        list with None-result entries removed.
+    """
+    n_total  = len(loaded)
+    filtered = [r for r in loaded if r['result'] is not None]
+    n_none   = n_total - len(filtered)
+    if n_total > 0 and (n_none / n_total) > warn_fraction:
+        warnings.warn(
+            "filter_sweep: %d of %d runs (%.0f%%) have result=None. "
+            "Check sweep output for incomplete or crashed runs."
+            % (n_none, n_total, 100. * n_none / n_total),
+            UserWarning, stacklevel=2
+        )
+    return filtered
 
 
 # ============================================================
@@ -391,7 +462,7 @@ def drift_velocity():
 
 def sweep_md(pos, calc_en_f, en_params, sweep_spec,
              base_md_kwargs=None, post_fn=None,
-             n_jobs=1, backend='loky', outdir='.', save=True,
+             n_jobs=1, backend='loky', outdir='.', save=True, save_traj=True,
              verbose=True):
     """Run one MD simulation per point in sweep_spec.
 
@@ -423,18 +494,25 @@ def sweep_md(pos, calc_en_f, en_params, sweep_spec,
         n_jobs:         int  -- joblib parallel workers.  Do NOT set n_jobs > 1
                                if run_md itself already uses parallelism.
                                Default 1 (serial).
-        backend:        str  -- joblib backend.  Default 'loky' (spawn-based,
-                               safe but each worker recompiles @njit functions).
-                               Use 'threading' when runs are dominated by Numba
-                               JIT: Numba releases the GIL, so threads achieve
-                               true CPU parallelism without recompilation cost.
-                               Do NOT use 'threading' if run_md uses Python-
-                               level shared mutable state.
+        backend:        str  -- joblib backend.  Default 'loky' (spawn-based
+                               separate processes, no GIL).  Each worker
+                               recompiles @njit functions (~1-2 s overhead),
+                               so speedup requires runs of at least ~30 s each
+                               to amortise that cost.  'threading' does NOT
+                               help here: the EM loop has enough Python-level
+                               work per step (numpy ops, RNG) that threads
+                               serialize on the GIL and may be slower than
+                               serial.
         outdir:         str  -- directory for per-run output.  Created if absent.
         save:           bool -- if True, write per-run output to outdir.
                                Each run writes:
-                                 outdir/run_NNNN/traj.h5
+                                 outdir/run_NNNN/traj.h5  (if save_traj=True)
                                  outdir/run_NNNN/params.yaml
+        save_traj:      bool -- if True (default), write the full trajectory
+                               to traj.h5 for each run.  Set False when
+                               post_fn already extracts all needed information,
+                               to avoid storing gigabytes of unused data.
+                               params.yaml is always written.
         verbose:        bool -- if True (default), report progress.  Uses tqdm
                                if installed (works in TTY and batch logs alike);
                                otherwise prints one line per run to stdout.
@@ -498,13 +576,31 @@ def sweep_md(pos, calc_en_f, en_params, sweep_spec,
     n_runs = len(run_kwargs_list)
 
     def _run_one(i, kwargs):
+        run_dir = os.path.join(outdir, 'run_%04d' % i) if save else None
+
+        # Resume: only when save_traj=True and traj.h5 already exists.
+        # Checking params.yaml was wrong -- it is written for EVERY run, so
+        # an existing params.yaml just means the run was started, not finished.
+        # When save_traj=False there is no result file on disk; always re-run.
+        if run_dir is not None:
+            traj_path    = os.path.join(run_dir, 'traj.h5')
+            already_done = save_traj and os.path.isfile(traj_path)
+            if already_done:
+                warnings.warn(
+                    "run_%04d: traj.h5 already exists, skipping (resume). "
+                    "Delete %s to re-run." % (i, run_dir),
+                    UserWarning
+                )
+                from drift.slides_io import load_trajectory
+                traj, _ = load_trajectory(traj_path)
+                result = post_fn(traj, kwargs) if post_fn is not None else traj
+                return {'params': kwargs, 'result': result, 'run_dir': run_dir}
+
         _log.info("sweep_md: starting run %04d / %04d", i, n_runs - 1)
         traj   = run_md(pos, calc_en_f, en_params, **kwargs)
         result = post_fn(traj, kwargs) if post_fn is not None else traj
-        run_dir = None
-        if save:
-            run_dir = os.path.join(outdir, 'run_%04d' % i)
-            _save_run(run_dir, traj, kwargs)
+        if run_dir is not None:
+            _save_run(run_dir, traj, kwargs, save_traj=save_traj)
         return {'params': kwargs, 'result': result, 'run_dir': run_dir}
 
     # Progress bar: tqdm if available, plain print otherwise.

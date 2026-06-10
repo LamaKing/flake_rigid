@@ -3,10 +3,11 @@ Unified command-line interface for the DRIFT package.
 
 Usage
 -----
-    drift map    -i params.yaml --grid  grid.yaml   -o output.h5
-    drift sweep  -i params.yaml --spec  spec.yaml   --outdir sweep_out/
-    drift string -i params.yaml --cfg   string.yaml -o path.h5
-    drift make-sweep [options]  -o spec.yaml
+    drift map         -i params.yaml --grid  grid.yaml   -o output.h5
+    drift sweep       -i params.yaml --spec  spec.yaml   --outdir sweep_out/
+    drift string      -i params.yaml --cfg   string.yaml -o path.h5
+    drift make-sweep  [options]  -o spec.yaml
+    drift make-params --substrate sin --n 6 --spacing 1.0 -o params.yaml
 
 Physics input (params.yaml)
 ---------------------------
@@ -65,20 +66,26 @@ def _dump_yaml(obj, path):
 def _build_physics(params_path):
     """Load params.yaml and return (pos, calc_en_f, en_params, params_dict).
 
+    pos is always the cluster in the REFERENCE FRAME (theta=0).  Callers are
+    responsible for applying the 'theta' value from params_dict appropriately:
+      - translational_map / find_mep 2D: rotate(pos, theta) before calling.
+      - run_md: pass theta as theta0 keyword argument.
+      - rotational_map / rototrasl_map / find_mep 3D: use pos as-is;
+        orientation is a scan variable, not a fixed offset.
+
+    Applying the rotation here used to be tempting but caused a double-rotation
+    in the 3D string method (find_mep rotates pos internally at each path point)
+    and an implicit conflict with run_md's theta0 argument.
+
     Imports are deferred so that the CLI starts fast even on cold Numba.
     """
     from tool_create_substrate import substrate_from_params
-    from tool_create_cluster import cluster_from_params, rotate
+    from tool_create_cluster import cluster_from_params
 
     params = _load_yaml(params_path)
 
     _, calc_en_f, en_params = substrate_from_params(params)
     pos = cluster_from_params(params)
-
-    # Apply initial rotation if specified in params.
-    theta = float(params.get('theta', 0.0))
-    if theta != 0.0:
-        pos = rotate(pos, theta)
 
     return pos, calc_en_f, en_params, params
 
@@ -93,19 +100,41 @@ _MAP_TYPES = ('translational', 'rotational', 'rototrasl')
 def _cmd_map(args):
     """Compute a static energy map and write the result to HDF5.
 
-    grid.yaml keys (all optional if defaults are acceptable):
-        map_type:  'translational' | 'rotational' | 'rototrasl'
-                   (default: 'translational')
-        n_x, n_y:  int -- grid size along x and y (default: 50)
-        n_theta:   int -- number of orientation angles (rototrasl only)
-        frac_x:    [lo, hi] -- fractional x range (default: [0, 1])
-        frac_y:    [lo, hi] -- fractional y range (default: [0, 1])
+    grid.yaml keys:
+        map_type:    'translational' | 'rotational' | 'rototrasl'
+                     (default: 'translational')
+        n_x, n_y:   int -- grid size along x and y (default: 50)
+        n_theta:    int -- number of orientation angles (rotational/rototrasl)
         theta_range: [lo, hi] -- in degrees (default: [0, 360])
-        n_jobs:    int -- joblib workers (default: 1)
+        n_jobs:     int -- joblib workers (default: 1)
 
-    For 'sin' substrates u_inv is taken as eye(2); for 'gaussian'/'tanh'
-    it is derived from the b1/b2 lattice vectors in params.yaml.
+        For gaussian/tanh substrates (Bravais lattice, unit cell defined):
+            frac_x: [lo, hi] -- fractional x range (default: [0, 1])
+            frac_y: [lo, hi] -- fractional y range (default: [0, 1])
+
+        For sin substrates (no unit cell -- quasicrystal variants have none
+        at all), Cartesian coords are required:
+            x_range: [lo, hi] -- Cartesian x range in substrate length units
+            y_range: [lo, hi] -- Cartesian y range in substrate length units
+            If absent, a 2-period default is estimated from |k[0]|.
+
+    Example grid.yaml for gaussian/tanh (fractional coords):
+        map_type: translational
+        frac_x: [-0.5, 0.5]
+        frac_y: [-0.5, 0.5]
+        n_x: 100
+        n_y: 100
+        n_jobs: 4
+
+    Example grid.yaml for sin (Cartesian coords):
+        map_type: translational
+        x_range: [-1.5, 1.5]
+        y_range: [-1.5, 1.5]
+        n_x: 150
+        n_y: 150
+        n_jobs: 4
     """
+    import warnings
     import numpy as np
     from maps import translational_map, rotational_map, rototrasl_map
     from slides_io import save_map
@@ -114,49 +143,117 @@ def _cmd_map(args):
 
     grid = _load_yaml(args.grid) if args.grid else {}
 
-    map_type   = grid.get('map_type', 'translational')
-    n_x        = int(grid.get('n_x', 50))
-    n_y        = int(grid.get('n_y', 50))
-    n_theta    = int(grid.get('n_theta', 36))
-    frac_x     = tuple(grid.get('frac_x', [0.0, 1.0]))
-    frac_y     = tuple(grid.get('frac_y', [0.0, 1.0]))
+    map_type    = grid.get('map_type', 'translational')
+    n_x         = int(grid.get('n_x', 50))
+    n_y         = int(grid.get('n_y', 50))
+    n_theta     = int(grid.get('n_theta', 36))
+    frac_x      = tuple(grid.get('frac_x', [0.0, 1.0]))
+    frac_y      = tuple(grid.get('frac_y', [0.0, 1.0]))
     theta_range = tuple(grid.get('theta_range', [0.0, 360.0]))
-    n_jobs     = int(grid.get('n_jobs', 1))
+    n_jobs      = int(grid.get('n_jobs', 1))
 
     if map_type not in _MAP_TYPES:
-        print("ERROR: map_type '%s' not in %s" % (map_type, _MAP_TYPES),
-              file=sys.stderr)
-        sys.exit(1)
+        raise ValueError("map_type '%s' not in %s" % (map_type, _MAP_TYPES))
 
-    # u_inv: metric matrix for real-space grid.  sin substrates use identity
-    # because the plane-wave potential is Cartesian by construction.
+    # For translational maps the cluster orientation is fixed; apply theta now.
+    # For rotational/rototrasl maps theta is a scan variable -- leave pos in the
+    # reference frame so the internal rotate() calls in *_map are not offset.
+    theta = float(params.get('theta', 0.0))
+    if map_type == 'translational' and theta != 0.0:
+        from tool_create_cluster import rotate as _rotate
+        pos = _rotate(pos, theta)
+
     well_shape = params.get('well_shape', 'sin')
-    if well_shape in ('gaussian', 'tanh'):
-        from tool_create_substrate import calc_matrices_bvect
-        b1 = params['b1']
-        b2 = params['b2']
-        _, u_inv = calc_matrices_bvect(b1, b2)
-    else:
-        u_inv = np.eye(2)
+
+    # Build u_inv and/or pos_cm_grid based on substrate type.
+    # No silent fallbacks: every well_shape must be explicit.
+    u_inv       = None
+    pos_cm_grid = None
+
+    if map_type in ('translational', 'rototrasl'):
+        if well_shape in ('gaussian', 'tanh'):
+            if 'b1' not in params or 'b2' not in params:
+                raise ValueError(
+                    "params.yaml must contain 'b1' and 'b2' for "
+                    "well_shape='%s'." % well_shape
+                )
+            if 'x_range' in grid or 'y_range' in grid:
+                raise ValueError(
+                    "Use frac_x/frac_y (not x_range/y_range) for "
+                    "well_shape='%s'. The substrate has a defined unit "
+                    "cell; fractional coordinates are the correct tool."
+                    % well_shape
+                )
+            from tool_create_substrate import calc_matrices_bvect
+            _, u_inv = calc_matrices_bvect(params['b1'], params['b2'])
+
+        elif well_shape == 'sin':
+            if 'frac_x' in grid or 'frac_y' in grid:
+                raise ValueError(
+                    "well_shape='sin' has no unit cell (quasicrystal "
+                    "variants have none at all). Use x_range/y_range in "
+                    "grid.yaml to specify a Cartesian grid."
+                )
+            if map_type == 'rototrasl':
+                raise ValueError(
+                    "rototrasl map with well_shape='sin' is not yet "
+                    "supported via CLI (no unit cell for the translational "
+                    "sub-grid). Run translational_map and rotational_map "
+                    "separately, or add pos_cm_grid support to rototrasl_map."
+                )
+            if 'x_range' not in grid or 'y_range' not in grid:
+                from tool_create_substrate import get_ks
+                ks_arr = np.asarray(params.get('ks', []))
+                if len(ks_arr) == 0:
+                    raise ValueError(
+                        "grid.yaml must contain x_range and y_range for "
+                        "well_shape='sin', or params.yaml must contain 'ks'."
+                    )
+                k_mag  = float(np.linalg.norm(ks_arr[0]))
+                period = 2. * np.pi / k_mag
+                x_range = [-2. * period, 2. * period]
+                y_range = [-2. * period, 2. * period]
+                warnings.warn(
+                    "x_range/y_range not in grid.yaml; using 2 substrate "
+                    "periods from |k|: x,y in [%.3g, %.3g]."
+                    % (x_range[0], x_range[1]),
+                    UserWarning
+                )
+            else:
+                x_range = list(grid['x_range'])
+                y_range = list(grid['y_range'])
+            xx = np.linspace(x_range[0], x_range[1], n_x)
+            yy = np.linspace(y_range[0], y_range[1], n_y)
+            pos_cm_grid = np.array([[x, y] for x in xx for y in yy])
+
+        else:
+            raise ValueError("Unknown well_shape '%s'." % well_shape)
 
     print("drift map: type=%s  grid=(%d x %d)  n_jobs=%d"
           % (map_type, n_x, n_y, n_jobs), flush=True)
 
     if map_type == 'translational':
-        result = translational_map(pos, calc_en_f, en_params, u_inv,
-                                   n_x, n_y,
-                                   frac_x=frac_x, frac_y=frac_y,
-                                   n_jobs=n_jobs)
+        if well_shape == 'sin':
+            result = translational_map(pos, calc_en_f, en_params, None,
+                                       n_x, n_y,
+                                       pos_cm_grid=pos_cm_grid,
+                                       n_jobs=n_jobs)
+        else:
+            result = translational_map(pos, calc_en_f, en_params, u_inv,
+                                       n_x, n_y,
+                                       frac_x=frac_x, frac_y=frac_y,
+                                       n_jobs=n_jobs)
     elif map_type == 'rotational':
+        theta_deg = np.linspace(theta_range[0], theta_range[1],
+                                n_theta, endpoint=False)
         result = rotational_map(pos, calc_en_f, en_params,
-                                n_theta=n_theta,
-                                theta_range=theta_range,
-                                n_jobs=n_jobs)
-    else:  # rototrasl
+                                theta_deg, n_jobs=n_jobs)
+    else:  # rototrasl (gaussian/tanh only; sin raises above)
+        theta_deg = np.linspace(theta_range[0], theta_range[1],
+                                n_theta, endpoint=False)
         result = rototrasl_map(pos, calc_en_f, en_params, u_inv,
-                               n_x, n_y, n_theta,
+                               theta_deg, n_x, n_y,
                                frac_x=frac_x, frac_y=frac_y,
-                               theta_range=theta_range,
                                n_jobs=n_jobs)
 
     out = args.output if args.output else 'map.h5'
@@ -218,7 +315,7 @@ def _cmd_sweep(args):
     """
     from sweep_md import sweep_md, grid_sweep, line_sweep, force_sweep
 
-    pos, calc_en_f, en_params, _ = _build_physics(args.input)
+    pos, calc_en_f, en_params, params = _build_physics(args.input)
 
     spec_dict = _load_yaml(args.spec)
 
@@ -240,6 +337,16 @@ def _cmd_sweep(args):
             sys.exit(1)
 
     base_md_kwargs = spec_dict.get('base_md_kwargs', {})
+
+    # Propagate 'theta' from params.yaml as theta0 for the MD run, but
+    # only when the spec does not already override it explicitly.  run_md
+    # handles orientation as theta0 (degrees) rather than via a pre-rotated
+    # pos, so pos stays in the reference frame throughout.
+    theta_params = float(params.get('theta', 0.0))
+    if 'theta0' not in base_md_kwargs and theta_params != 0.0:
+        base_md_kwargs = dict(base_md_kwargs)   # don't mutate the original
+        base_md_kwargs['theta0'] = theta_params
+
     n_jobs         = int(spec_dict.get('n_jobs', 1))
     backend        = str(spec_dict.get('backend', 'loky'))
     save_traj      = bool(spec_dict.get('save_traj', True))
@@ -307,13 +414,30 @@ def _cmd_string(args):
     tol      = float(cfg.get('tol', 1e-6))
     scale    = cfg.get('scale', [1.0] * dim)
 
+    # For 2D MEP: orientation is fixed; apply theta so that the substrate
+    # force is evaluated at the correct cluster orientation.
+    # For 3D MEP: orientation is the third path coordinate; pos must stay
+    # in the reference frame (theta=0) because find_mep rotates internally.
+    theta = float(params.get('theta', 0.0))
+    if dim == 2 and theta != 0.0:
+        from tool_create_cluster import rotate as _rotate
+        pos = _rotate(pos, theta)
+    elif dim == 3 and theta != 0.0:
+        import warnings
+        warnings.warn(
+            "'theta' in params.yaml (%.4g deg) is ignored for a 3D MEP search. "
+            "Set the initial orientation via the theta component of p0/p1 in "
+            "string.yaml instead." % theta,
+            UserWarning
+        )
+
     print("drift string: dim=%d  n_points=%d  n_iter=%d"
           % (dim, n_points, n_iter), flush=True)
 
     result = find_mep(pos, calc_en_f, en_params,
-                      p0=p0, p1=p1,
-                      n_points=n_points, n_iter=n_iter,
-                      step=step, tol=tol,
+                      p0, p1,
+                      n_pt=n_points, max_steps=n_iter,
+                      dt=step, tol=tol,
                       scale=scale)
 
     out = args.output if args.output else 'mep.h5'
@@ -399,6 +523,118 @@ def _cmd_make_sweep(args):
 
 
 # ============================================================
+# make-params subcommand
+# ============================================================
+
+# Valid fold symmetries and their (c_n, alpha_n) preset pairs.
+# Mirrors slides_io._SIN_PRESETS so we don't import slides_io at module level.
+_SIN_N_VALID = (2, 3, 4, 5, 6)
+
+
+def _cmd_make_params(args):
+    """Print or write a starter params.yaml for common substrate types.
+
+    For sin substrates ks is computed via get_ks so the user never has to
+    hand-write wave-vector components.  Wrong angles produce physically wrong
+    landscapes with no error; this command eliminates that class of bug.
+    """
+    import numpy as np
+
+    substrate = args.substrate
+    spacing   = float(args.spacing)
+    out       = args.output if args.output else 'params.yaml'
+
+    cmd_comment = (
+        "# generated by: drift make-params --substrate %s --spacing %.6g"
+        % (substrate, spacing)
+    )
+
+    # Default cluster block; user adjusts a1/a2 to match their material.
+    cluster_block = (
+        "# --- cluster ---\n"
+        "cluster_shape: circle\n"
+        "a1: [1.0, 0.0]       # cluster lattice vector 1 -- adjust to your material\n"
+        "a2: [0.5, 0.866025]  # cluster lattice vector 2\n"
+        "N1: 9\n"
+        "N2: 9\n"
+        "cl_basis:\n"
+        "  - [0.0, 0.0]\n"
+        "theta: 0.0\n"
+    )
+
+    if substrate == 'sin':
+        if args.n is None:
+            raise ValueError("--n is required for --substrate sin.")
+        n = int(args.n)
+        if n not in _SIN_N_VALID:
+            raise ValueError(
+                "--n must be one of %s for sin substrate." % list(_SIN_N_VALID)
+            )
+        from slides_io import _SIN_PRESETS
+        from tool_create_substrate import get_ks
+        c_n, alpha_n = _SIN_PRESETS[n]
+        ks = get_ks(float(spacing), n, c_n, alpha_n)
+        ks_lines = "ks:\n" + "".join(
+            "  - [%.15g, %.15g]\n" % (float(k[0]), float(k[1])) for k in ks
+        )
+        content = (
+            cmd_comment + " --n %d\n" % n +
+            "# --- substrate ---\n"
+            "well_shape: sin\n"
+            "epsilon: 1.0\n"
+            "sub_basis:\n"
+            "  - [0.0, 0.0]\n"
+            + ks_lines
+            + cluster_block
+        )
+
+    elif substrate == 'gaussian':
+        s3o2 = float(np.sqrt(3.0) / 2.0)
+        b1   = [float(spacing), 0.0]
+        b2   = [float(spacing) * 0.5, float(spacing) * s3o2]
+        content = (
+            cmd_comment + "\n"
+            "# --- substrate ---\n"
+            "well_shape: gaussian\n"
+            "epsilon: 1.0\n"
+            "sub_basis:\n"
+            "  - [0.0, 0.0]\n"
+            "b1: [%.10g, %.10g]\n" % (b1[0], b1[1]) +
+            "b2: [%.10g, %.10g]\n" % (b2[0], b2[1]) +
+            "sigma: 0.3     # Gaussian width; tune (0.1=narrow, 0.5=wide)\n"
+            "a: 1.0         # semi-axis 1 in fractional coords\n"
+            "b: 1.0         # semi-axis 2 in fractional coords\n"
+            + cluster_block
+        )
+
+    else:  # tanh
+        s3o2 = float(np.sqrt(3.0) / 2.0)
+        b1   = [float(spacing), 0.0]
+        b2   = [float(spacing) * 0.5, float(spacing) * s3o2]
+        content = (
+            cmd_comment + "\n"
+            "# --- substrate ---\n"
+            "well_shape: tanh\n"
+            "epsilon: 1.0\n"
+            "sub_basis:\n"
+            "  - [0.0, 0.0]\n"
+            "b1: [%.10g, %.10g]\n" % (b1[0], b1[1]) +
+            "b2: [%.10g, %.10g]\n" % (b2[0], b2[1]) +
+            "wd: 0.1    # wall width (small=sharp step, large=smooth)\n"
+            "a: 1.0     # semi-axis 1 in fractional coords\n"
+            "b: 1.0     # semi-axis 2 in fractional coords\n"
+            + cluster_block
+        )
+
+    if out == '-':
+        print(content, end='')
+    else:
+        with open(out, 'w') as fh:
+            fh.write(content)
+        print("drift make-params: wrote %s" % out, flush=True)
+
+
+# ============================================================
 # Argument parser
 # ============================================================
 
@@ -438,6 +674,19 @@ def _build_parser():
                        help='String method config YAML.')
     p_str.add_argument('-o', '--output', metavar='OUT_H5',
                        help='Output HDF5 file (default: mep.h5).')
+
+    # ---- make-params ----
+    p_mp = sub.add_parser('make-params',
+                           help='Generate a starter params.yaml (no physics run).')
+    p_mp.add_argument('--substrate', required=True,
+                      choices=('sin', 'gaussian', 'tanh'),
+                      help='Substrate type.')
+    p_mp.add_argument('--n', type=int, metavar='N',
+                      help='Fold symmetry for sin substrate (2, 3, 4, 5, or 6).')
+    p_mp.add_argument('--spacing', type=float, required=True, metavar='S',
+                      help='Substrate lattice spacing.')
+    p_mp.add_argument('-o', '--output', metavar='PARAMS_YAML',
+                      help='Output file (default: params.yaml; - for stdout).')
 
     # ---- make-sweep ----
     p_ms = sub.add_parser('make-sweep',
@@ -491,10 +740,11 @@ def main():
                             format='%(levelname)s: %(message)s')
 
     dispatch = {
-        'map':        _cmd_map,
-        'sweep':      _cmd_sweep,
-        'string':     _cmd_string,
-        'make-sweep': _cmd_make_sweep,
+        'map':          _cmd_map,
+        'sweep':        _cmd_sweep,
+        'string':       _cmd_string,
+        'make-sweep':   _cmd_make_sweep,
+        'make-params':  _cmd_make_params,
     }
     dispatch[args.command](args)
 
