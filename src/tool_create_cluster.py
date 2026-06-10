@@ -26,6 +26,11 @@ raise ImportError with installation hints if absent.
 import numpy as np
 from numpy import pi, sqrt
 
+# Small tolerance for boundary conditions in shape functions.
+# Particles landing exactly on the boundary due to floating-point
+# rounding are excluded consistently -- avoids asymmetric clusters
+# in the commensurate case where particles can sit at exactly R.
+_BOUNDARY_TOL = 1e-10
 
 # ============================================================
 # Rotation
@@ -78,7 +83,7 @@ def _make_cluster_circle(a1, a2, N1, N2):
         for j in range(-M, M + 1):
             x = j*a1[0] + i*a2[0]
             y = j*a1[1] + i*a2[1]
-            if x*x + y*y < R2:
+            if x*x + y*y < R2 - _BOUNDARY_TOL:
                 pts.append([x, y])
 
     pos = np.array(pts, dtype=np.float64)
@@ -140,7 +145,7 @@ def _make_cluster_rectangle(a1, a2, N1, N2):
         for j in range(-M, M + 1):
             x = j*a1[0] + i*a2[0]
             y = j*a1[1] + i*a2[1]
-            if abs(x) < xlim and abs(y) < ylim:
+            if abs(x) < xlim - _BOUNDARY_TOL and abs(y) < ylim - _BOUNDARY_TOL:
                 pts.append([x, y])
 
     pos = np.array(pts, dtype=np.float64)
@@ -251,7 +256,7 @@ def _make_cluster_ellipse(a1, a2, N1, N2, rx, ry):
         for j in range(-M, M + 1):
             x = j*a1[0] + i*a2[0]
             y = j*a1[1] + i*a2[1]
-            if x*x / rx2 + y*y / ry2 < 1.0:
+            if x*x / rx2 + y*y / ry2 < 1.0 - _BOUNDARY_TOL:
                 pts.append([x, y])
 
     pos = np.array(pts, dtype=np.float64)
@@ -440,8 +445,9 @@ def cluster_from_params(params):
     # Re-centre: add_basis may shift CM if basis is asymmetric.
     pos  -= np.mean(pos, axis=0)
 
-    if 'theta' in params:
-        pos = rotate(pos, float(params['theta']))
+    # Leave outside, you risk applying multiple rotation
+    #if 'theta' in params:
+    #    pos = rotate(pos, float(params['theta']))
 
     return pos
 
@@ -517,8 +523,6 @@ def cluster_poly(polygon, params, direction=0):
         working_params['N2'] = Nl
 
     pos = cluster_from_params(working_params)
-    if 'theta' in params:
-        pos = rotate(pos, float(params['theta']))
 
     mpts = MultiPoint(pos)
     mask = np.array(
