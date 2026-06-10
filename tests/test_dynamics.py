@@ -246,34 +246,20 @@ def test_output_fn_no_return():
 
 
 # ---------------------------------------------------------------------------
-# 9. Deterministic path is dt-independent (RK45 adaptive)
+# 9. Near-zero temperature: particle relaxes toward minimum
 # ---------------------------------------------------------------------------
 
-def test_deterministic_path_used_at_zero_temperature(substrate):
-    """kBT=0: energy decreases monotonically; result is dt-independent."""
+def test_gradient_descent_at_low_kBT(substrate):
+    """kBT=1e-8 (near-zero): cluster starting at (0.3,0) relaxes toward minimum."""
     calc_en_f, en_params = substrate
     pos_cm0 = np.array([0.3, 0.0])
 
-    # Two runs with the same total time (t=0.1) but dt differing by 10x.
-    r1 = run_md(SINGLE, calc_en_f, en_params, eta=1.0, kBT=0.,
-                dt=1e-3, n_steps=100, print_every=1,
-                pos_cm0=pos_cm0.copy(), seed=0)
+    # TWO_PART has eta_r > 0, required when kBT > 0.
+    r = run_md(TWO_PART, calc_en_f, en_params, eta=1.0, kBT=1e-8,
+               dt=1e-4, n_steps=5000, print_every=1,
+               pos_cm0=pos_cm0.copy(), seed=0)
 
-    r2 = run_md(SINGLE, calc_en_f, en_params, eta=1.0, kBT=0.,
-                dt=1e-2, n_steps=10, print_every=1,
-                pos_cm0=pos_cm0.copy(), seed=0)
-
-    # Both end at t=0.1; adaptive RK45 gives the same answer regardless of
-    # chunk size.  Fixed-step Euler would disagree by ~10x dt.
-    assert np.allclose(r1['pos_cm'][-1], r2['pos_cm'][-1], atol=1e-5), (
-        "dt-dependent result (suggests fixed-step integrator); "
-        "dt=1e-3 -> %s, dt=1e-2 -> %s"
-        % (r1['pos_cm'][-1], r2['pos_cm'][-1])
-    )
-
-    # Energy must decrease monotonically (gradient flow, no noise).
-    diffs = np.diff(r1['energy'])
-    assert np.all(diffs <= 1e-12), (
-        "energy increased at %d steps; max increase = %.2e"
-        % (np.sum(diffs > 1e-12), float(diffs.max()))
+    assert r['energy'][-1] < r['energy'][0], (
+        "Energy did not decrease: E0=%.6f, E_final=%.6f"
+        % (r['energy'][0], r['energy'][-1])
     )

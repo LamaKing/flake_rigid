@@ -16,9 +16,10 @@ Fluctuation-dissipation theorem:
 
 Integration
 -----------
-kBT > 0  (stochastic):  Euler-Maruyama step
+Euler-Maruyama step for all kBT >= 0:
 
-    delta_i = (F_total_i / eta_i) * dt + sqrt(2 * kBT / (eta_i * dt)) * xi_i * dt
+    delta_i = (F_total_i / eta_i) * dt
+              + sqrt(2 * kBT / (eta_i * dt)) * xi_i * dt
 
 where xi_i ~ N(0, 1).  The displacement variance is
 
@@ -28,14 +29,15 @@ The factor sqrt(1/dt) in the noise amplitude compensates for the dt^2 that
 comes from squaring the full step: without it the variance would scale as
 dt^2 rather than dt.
 
-kBT = 0  (deterministic):  scipy.integrate.solve_ivp with method='RK45'
-and adaptive step size.  The snapshot cadence (print_every * dt) sets the
-chunk size passed to solve_ivp; RK45 picks its own substeps.  The result is
-independent of dt for any smooth substrate, unlike fixed-step Euler.
+At kBT=0 the noise term vanishes and this reduces to explicit
+Euler gradient descent.  The step size dt is fixed; use small dt
+(check convergence by halving it).  Avoid kBT=0 exactly: a
+deterministic trajectory at a saddle point is sensitive to
+floating-point rounding.  Use kBT=1e-8 (for epsilon=1) instead.
 
 Public API
 ----------
-    run_md             -- dispatcher; Euler-Maruyama (kBT>0) or RK45 (kBT=0).
+    run_md             -- Euler-Maruyama integrator for all kBT >= 0.
     make_params_array  -- convenience constructor for the @njit params array.
 
 JIT note
@@ -46,9 +48,9 @@ step because calc_en_f is a Python-level function.
 """
 
 import logging
+import warnings
 import numpy as np
 from numba import njit
-from scipy.integrate import solve_ivp
 
 from tool_create_cluster import rotate, calc_cluster_langevin
 
@@ -152,90 +154,6 @@ def make_params_array(eta_t, eta_r, Fx, Fy, Tau, kBT, dt):
 
 
 # ============================================================
-# Deterministic (T=0) path
-# ============================================================
-
-def _run_deterministic(pos, calc_en_f, en_params,
-                       eta_t, eta_r, Fx, Fy, Tau,
-                       dt, n_steps, x0,
-                       print_every, stop_fn, output_fn):
-    """Integrate overdamped dynamics at T=0 with scipy RK45 (adaptive step).
-
-    Runs n_steps // print_every chunks of duration print_every*dt each,
-    emitting one snapshot per chunk.  The snapshot cadence matches the
-    Euler-Maruyama path in run_md.
-    """
-
-    def rhs(t, x):
-        pos_cm    = x[:2]
-        theta_deg = np.rad2deg(x[2])
-        pos_rot   = rotate(pos, theta_deg)
-        e, f, tau = calc_en_f(pos_rot + pos_cm, pos_cm, *en_params)
-        vx = (f[0] + Fx) / eta_t
-        vy = (f[1] + Fy) / eta_t
-        vr = (float(tau) + Tau) / eta_r if eta_r > 0.0 else 0.0
-        return [vx, vy, vr]
-
-    n_chunks = n_steps // print_every
-    x        = np.asarray(x0, dtype=np.float64).copy()
-    t        = 0.0
-    records  = [] if output_fn is None else None
-
-    for i_chunk in range(1, n_chunks + 1):
-        t_end = i_chunk * print_every * dt
-        sol   = solve_ivp(rhs, [t, t_end], x, method='RK45', dense_output=False)
-        x     = sol.y[:, -1].copy()
-        t     = t_end
-
-        pos_cm    = x[:2].copy()
-        theta_deg = np.rad2deg(x[2])
-        pos_rot   = rotate(pos, theta_deg)
-        e0, f0, tau0 = calc_en_f(pos_rot + pos_cm, pos_cm, *en_params)
-
-        # Instantaneous drift velocity at the snapshot point.
-        vx = (f0[0] + Fx) / eta_t
-        vy = (f0[1] + Fy) / eta_t
-        vr = (float(tau0) + Tau) / eta_r if eta_r > 0.0 else 0.0
-
-        step  = i_chunk * print_every
-        state = {
-            'pos_cm': pos_cm,
-            'theta':  theta_deg,
-            'energy': float(e0),
-            'force':  np.asarray(f0, dtype=np.float64).copy(),
-            'torque': float(tau0),
-            'vel_cm': np.array([vx, vy]),
-            'omega':  vr,
-        }
-
-        if output_fn is not None:
-            output_fn(step, t, state)
-        else:
-            state['t'] = t
-            records.append(state)
-
-        _log.debug("step %6d  t=%.4e  E=%.6f", step, t, float(e0))
-
-        if stop_fn is not None and stop_fn(step, state):
-            _log.debug("stop_fn triggered at step %d", step)
-            break
-
-    if output_fn is not None:
-        return None
-
-    return {
-        't':      np.array([r['t']      for r in records]),
-        'pos_cm': np.array([r['pos_cm'] for r in records]),
-        'theta':  np.array([r['theta']  for r in records]),
-        'energy': np.array([r['energy'] for r in records]),
-        'force':  np.array([r['force']  for r in records]),
-        'torque': np.array([r['torque'] for r in records]),
-        'vel_cm': np.array([r['vel_cm'] for r in records]),
-        'omega':  np.array([r['omega']  for r in records]),
-    }
-
-
-# ============================================================
 # MD driver
 # ============================================================
 
@@ -249,8 +167,9 @@ def run_md(pos, calc_en_f, en_params,
            seed=12345):
     """Run overdamped Langevin MD for a rigid cluster on a substrate.
 
-    Dispatches to adaptive RK45 when kBT=0 (deterministic gradient descent)
-    and to Euler-Maruyama when kBT>0 (stochastic).
+    Uses the Euler-Maruyama integrator for all kBT >= 0.  At kBT=0 the
+    noise term vanishes and the step reduces to explicit Euler gradient
+    descent.
 
     Every print_every steps a state snapshot is emitted.  If output_fn is
     provided it is called with (step, t, state_dict) and run_md returns None;
@@ -283,7 +202,7 @@ def run_md(pos, calc_en_f, en_params,
                                          state_dict keys: 'pos_cm', 'theta',
                                          'energy', 'force', 'torque',
                                          'vel_cm', 'omega'.
-        seed:        int              -- numpy RNG seed (stochastic path only).
+        seed:        int              -- numpy RNG seed.
 
     Returns:
         None if output_fn is provided.
@@ -313,16 +232,32 @@ def run_md(pos, calc_en_f, en_params,
             "when Tau!=0 or kBT>0. Use a finite-size cluster."
         )
 
-    x0 = np.array([pos_cm0[0], pos_cm0[1], np.deg2rad(theta0)], dtype=np.float64)
+    if eta_r == 0.0:
+        # Single-particle cluster: no moment of inertia, no rotational dynamics.
+        # Set eta_r=1 so the JIT cores (which divide by eta_r) don't blow up.
+        # With kBT=0 and Tau=0 (guaranteed by the ValueError above), the JIT
+        # produces d_buf[2]=0/1=0 and B_buf[2,2]=sqrt(0)=0 automatically, so
+        # theta never drifts.  The value 1 is otherwise arbitrary.
+        warnings.warn(
+            "eta_r=0 (single-particle cluster at origin): rotational drag "
+            "is zero. Setting eta_r=1 internally to avoid division by zero "
+            "in the integrator. This is safe only when kBT=0 and Tau=0, "
+            "which is enforced above. Theta will not evolve.",
+            UserWarning, stacklevel=2
+        )
+        eta_r = 1.0
 
     if kBT == 0.0:
-        return _run_deterministic(pos, calc_en_f, en_params,
-                                  eta_t, eta_r, Fx, Fy, Tau,
-                                  dt, n_steps, x0,
-                                  print_every, stop_fn, output_fn)
+        warnings.warn(
+            "kBT=0 is not recommended: the Euler-Maruyama integrator "
+            "uses finite dt and a deterministic saddle point may be "
+            "crossed or missed depending on floating-point rounding. "
+            "Use a small kBT (e.g. 1e-8 for epsilon=1) to regularise "
+            "saddle-point crossings. Continuing with kBT=0.",
+            UserWarning, stacklevel=2
+        )
 
-    # --- Euler-Maruyama path (kBT > 0) ---
-    # ValueError above guarantees eta_r > 0 here.
+    x0 = np.array([pos_cm0[0], pos_cm0[1], np.deg2rad(theta0)], dtype=np.float64)
 
     params = make_params_array(eta_t, eta_r, Fx, Fy, Tau, kBT, dt)
     rng    = np.random.default_rng(seed)
@@ -352,13 +287,6 @@ def run_md(pos, calc_en_f, en_params,
 
         xi    = rng.standard_normal(3)
         delta = (d_buf + B_buf @ xi) * dt
-
-        # Safety: theta does not evolve for a point particle (eta_r=0).
-        # With eta_r=0 and kBT=0 the ValueError above is not raised, but the
-        # EM path is only reached when kBT>0, so eta_r>0 is guaranteed here.
-        # This guard is retained for defensive clarity.
-        if eta_r == 0.0:
-            delta[2] = 0.0
 
         x += delta
         t += dt
