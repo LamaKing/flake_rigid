@@ -48,6 +48,26 @@ SIN_PARAMS = {
 
 _FLAT_PARAMS = {'well_shape': 'flat'}
 
+# Gaussian substrate on a square lattice spacing=1.
+# sigma=0.2, a=0.4, b=0.5 keep the well narrow relative to the unit cell,
+# so a commensurate cluster sitting at well centres has energy ~ -N*epsilon
+# and a clear barrier separating minima.
+GAUSS_PARAMS = {
+    'well_shape': 'gaussian',
+    'epsilon':    1.0,
+    'sigma':      0.2,
+    'a':          0.4,
+    'b':          0.5,
+    'b1':         [1.0, 0.0],
+    'b2':         [0.0, 1.0],
+    'sub_basis':  [[0., 0.]],
+}
+
+# 5-particle commensurate cluster on the square lattice (centre + 4 NN).
+_COMM_SQ = np.array([
+    [0., 0.], [1., 0.], [-1., 0.], [0., 1.], [0., -1.]
+], dtype=np.float64)
+
 # 7-particle commensurate cluster (center + 6 nearest neighbours).
 _COMM_POS = np.array([
     [0., 0.], A1, -A1, A2, -A2, A1 + A2, -(A1 + A2)
@@ -73,6 +93,13 @@ def _flat_sub(abs_pos, pos_cm):
 def substrate():
     """Return (calc_en_f, en_params) for the triangular sin substrate."""
     _, calc_en_f, en_params = substrate_from_params(SIN_PARAMS)
+    return calc_en_f, en_params
+
+
+@pytest.fixture(scope='module')
+def gauss_substrate():
+    """Return (calc_en_f, en_params) for the square-lattice Gaussian substrate."""
+    _, calc_en_f, en_params = substrate_from_params(GAUSS_PARAMS)
     return calc_en_f, en_params
 
 
@@ -464,6 +491,94 @@ def test_jit_speedup_benchmark():
     print("speedup: %.2fx" % speedup)
     print("Note: speedup shrinks with N because O(N) substrate cost")
     print("dominates at large N; the ~15 us/step Python overhead is fixed.")
+
+    assert speedup > 1.0, (
+        "JIT-loop (%.2f s) not faster than Python-loop (%.2f s)" % (t_jit, t_python)
+    )
+
+
+# ---------------------------------------------------------------------------
+# Gaussian substrate: energy descent, pinning, JIT speedup
+# ---------------------------------------------------------------------------
+
+def test_gauss_energy_decreases(gauss_substrate):
+    """kBT=0, single particle starts off-minimum: energy must decrease monotonically."""
+    calc_en_f, en_params = gauss_substrate
+
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        result = run_md(SINGLE, calc_en_f, en_params, eta=1.0, kBT=0.,
+                        dt=1e-4, n_steps=5000, print_every=1,
+                        pos_cm0=np.array([0.3, 0.0]), seed=0)
+
+    diffs = np.diff(result['energy'])
+    assert np.all(diffs <= 1e-12), (
+        "energy increased at %d steps; max increase = %.2e"
+        % (np.sum(diffs > 1e-12), float(diffs.max()))
+    )
+
+
+def test_gauss_commensurate_pinned(gauss_substrate):
+    """kBT=0, Fx=0.01*epsilon: 5-particle commensurate cluster stays pinned."""
+    calc_en_f, en_params = gauss_substrate
+    Fx = 0.01 * GAUSS_PARAMS['epsilon']
+
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        result = run_md(_COMM_SQ, calc_en_f, en_params, eta=1.0, Fx=Fx, kBT=0.,
+                        dt=1e-4, n_steps=5000, print_every=100, seed=0)
+
+    final_x = abs(float(result['pos_cm'][-1, 0]))
+    assert final_x < 0.5, (
+        "cluster slid to x=%.4f under Fx=%.3f" % (final_x, Fx)
+    )
+
+
+@pytest.mark.slow
+def test_gauss_jit_speedup_benchmark():
+    """JIT-loop faster than Python-loop on Gaussian substrate (N=85).
+
+    Mirrors test_jit_speedup_benchmark but uses the Gaussian well to confirm
+    that _calc_en_gaussian_core compiles and dispatches correctly via _jit_params.
+    """
+    import warnings
+    from time import perf_counter
+    from tool_create_cluster import make_cluster
+
+    pos = make_cluster(A1, A2, 9, 10, shape='circle')   # N=85
+    N   = len(pos)
+
+    _, gauss_en_f, gauss_en_p = substrate_from_params(GAUSS_PARAMS)
+
+    n_steps = 500_000
+    md_kw = dict(eta=1.0, kBT=1e-5, Fx=0.3, dt=5e-4,
+                 n_steps=n_steps, print_every=n_steps, seed=42)
+
+    def _never_stop(step, state):
+        return False
+
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+
+        wkw = dict(md_kw, n_steps=200, print_every=200)
+        run_md(pos, gauss_en_f, gauss_en_p, **wkw)
+        run_md(pos, gauss_en_f, gauss_en_p, stop_fn=_never_stop, **wkw)
+
+        t0 = perf_counter()
+        run_md(pos, gauss_en_f, gauss_en_p, stop_fn=_never_stop, **md_kw)
+        t_python = perf_counter() - t0
+
+        t0 = perf_counter()
+        run_md(pos, gauss_en_f, gauss_en_p, **md_kw)
+        t_jit = perf_counter() - t0
+
+    speedup = t_python / t_jit
+    print("\n--- Gaussian JIT speedup  N=%d  n_steps=%d ---" % (N, n_steps))
+    print("Python-loop (stop_fn): %.2f us/step  (%.2f s)" % (t_python * 1e6 / n_steps, t_python))
+    print("JIT-loop    (no cb)  : %.2f us/step  (%.2f s)" % (t_jit    * 1e6 / n_steps, t_jit))
+    print("speedup: %.2fx" % speedup)
 
     assert speedup > 1.0, (
         "JIT-loop (%.2f s) not faster than Python-loop (%.2f s)" % (t_jit, t_python)
