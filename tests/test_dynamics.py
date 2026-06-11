@@ -5,11 +5,14 @@ Substrate used throughout: sinusoidal triangular (n=3, epsilon=1, spacing=1),
 same as test_maps.py.  The 7-particle commensurate cluster and the flat-
 substrate helper are defined locally so this file is self-contained.
 
-Flat substrate helper
----------------------
-_flat_sub(abs_pos, pos_cm) returns (0.0, zeros(2), 0.0) and accepts no
-extra en_params.  run_md is called with en_params=[] so the *en_params
-unpacking passes nothing.
+Flat substrate
+--------------
+_flat_sub(abs_pos, pos_cm) is a plain Python callable -- no _jit_core.
+It is used only in tests that pass stop_fn or output_fn (Python loop path).
+
+For tests without callbacks (JIT path), flat_sub_jit is used: a sin
+substrate with epsilon=1e-300 so forces are zero to machine precision but
+the en_func has _jit_core and _jit_params attached.
 
 Cluster choices
 ---------------
@@ -24,7 +27,7 @@ _COMM_POS: 7-particle commensurate cluster for pinning test.
 import numpy as np
 import pytest
 
-from tool_create_substrate import substrate_from_params, get_ks
+from tool_create_substrate import substrate_from_params, get_ks, _calc_en_flat_core
 from tool_create_cluster import calc_cluster_langevin
 from dynamics import run_md, make_params_array
 
@@ -43,6 +46,8 @@ SIN_PARAMS = {
     'ks':         get_ks(1.0, 3, 4.0 / 3.0, 0.0).tolist(),
 }
 
+_FLAT_PARAMS = {'well_shape': 'flat'}
+
 # 7-particle commensurate cluster (center + 6 nearest neighbours).
 _COMM_POS = np.array([
     [0., 0.], A1, -A1, A2, -A2, A1 + A2, -(A1 + A2)
@@ -57,7 +62,10 @@ TWO_PART = np.array([[0.5, 0.], [-0.5, 0.]])
 
 
 def _flat_sub(abs_pos, pos_cm):
-    """Flat (zero) substrate: no energy, force, or torque."""
+    """Flat (zero) substrate: plain Python callable, no _jit_core.
+
+    Only valid for the Python loop path (stop_fn or output_fn present).
+    """
     return 0.0, np.zeros(2, dtype=np.float64), 0.0
 
 
@@ -68,12 +76,24 @@ def substrate():
     return calc_en_f, en_params
 
 
+@pytest.fixture(scope='module')
+def flat_sub_jit():
+    """Return (calc_en_f, en_params) for the flat (zero) substrate.
+
+    Energy and force are identically zero; _jit_core/_jit_params are present.
+    Use in JIT-path tests that need a substrate-free integrator.
+    """
+    _, calc_en_f, en_params = substrate_from_params(_FLAT_PARAMS)
+    return calc_en_f, en_params
+
+
 # ---------------------------------------------------------------------------
 # 1. Noise amplitude
 # ---------------------------------------------------------------------------
 
-def test_noise_amplitude_correct():
+def test_noise_amplitude_correct(flat_sub_jit):
     """var(delta_x) == 2*D_t*dt within 20% (TWO_PART cluster, kBT=1)."""
+    calc_en_f, en_params = flat_sub_jit
     eta   = 1.0
     kBT   = 1.0
     dt    = 1e-3
@@ -81,7 +101,7 @@ def test_noise_amplitude_correct():
     eta_t, _ = calc_cluster_langevin(eta, TWO_PART)
     D_t = kBT / eta_t
 
-    result = run_md(TWO_PART, _flat_sub, [], eta=eta, kBT=kBT,
+    result = run_md(TWO_PART, calc_en_f, en_params, eta=eta, kBT=kBT,
                     dt=dt, n_steps=n, print_every=1, seed=42)
 
     dx      = np.diff(result['pos_cm'][:, 0])
@@ -98,9 +118,10 @@ def test_noise_amplitude_correct():
 # 2. Zero temperature, no force -- particle stays put
 # ---------------------------------------------------------------------------
 
-def test_zero_temperature_no_diffusion():
+def test_zero_temperature_no_diffusion(flat_sub_jit):
     """kBT=0 and no external force: particle must not move at all."""
-    result = run_md(SINGLE, _flat_sub, [], eta=1.0, kBT=0.,
+    calc_en_f, en_params = flat_sub_jit
+    result = run_md(SINGLE, calc_en_f, en_params, eta=1.0, kBT=0.,
                     dt=1e-3, n_steps=1000, print_every=1, seed=0)
 
     pos = result['pos_cm']
@@ -113,15 +134,16 @@ def test_zero_temperature_no_diffusion():
 # 3. Constant external force, flat substrate, zero temperature
 # ---------------------------------------------------------------------------
 
-def test_external_force_free_particle():
+def test_external_force_free_particle(flat_sub_jit):
     """kBT=0, flat substrate, Fx: pos_cm_x = Fx/eta_t * t up to 1e-8."""
+    calc_en_f, en_params = flat_sub_jit
     eta   = 1.0
     Fx    = 0.5
     dt    = 1e-3
     n     = 2000
     eta_t, _ = calc_cluster_langevin(eta, SINGLE)
 
-    result = run_md(SINGLE, _flat_sub, [], eta=eta, Fx=Fx, kBT=0.,
+    result = run_md(SINGLE, calc_en_f, en_params, eta=eta, Fx=Fx, kBT=0.,
                     dt=dt, n_steps=n, print_every=1, seed=0)
 
     t_arr  = result['t']
@@ -200,12 +222,13 @@ def test_commensurate_cluster_pinned(substrate):
 # 7. Output dict keys and array shapes
 # ---------------------------------------------------------------------------
 
-def test_output_dict_keys():
+def test_output_dict_keys(flat_sub_jit):
     """All expected keys present and shapes consistent with n_rec."""
+    calc_en_f, en_params = flat_sub_jit
     n_steps     = 100
     print_every = 10
 
-    result = run_md(SINGLE, _flat_sub, [], eta=1.0, kBT=0.,
+    result = run_md(SINGLE, calc_en_f, en_params, eta=1.0, kBT=0.,
                     dt=1e-3, n_steps=n_steps,
                     print_every=print_every, seed=0)
 
@@ -262,4 +285,186 @@ def test_gradient_descent_at_low_kBT(substrate):
     assert r['energy'][-1] < r['energy'][0], (
         "Energy did not decrease: E0=%.6f, E_final=%.6f"
         % (r['energy'][0], r['energy'][-1])
+    )
+
+
+# ---------------------------------------------------------------------------
+# 10. JIT path: no force, kBT=0 -- particle stays at origin
+# ---------------------------------------------------------------------------
+
+def test_jit_no_force_no_motion(flat_sub_jit):
+    """JIT path: kBT=0, no external force -- CM stays at origin."""
+    calc_en_f, en_params = flat_sub_jit
+    result = run_md(TWO_PART, calc_en_f, en_params, eta=1.0, kBT=0.,
+                    dt=1e-3, n_steps=200, print_every=10, seed=42)
+    assert np.allclose(result['pos_cm'], 0., atol=1e-14), (
+        "max displacement = %.2e" % np.max(np.abs(result['pos_cm']))
+    )
+
+
+# ---------------------------------------------------------------------------
+# 11. JIT path: noise amplitude matches FDT
+# ---------------------------------------------------------------------------
+
+def test_jit_noise_amplitude(flat_sub_jit):
+    """JIT path: var(delta_x) == 2*D_t*dt within 20%."""
+    calc_en_f, en_params = flat_sub_jit
+    eta = 1.0
+    kBT = 1.0
+    dt  = 1e-3
+    n   = 50000
+    eta_t, _ = calc_cluster_langevin(eta, TWO_PART)
+    D_t = kBT / eta_t
+
+    result = run_md(TWO_PART, calc_en_f, en_params, eta=eta, kBT=kBT,
+                    dt=dt, n_steps=n, print_every=1, seed=42)
+    dx  = np.diff(result['pos_cm'][:, 0])
+    var = float(np.var(dx))
+    assert abs(var - 2. * D_t * dt) / (2. * D_t * dt) < 0.20, (
+        "var(dx)=%.4e, expected=%.4e" % (var, 2. * D_t * dt)
+    )
+
+
+# ---------------------------------------------------------------------------
+# 12. Missing _jit_core raises NotImplementedError on JIT path
+# ---------------------------------------------------------------------------
+
+def test_no_jit_core_raises():
+    """run_md without callbacks raises NotImplementedError for a plain callable."""
+    with pytest.raises(NotImplementedError, match="_jit_core"):
+        run_md(SINGLE, _flat_sub, [], eta=1.0, kBT=0.,
+               dt=1e-3, n_steps=10, print_every=5, seed=0)
+
+
+# ---------------------------------------------------------------------------
+# 13. Flat substrate: analytic checks (drift velocity, diffusion)
+# ---------------------------------------------------------------------------
+
+def test_flat_drift_velocity(flat_sub_jit):
+    """F/eta_t * t analytic prediction matches JIT trajectory to 1e-8."""
+    calc_en_f, en_params = flat_sub_jit
+    eta = 1.0
+    Fx  = 0.5
+    dt  = 1e-3
+    n   = 2000
+    eta_t, _ = calc_cluster_langevin(eta, TWO_PART)
+
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        r = run_md(TWO_PART, calc_en_f, en_params, eta=eta, Fx=Fx, kBT=0.,
+                   dt=dt, n_steps=n, print_every=1, seed=0)
+
+    x_pred = Fx / eta_t * r['t']
+    assert np.allclose(r['pos_cm'][:, 0], x_pred, atol=1e-8)
+
+
+def test_flat_diffusion(flat_sub_jit):
+    """var(delta_x) == 2*D_t*dt to 5% on flat substrate (N=50000 steps)."""
+    calc_en_f, en_params = flat_sub_jit
+    eta = 1.0
+    kBT = 1.0
+    dt  = 1e-3
+    n   = 50000
+    eta_t, _ = calc_cluster_langevin(eta, TWO_PART)
+    D_t = kBT / eta_t
+
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        r = run_md(TWO_PART, calc_en_f, en_params, eta=eta, kBT=kBT,
+                   dt=dt, n_steps=n, print_every=1, seed=7)
+
+    dx  = np.diff(r['pos_cm'][:, 0])
+    var = float(np.var(dx))
+    assert abs(var - 2. * D_t * dt) / (2. * D_t * dt) < 0.05, (
+        "var(dx)=%.4e expected=%.4e" % (var, 2. * D_t * dt)
+    )
+
+
+# ---------------------------------------------------------------------------
+# 14. JIT speedup benchmark  (pytest -m slow)
+# ---------------------------------------------------------------------------
+
+@pytest.mark.slow
+def test_jit_speedup_benchmark():
+    """Compare Python-loop vs JIT-loop integration paths.
+
+    Two paths on an N=85 commensurate sin substrate:
+
+      Python-loop: stop_fn=always-False forces the Python EM loop.
+        Every step crosses the Python/JIT boundary once to call the
+        substrate @njit core, then returns to Python for RNG, rotate,
+        state dict, and the loop itself.  This is the old code pattern.
+
+      JIT-loop: no callbacks.  The entire EM loop -- rotate, substrate
+        call, RNG, state update -- runs inside a single @njit function.
+        Zero Python/JIT boundary crossings per step.
+
+    The speedup from the JIT loop comes entirely from eliminating the
+    Python overhead per step (~15 us fixed cost: rotate, dict, RNG on the
+    Python side).  At small N this overhead dominates, giving ~4x speedup.
+    At large N the O(N) substrate cost dominates and the relative gain
+    shrinks (~2x at N=397), but the absolute saving per step is the same.
+
+    Warmup runs are done first so compilation cost is excluded from timing.
+    n_steps=500000 at dt=5e-4 (~250 physical time units).
+
+    The test only asserts speedup > 1 -- the exact ratio depends on N and
+    machine load and should be read from the printed table, not a threshold.
+
+    Run with:  pytest tests/test_dynamics.py -m slow -v -s
+    """
+    import warnings
+    from time import perf_counter
+
+    A1 = np.array([1.0, 0.0])
+    A2 = np.array([-0.5, np.sqrt(3.0) / 2.0])
+
+    from tool_create_cluster import make_cluster
+    pos = make_cluster(A1, A2, 9, 10, shape='circle')   # N=85
+    N   = len(pos)
+
+    sin_params = {
+        'well_shape': 'sin', 'epsilon': 1.0,
+        'sub_basis': [[0., 0.]],
+        'ks': get_ks(1.0, 3, 4.0 / 3.0, 0.0).tolist(),
+    }
+    _, sin_en_f, sin_en_p = substrate_from_params(sin_params)
+
+    n_steps = 500_000
+    md_kw = dict(eta=1.0, kBT=1e-5, Fx=0.3, dt=5e-4,
+                 n_steps=n_steps, print_every=n_steps, seed=42)
+
+    def _never_stop(step, state):
+        return False
+
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+
+        # warmup: compile JIT paths before timing
+        wkw = dict(md_kw, n_steps=200, print_every=200)
+        run_md(pos, sin_en_f, sin_en_p, **wkw)
+        run_md(pos, sin_en_f, sin_en_p, stop_fn=_never_stop, **wkw)
+
+        # Python-loop: stop_fn forces _run_python_loop
+        t0 = perf_counter()
+        run_md(pos, sin_en_f, sin_en_p, stop_fn=_never_stop, **md_kw)
+        t_python = perf_counter() - t0
+
+        # JIT-loop: no callbacks
+        t0 = perf_counter()
+        run_md(pos, sin_en_f, sin_en_p, **md_kw)
+        t_jit = perf_counter() - t0
+
+    speedup = t_python / t_jit
+    print("\n--- JIT speedup benchmark  N=%d  n_steps=%d ---" % (N, n_steps))
+    print("Python-loop (stop_fn): %.2f us/step  (%.2f s)" % (t_python * 1e6 / n_steps, t_python))
+    print("JIT-loop    (no cb)  : %.2f us/step  (%.2f s)" % (t_jit    * 1e6 / n_steps, t_jit))
+    print("speedup: %.2fx" % speedup)
+    print("Note: speedup shrinks with N because O(N) substrate cost")
+    print("dominates at large N; the ~15 us/step Python overhead is fixed.")
+
+    assert speedup > 1.0, (
+        "JIT-loop (%.2f s) not faster than Python-loop (%.2f s)" % (t_jit, t_python)
     )

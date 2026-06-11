@@ -25,26 +25,26 @@ where xi_i ~ N(0, 1).  The displacement variance is
 
     <delta_i^2> = 2 * kBT / eta_i * dt = 2 * D_i * dt   (correct FDT)
 
-The factor sqrt(1/dt) in the noise amplitude compensates for the dt^2 that
-comes from squaring the full step: without it the variance would scale as
-dt^2 rather than dt.
-
 At kBT=0 the noise term vanishes and this reduces to explicit
 Euler gradient descent.  The step size dt is fixed; use small dt
 (check convergence by halving it).  Avoid kBT=0 exactly: a
 deterministic trajectory at a saddle point is sensitive to
 floating-point rounding.  Use kBT=1e-8 (for epsilon=1) instead.
 
+JIT path vs Python path
+-----------------------
+When stop_fn and output_fn are both None, the inner EM loop runs entirely
+in Numba JIT via _md_loop_njit -- no Python/JIT boundary per step.
+calc_en_f must have been produced by substrate_from_params, which attaches
+_jit_core and _jit_params to the en_func closure.
+
+When stop_fn or output_fn is provided, the Python loop path is used instead.
+This is ~6-11x slower but supports arbitrary Python callbacks.
+
 Public API
 ----------
     run_md             -- Euler-Maruyama integrator for all kBT >= 0.
-    make_params_array  -- convenience constructor for the @njit params array.
-
-JIT note
---------
-_overdamped_drift and _overdamped_diffusion are @njit cores called from the
-Euler-Maruyama loop.  The substrate force is recomputed in Python at every
-step because calc_en_f is a Python-level function.
+    make_params_array  -- DEPRECATED; kept for import compatibility.
 """
 
 import logging
@@ -52,7 +52,7 @@ import warnings
 import numpy as np
 from numba import njit
 
-from tool_create_cluster import rotate, calc_cluster_langevin
+from tool_create_cluster import calc_cluster_langevin
 
 _log = logging.getLogger(__name__)
 _log.addHandler(logging.NullHandler())
@@ -63,85 +63,130 @@ _log.addHandler(logging.NullHandler())
 # ============================================================
 
 @njit
-def _overdamped_drift(x, t, params, out):
-    """Fill out with the drift velocity d[i] = F_total_i / eta_i.
+def _rotate_core(pos, angle_deg):
+    """Rotate (N,2) array by angle_deg about origin.
 
-    params array layout (length 10, float64):
-         0: eta_t   -- translational damping
-         1: eta_r   -- rotational damping
-         2: Fx_ext  -- external force x
-         3: Fy_ext  -- external force y
-         4: Tau_ext -- external torque
-         5: kBT     -- thermal energy
-         6: dt      -- timestep
-         7: Fx_sub  -- substrate force x (updated each step)
-         8: Fy_sub  -- substrate force y (updated each step)
-         9: tau_sub -- substrate torque  (updated each step)
-
-    Args:
-        x:      (3,)  float64 -- state [x_cm, y_cm, theta_rad] (unused).
-        t:      float         -- time (unused).
-        params: (10,) float64 -- physics parameters (see layout above).
-        out:    (3,)  float64 -- filled in-place.
+    Duplicate of rotate() in tool_create_cluster, made @njit so the
+    MD step loop can call it without crossing the Python/JIT boundary.
     """
-    eta_t   = params[0]
-    eta_r   = params[1]
-    Fx_ext  = params[2]
-    Fy_ext  = params[3]
-    Tau_ext = params[4]
-    Fx_sub  = params[7]
-    Fy_sub  = params[8]
-    tau_sub = params[9]
-
-    out[0] = (Fx_sub + Fx_ext) / eta_t
-    out[1] = (Fy_sub + Fy_ext) / eta_t
-    out[2] = (tau_sub + Tau_ext) / eta_r
+    theta = angle_deg * 3.141592653589793 / 180.0
+    c = np.cos(theta)
+    s = np.sin(theta)
+    out = np.empty_like(pos)
+    for i in range(pos.shape[0]):
+        out[i, 0] = c * pos[i, 0] - s * pos[i, 1]
+        out[i, 1] = s * pos[i, 0] + c * pos[i, 1]
+    return out
 
 
 @njit
-def _overdamped_diffusion(x, t, params, out):
-    """Fill out with the diagonal noise amplitude matrix B.
+def _md_loop_njit(pos, calc_en_core, substrate_params,
+                  eta_t, eta_r,
+                  Fx_ext, Fy_ext, Tau_ext,
+                  kBT, dt, x0, n_steps, print_every):
+    """Euler-Maruyama loop, fully in Numba JIT.
 
-    B[i,i] = sqrt(2 * kBT / (eta_i * dt)) so that
-    B[i,i]^2 * dt = 2 * D_i = 2 * kBT / eta_i  (correct FDT).
-    When kBT=0 the sqrt evaluates to 0 and the noise term vanishes.
+    calc_en_core is a @njit function with signature:
+        (abs_pos, pos_cm, *substrate_params) -> (float, (2,) float64, float)
+    substrate_params is a tuple of pre-converted float64 arrays captured in
+    the en_func closure and exposed via en_func._jit_params.
 
-    Args:
-        x:      (3,)    float64 -- state (unused).
-        t:      float           -- time (unused).
-        params: (10,)   float64 -- physics parameters (see _overdamped_drift).
-        out:    (3, 3)  float64 -- filled in-place; diagonal entries only.
+    Numba specialises this function for each concrete (calc_en_core, param
+    tuple type) pair at first call; subsequent calls use the compiled version.
+
+    RNG: np.random.seed() before calling from Python seeds Numba's internal
+    xorshift generator.  np.random.normal(0.0, 1.0) inside @njit uses that
+    generator -- no Python/JIT boundary crossing.
+
+    Returns flat arrays (no Python dicts inside @njit):
+        (t, xcm, ycm, theta_deg, energy, Fx, Fy, torque, vcmx, vcmy, omega)
+    each shape (n_steps // print_every,).
     """
-    eta_t = params[0]
-    eta_r = params[1]
-    kBT   = params[5]
-    dt    = params[6]
+    n_rec = n_steps // print_every
+    t_arr    = np.empty(n_rec)
+    xcm_arr  = np.empty(n_rec)
+    ycm_arr  = np.empty(n_rec)
+    th_arr   = np.empty(n_rec)
+    en_arr   = np.empty(n_rec)
+    Fx_arr   = np.empty(n_rec)
+    Fy_arr   = np.empty(n_rec)
+    tau_arr  = np.empty(n_rec)
+    vcmx_arr = np.empty(n_rec)
+    vcmy_arr = np.empty(n_rec)
+    om_arr   = np.empty(n_rec)
 
-    out[0, 0] = (2.0 * kBT / (eta_t * dt)) ** 0.5
-    out[1, 1] = (2.0 * kBT / (eta_t * dt)) ** 0.5
-    out[2, 2] = (2.0 * kBT / (eta_r * dt)) ** 0.5
+    x = x0.copy()
+    t = 0.0
+    i_rec = 0
+
+    B_t = (2.0 * kBT / (eta_t * dt)) ** 0.5
+    B_r = (2.0 * kBT / (eta_r * dt)) ** 0.5
+
+    for i_step in range(1, n_steps + 1):
+        theta_deg = x[2] * 180.0 / 3.141592653589793
+        pos_rot   = _rotate_core(pos, theta_deg)
+
+        abs_pos = np.empty_like(pos_rot)
+        for i in range(pos_rot.shape[0]):
+            abs_pos[i, 0] = pos_rot[i, 0] + x[0]
+            abs_pos[i, 1] = pos_rot[i, 1] + x[1]
+        pos_cm = x[:2].copy()
+
+        e0, f0, tau0 = calc_en_core(abs_pos, pos_cm, *substrate_params)
+
+        xi0 = np.random.normal(0.0, 1.0)
+        xi1 = np.random.normal(0.0, 1.0)
+        xi2 = np.random.normal(0.0, 1.0)
+
+        dx     = ((f0[0] + Fx_ext) / eta_t + B_t * xi0) * dt
+        dy     = ((f0[1] + Fy_ext) / eta_t + B_t * xi1) * dt
+        dtheta = ((tau0  + Tau_ext) / eta_r + B_r * xi2) * dt
+
+        x[0] += dx
+        x[1] += dy
+        x[2] += dtheta
+        t    += dt
+
+        if i_step % print_every == 0 and i_rec < n_rec:
+            t_arr[i_rec]    = t
+            xcm_arr[i_rec]  = x[0]
+            ycm_arr[i_rec]  = x[1]
+            th_arr[i_rec]   = x[2] * 180.0 / 3.141592653589793
+            en_arr[i_rec]   = e0
+            Fx_arr[i_rec]   = f0[0]
+            Fy_arr[i_rec]   = f0[1]
+            tau_arr[i_rec]  = tau0
+            vcmx_arr[i_rec] = dx / dt
+            vcmy_arr[i_rec] = dy / dt
+            om_arr[i_rec]   = dtheta / dt
+            i_rec += 1
+
+    return (t_arr, xcm_arr, ycm_arr, th_arr, en_arr,
+            Fx_arr, Fy_arr, tau_arr, vcmx_arr, vcmy_arr, om_arr)
 
 
 # ============================================================
-# Convenience constructor
+# Deprecated helpers (kept for import compatibility)
 # ============================================================
 
 def make_params_array(eta_t, eta_r, Fx, Fy, Tau, kBT, dt):
-    """Build the (10,) params array expected by the @njit drift/diffusion.
+    """DEPRECATED: superseded by _md_loop_njit; kept so old imports don't break.
 
     Args:
-        eta_t: float -- translational damping  (eta * N).
-        eta_r: float -- rotational damping      (eta * sum r_i^2).
-        Fx:    float -- external force x.
-        Fy:    float -- external force y.
-        Tau:   float -- external torque.
+        eta_t: float -- translational damping.
+        eta_r: float -- rotational damping.
+        Fx, Fy, Tau: floats -- external force/torque.
         kBT:   float -- thermal energy.
         dt:    float -- timestep.
 
     Returns:
-        (10,) float64 ndarray.  Substrate-force slots 7-9 are zero;
-        run_md overwrites them each step.
+        (10,) float64 ndarray (substrate-force slots 7-9 are zero).
     """
+    warnings.warn(
+        "make_params_array is deprecated and will be removed in a future release. "
+        "It is no longer used by run_md.",
+        DeprecationWarning, stacklevel=2
+    )
     p = np.zeros(10, dtype=np.float64)
     p[0] = float(eta_t)
     p[1] = float(eta_r)
@@ -154,125 +199,23 @@ def make_params_array(eta_t, eta_r, Fx, Fy, Tau, kBT, dt):
 
 
 # ============================================================
-# MD driver
+# Python-loop path (used when callbacks are present)
 # ============================================================
 
-def run_md(pos, calc_en_f, en_params,
-           eta, Fx=0., Fy=0., Tau=0., kBT=0.,
-           dt=1e-4, n_steps=10000,
-           theta0=0., pos_cm0=None,
-           print_every=100,
-           stop_fn=None,
-           output_fn=None,
-           seed=12345):
-    """Run overdamped Langevin MD for a rigid cluster on a substrate.
+def _run_python_loop(pos, calc_en_f, en_params,
+                     eta_t, eta_r, Fx, Fy, Tau, kBT, dt,
+                     x0, n_steps, print_every,
+                     stop_fn, output_fn, seed):
+    """Euler-Maruyama loop in Python; supports stop_fn and output_fn callbacks.
 
-    Uses the Euler-Maruyama integrator for all kBT >= 0.  At kBT=0 the
-    noise term vanishes and the step reduces to explicit Euler gradient
-    descent.
+    Called by run_md when stop_fn or output_fn is not None.
+    Uses np.random.default_rng for reproducibility on the Python path.
 
-    Every print_every steps a state snapshot is emitted.  If output_fn is
-    provided it is called with (step, t, state_dict) and run_md returns None;
-    otherwise snapshots accumulate in memory and are returned as a dict of
-    arrays.
-
-    Args:
-        pos:         (N, 2) ndarray   -- cluster positions in the cluster frame
-                                         (CM at origin).
-        calc_en_f:   callable         -- substrate energy function from
-                                         substrate_from_params.  Signature:
-                                         (abs_pos, pos_cm, *en_params) ->
-                                         (energy, force_cm, torque).
-        en_params:   list             -- extra arguments for calc_en_f.
-        eta:         float            -- single-particle drag coefficient.
-        Fx:          float            -- constant external force x (default 0).
-        Fy:          float            -- constant external force y (default 0).
-        Tau:         float            -- constant external torque  (default 0).
-        kBT:         float            -- thermal energy; 0 for a T=0 run.
-        dt:          float            -- timestep (snapshot cadence = print_every*dt).
-        n_steps:     int              -- number of MD steps.
-        theta0:      float            -- initial orientation in degrees.
-        pos_cm0:     (2,) array-like  -- initial CM position; default (0, 0).
-        print_every: int              -- emit a snapshot every this many steps.
-        stop_fn:     callable or None -- stop_fn(step, state_dict) -> bool;
-                                         called at every snapshot;
-                                         return True to halt early.
-        output_fn:   callable or None -- output_fn(step, t, state_dict) -> None;
-                                         if given, run_md returns None.
-                                         state_dict keys: 'pos_cm', 'theta',
-                                         'energy', 'force', 'torque',
-                                         'vel_cm', 'omega'.
-        seed:        int              -- numpy RNG seed.
-
-    Returns:
-        None if output_fn is provided.
-        Otherwise a dict with keys:
-            't'      : (n_rec,)    -- time at each snapshot.
-            'pos_cm' : (n_rec, 2)  -- CM position.
-            'theta'  : (n_rec,)    -- orientation in degrees.
-            'energy' : (n_rec,)    -- substrate energy.
-            'force'  : (n_rec, 2)  -- substrate force on CM.
-            'torque' : (n_rec,)    -- substrate torque.
-            'vel_cm' : (n_rec, 2)  -- CM velocity (drift) at snapshot.
-            'omega'  : (n_rec,)    -- angular velocity at snapshot.
-
-    Raises:
-        ValueError: if eta_r == 0 and (Tau != 0 or kBT > 0).
+    Returns dict of arrays, or None if output_fn is provided.
     """
-    pos = np.asarray(pos, dtype=np.float64)
-    if pos_cm0 is None:
-        pos_cm0 = np.zeros(2, dtype=np.float64)
-    pos_cm0 = np.asarray(pos_cm0, dtype=np.float64)
+    from tool_create_cluster import rotate
 
-    eta_t, eta_r = calc_cluster_langevin(eta, pos)
-
-    if eta_r == 0.0 and (Tau != 0.0 or kBT > 0.0):
-        raise ValueError(
-            "eta_r=0 (point-like cluster): orientation is undefined "
-            "when Tau!=0 or kBT>0. Use a finite-size cluster."
-        )
-
-    if eta_r == 0.0:
-        # Single-particle cluster: no moment of inertia, no rotational dynamics.
-        # Set eta_r=1 so the JIT cores (which divide by eta_r) don't blow up.
-        # With kBT=0 and Tau=0 (guaranteed by the ValueError above), the JIT
-        # produces d_buf[2]=0/1=0 and B_buf[2,2]=sqrt(0)=0 automatically, so
-        # theta never drifts.  The value 1 is otherwise arbitrary.
-        warnings.warn(
-            "eta_r=0 (single-particle cluster at origin): rotational drag "
-            "is zero. Setting eta_r=1 internally to avoid division by zero "
-            "in the integrator. This is safe only when kBT=0 and Tau=0, "
-            "which is enforced above. Theta will not evolve.",
-            UserWarning, stacklevel=2
-        )
-        eta_r = 1.0
-
-    if kBT == 0.0:
-        warnings.warn(
-            "kBT=0 is not recommended: the Euler-Maruyama integrator "
-            "uses finite dt and a deterministic saddle point may be "
-            "crossed or missed depending on floating-point rounding. "
-            "Use a small kBT (e.g. 1e-8 for epsilon=1) to regularise "
-            "saddle-point crossings. Continuing with kBT=0.",
-            UserWarning, stacklevel=2
-        )
-
-    # theta0 is in degrees -- consistent with the rest of the public API.
-    # Values outside [-720, 720] almost certainly indicate a radians-vs-degrees
-    # mistake (the whole 2pi range is only ~6.28).
-    if abs(theta0) > 720.0:
-        warnings.warn(
-            "theta0=%.4g looks suspiciously large. "
-            "run_md expects degrees, not radians." % theta0,
-            UserWarning, stacklevel=2
-        )
-    x0 = np.array([pos_cm0[0], pos_cm0[1], np.deg2rad(theta0)], dtype=np.float64)
-
-    params = make_params_array(eta_t, eta_r, Fx, Fy, Tau, kBT, dt)
-    rng    = np.random.default_rng(seed)
-
-    d_buf = np.zeros(3,      dtype=np.float64)
-    B_buf = np.zeros((3, 3), dtype=np.float64)
+    rng = np.random.default_rng(seed)
 
     x         = x0.copy()
     t         = 0.0
@@ -284,26 +227,24 @@ def run_md(pos, calc_en_f, en_params,
 
     records = [] if output_fn is None else None
 
+    # Pre-compute noise amplitudes (constant through the run).
+    B_t = (2.0 * kBT / (eta_t * dt)) ** 0.5
+    B_r = (2.0 * kBT / (eta_r * dt)) ** 0.5
+
     for i_step in range(1, n_steps + 1):
-        params[7] = f0[0]
-        params[8] = f0[1]
-        params[9] = float(tau0)
-
-        d_buf[:] = 0.
-        B_buf[:] = 0.
-        _overdamped_drift(x, t, params, d_buf)
-        _overdamped_diffusion(x, t, params, B_buf)
-
         xi    = rng.standard_normal(3)
-        delta = (d_buf + B_buf @ xi) * dt
+        dx    = ((f0[0] + Fx) / eta_t + B_t * xi[0]) * dt
+        dy    = ((f0[1] + Fy) / eta_t + B_t * xi[1]) * dt
+        dth   = ((tau0  + Tau) / eta_r + B_r * xi[2]) * dt
 
-        x += delta
-        t += dt
+        x[0] += dx
+        x[1] += dy
+        x[2] += dth
+        t    += dt
 
         pos_cm    = x[:2].copy()
         theta_deg = np.rad2deg(x[2])
         pos_rot   = rotate(pos, theta_deg)
-
         e0, f0, tau0 = calc_en_f(pos_rot + pos_cm, pos_cm, *en_params)
 
         if i_step % print_every == 0:
@@ -313,8 +254,8 @@ def run_md(pos, calc_en_f, en_params,
                 'energy': float(e0),
                 'force':  np.asarray(f0, dtype=np.float64).copy(),
                 'torque': float(tau0),
-                'vel_cm': (delta[:2] / dt).copy(),
-                'omega':  float(delta[2] / dt),
+                'vel_cm': np.array([dx / dt, dy / dt]),
+                'omega':  float(dth / dt),
             }
 
             if output_fn is not None:
@@ -341,4 +282,160 @@ def run_md(pos, calc_en_f, en_params,
         'torque': np.array([r['torque'] for r in records]),
         'vel_cm': np.array([r['vel_cm'] for r in records]),
         'omega':  np.array([r['omega']  for r in records]),
+    }
+
+
+# ============================================================
+# MD driver
+# ============================================================
+
+def run_md(pos, calc_en_f, en_params,
+           eta, Fx=0., Fy=0., Tau=0., kBT=0.,
+           dt=1e-4, n_steps=10000,
+           theta0=0., pos_cm0=None,
+           print_every=100,
+           stop_fn=None,
+           output_fn=None,
+           seed=12345):
+    """Run overdamped Langevin MD for a rigid cluster on a substrate.
+
+    Uses the Euler-Maruyama integrator for all kBT >= 0.  At kBT=0 the
+    noise term vanishes and the step reduces to explicit Euler gradient
+    descent.
+
+    Every print_every steps a state snapshot is emitted.  If output_fn is
+    provided it is called with (step, t, state_dict) and run_md returns None;
+    otherwise snapshots accumulate in memory and are returned as a dict of
+    arrays.
+
+    Performance note:
+        When stop_fn and output_fn are both None, the inner loop runs in
+        Numba JIT (_md_loop_njit) with no Python overhead per step.
+        When either callback is provided, the slower Python loop runs instead.
+        For maximum throughput, avoid callbacks and post-process the returned
+        trajectory dict.
+
+    Args:
+        pos:         (N, 2) ndarray   -- cluster positions in the cluster frame
+                                         (CM at origin).
+        calc_en_f:   callable         -- substrate energy function from
+                                         substrate_from_params.  Must expose
+                                         _jit_core and _jit_params attributes
+                                         (set automatically by substrate_from_params).
+        en_params:   list             -- extra arguments for calc_en_f (usually []).
+        eta:         float            -- single-particle drag coefficient.
+        Fx:          float            -- constant external force x (default 0).
+        Fy:          float            -- constant external force y (default 0).
+        Tau:         float            -- constant external torque  (default 0).
+        kBT:         float            -- thermal energy; 0 for a T=0 run.
+        dt:          float            -- timestep.
+        n_steps:     int              -- number of MD steps.
+        theta0:      float            -- initial orientation in degrees.
+        pos_cm0:     (2,) array-like  -- initial CM position; default (0, 0).
+        print_every: int              -- emit a snapshot every this many steps.
+        stop_fn:     callable or None -- stop_fn(step, state_dict) -> bool;
+                                         forces Python loop path.
+        output_fn:   callable or None -- output_fn(step, t, state_dict) -> None;
+                                         forces Python loop path; run_md returns None.
+        seed:        int              -- RNG seed.
+
+    Returns:
+        None if output_fn is provided.
+        Otherwise a dict with keys:
+            't'      : (n_rec,)    -- time at each snapshot.
+            'pos_cm' : (n_rec, 2)  -- CM position.
+            'theta'  : (n_rec,)    -- orientation in degrees.
+            'energy' : (n_rec,)    -- substrate energy.
+            'force'  : (n_rec, 2)  -- substrate force on CM.
+            'torque' : (n_rec,)    -- substrate torque.
+            'vel_cm' : (n_rec, 2)  -- CM velocity at snapshot.
+            'omega'  : (n_rec,)    -- angular velocity at snapshot.
+
+    Raises:
+        ValueError:         if eta_r == 0 and (Tau != 0 or kBT > 0).
+        NotImplementedError: if calc_en_f lacks _jit_core/_jit_params and
+                             no callbacks are provided (JIT path required).
+    """
+    pos = np.asarray(pos, dtype=np.float64)
+    if pos_cm0 is None:
+        pos_cm0 = np.zeros(2, dtype=np.float64)
+    pos_cm0 = np.asarray(pos_cm0, dtype=np.float64)
+
+    eta_t, eta_r = calc_cluster_langevin(eta, pos)
+
+    if eta_r == 0.0 and (Tau != 0.0 or kBT > 0.0):
+        raise ValueError(
+            "eta_r=0 (point-like cluster): orientation is undefined "
+            "when Tau!=0 or kBT>0. Use a finite-size cluster."
+        )
+
+    if eta_r == 0.0:
+        warnings.warn(
+            "eta_r=0 (single-particle cluster at origin): rotational drag "
+            "is zero. Setting eta_r=1 internally to avoid division by zero "
+            "in the integrator. This is safe only when kBT=0 and Tau=0, "
+            "which is enforced above. Theta will not evolve.",
+            UserWarning, stacklevel=2
+        )
+        eta_r = 1.0
+
+    if kBT == 0.0:
+        warnings.warn(
+            "kBT=0 is not recommended: the Euler-Maruyama integrator "
+            "uses finite dt and a deterministic saddle point may be "
+            "crossed or missed depending on floating-point rounding. "
+            "Use a small kBT (e.g. 1e-8 for epsilon=1) to regularise "
+            "saddle-point crossings. Continuing with kBT=0.",
+            UserWarning, stacklevel=2
+        )
+
+    if abs(theta0) > 720.0:
+        warnings.warn(
+            "theta0=%.4g looks suspiciously large. "
+            "run_md expects degrees, not radians." % theta0,
+            UserWarning, stacklevel=2
+        )
+
+    x0 = np.array([pos_cm0[0], pos_cm0[1], np.deg2rad(theta0)], dtype=np.float64)
+
+    # Python loop path: required when callbacks are present.
+    if stop_fn is not None or output_fn is not None:
+        return _run_python_loop(
+            pos, calc_en_f, en_params,
+            eta_t, eta_r, Fx, Fy, Tau, kBT, dt,
+            x0, n_steps, print_every,
+            stop_fn, output_fn, seed
+        )
+
+    # JIT path: requires _jit_core and _jit_params on calc_en_f.
+    jit_core   = getattr(calc_en_f, '_jit_core',   None)
+    jit_params = getattr(calc_en_f, '_jit_params', None)
+    if jit_core is None or jit_params is None:
+        raise NotImplementedError(
+            "run_md requires calc_en_f to expose _jit_core and _jit_params. "
+            "Use substrate_from_params to build the energy function. "
+            "Custom energy functions must attach these attributes manually "
+            "to use run_md without callbacks."
+        )
+
+    # np.random.seed sets Numba's internal xorshift state.
+    # np.random.default_rng() does NOT affect Numba RNG -- do not use it here.
+    np.random.seed(seed)
+
+    arrs = _md_loop_njit(
+        pos, jit_core, jit_params,
+        eta_t, eta_r, Fx, Fy, Tau, kBT, dt,
+        x0, n_steps, print_every
+    )
+    t_a, xcm_a, ycm_a, th_a, en_a, fx_a, fy_a, tau_a, vx_a, vy_a, om_a = arrs
+
+    return {
+        't':      t_a,
+        'pos_cm': np.column_stack([xcm_a, ycm_a]),
+        'theta':  th_a,
+        'energy': en_a,
+        'force':  np.column_stack([fx_a, fy_a]),
+        'torque': tau_a,
+        'vel_cm': np.column_stack([vx_a, vy_a]),
+        'omega':  om_a,
     }

@@ -190,6 +190,34 @@ def _particle_en_gaussian_core(pos, pos_torque, basis,
     return en, F, tau
 
 
+# One JIT boundary crossing per MD step: the closure in substrate_from_params
+# calls this directly with pre-converted float64 arrays, so no Python-level
+# np.sum or np.array(basis,...) overhead accumulates over 200k steps.
+@njit
+def _calc_en_gaussian_core(pos, pos_cm,
+                            basis, a, b, sigma, epsilon, u, u_inv):
+    """Sum particle energies, forces, and torque over all cluster particles.
+
+    Called from the en_func closure returned by substrate_from_params.
+    All arguments are pre-converted float64 arrays; no conversion at call time.
+
+    Returns:
+        (float, (2,) float64, float) -- total energy, force on CM, total torque.
+    """
+    en, F, tau = _particle_en_gaussian_core(
+        pos, pos_cm, basis, a, b, sigma, epsilon, u, u_inv)
+    E_tot   = 0.0
+    Fx_tot  = 0.0
+    Fy_tot  = 0.0
+    tau_tot = 0.0
+    for i in range(en.shape[0]):
+        E_tot   += en[i]
+        Fx_tot  += F[i, 0]
+        Fy_tot  += F[i, 1]
+        tau_tot += tau[i]
+    return E_tot, np.array([Fx_tot, Fy_tot]), tau_tot
+
+
 def particle_en_gaussian(pos, pos_torque, basis, a, b, sigma, epsilon, u, u_inv):
     """Per-particle energy, force, and torque for a Gaussian-well substrate.
 
@@ -310,6 +338,32 @@ def _particle_en_tanh_core(pos, pos_torque, basis,
             F[i, 1] += F_site[i, 1]
 
     return en, F, tau
+
+
+# Same rationale as _calc_en_gaussian_core: sum inside Numba, called once
+# per MD step with zero Python array-conversion overhead.
+@njit
+def _calc_en_tanh_core(pos, pos_cm,
+                       basis, a, b, ww, epsilon, u, u_inv):
+    """Sum particle energies, forces, and torque for tanh-well substrate.
+
+    See _calc_en_gaussian_core for the rationale.
+
+    Returns:
+        (float, (2,) float64, float) -- total energy, force on CM, total torque.
+    """
+    en, F, tau = _particle_en_tanh_core(
+        pos, pos_cm, basis, a, b, ww, epsilon, u, u_inv)
+    E_tot   = 0.0
+    Fx_tot  = 0.0
+    Fy_tot  = 0.0
+    tau_tot = 0.0
+    for i in range(en.shape[0]):
+        E_tot   += en[i]
+        Fx_tot  += F[i, 0]
+        Fy_tot  += F[i, 1]
+        tau_tot += tau[i]
+    return E_tot, np.array([Fx_tot, Fy_tot]), tau_tot
 
 
 def particle_en_tanh(pos, pos_torque, basis, a, b, ww, epsilon, u, u_inv):
@@ -465,6 +519,31 @@ def _particle_en_sin_core(pos, pos_torque, basis, ks, epsilon):
     return en, F, tau
 
 
+# Same rationale as _calc_en_gaussian_core.  ks is pre-converted once in
+# substrate_from_params; basis and epsilon likewise.
+@njit
+def _calc_en_sin_core(pos, pos_cm, basis, ks, epsilon):
+    """Sum particle energies, forces, and torque for plane-wave substrate.
+
+    See _calc_en_gaussian_core for the rationale.
+
+    Returns:
+        (float, (2,) float64, float) -- total energy, force on CM, total torque.
+    """
+    en, F, tau = _particle_en_sin_core(
+        pos, pos_cm, basis, ks, epsilon)
+    E_tot   = 0.0
+    Fx_tot  = 0.0
+    Fy_tot  = 0.0
+    tau_tot = 0.0
+    for i in range(en.shape[0]):
+        E_tot   += en[i]
+        Fx_tot  += F[i, 0]
+        Fy_tot  += F[i, 1]
+        tau_tot += tau[i]
+    return E_tot, np.array([Fx_tot, Fy_tot]), tau_tot
+
+
 def particle_en_sin(pos, pos_torque, basis, ks, epsilon):
     """Per-particle energy, force, and torque for a plane-wave substrate.
 
@@ -499,6 +578,24 @@ def calc_en_sin(pos, pos_torque, basis, ks, epsilon):
 
 
 # ============================================================
+# Flat (zero) substrate
+# ============================================================
+
+@njit
+def _calc_en_flat_core(pos, pos_cm):
+    """Zero energy and force for all positions.
+
+    Used as a trivial substrate for testing the integrator in isolation:
+    with no substrate force, analytic predictions for drift velocity and
+    diffusion are exact, giving a clean check of the EM integrator.
+
+    Returns:
+        (0.0, zeros(2), 0.0)
+    """
+    return 0.0, np.zeros(2), 0.0
+
+
+# ============================================================
 # Factory: build substrate from parameter dictionary
 # ============================================================
 
@@ -513,6 +610,7 @@ def substrate_from_params(params):
         'gaussian':  epsilon, sigma, a, b, b1, b2, sub_basis
         'tanh':      epsilon, wd (=ww), a, b, b1, b2, sub_basis
         'sin':       epsilon, ks, sub_basis
+        'flat':      no keys required (not even epsilon or sub_basis)
 
     For 'gaussian' and 'tanh', b1 and b2 are the primitive lattice vectors
     used to build the metric matrices (via calc_matrices_bvect).
@@ -521,43 +619,119 @@ def substrate_from_params(params):
     No metric matrices are needed because the plane-wave potential is
     already periodic by construction.
 
+    For 'flat', the substrate is identically zero everywhere -- useful for
+    testing the integrator against analytic predictions (drift velocity,
+    diffusion coefficient, FDT) without substrate interference.
+
+    All array parameters (basis, u, u_inv, ks) are converted to float64 ONCE
+    here and captured in the returned closures.  Callers pass en_inputs=[]
+    and call en_func(pos, pos_cm) -- the closure holds everything else.
+    This eliminates per-step np.array conversions in run_md.
+
     Args:
-        params: dict with at least 'well_shape', 'epsilon', 'sub_basis',
-                and shape-specific keys listed above.
+        params: dict with at least 'well_shape' and shape-specific keys
+                listed above.  'epsilon' and 'sub_basis' are not required
+                for 'flat'.
 
     Returns:
-        pen_func:  particle-level function (pos, pos_torque, *en_inputs).
-        en_func:   total function        (pos, pos_torque, *en_inputs).
-        en_inputs: list of positional arguments to pass after pos_torque.
+        pen_func:  particle-level closure (pos, pos_cm) ->
+                   (en, F, tau) arrays (per particle).
+        en_func:   total-energy closure  (pos, pos_cm) ->
+                   (float, (2,) float64, float).
+        en_inputs: always [] -- all parameters live in the closures.
 
     Raises:
         NotImplementedError: if well_shape is not recognised.
     """
-    epsilon    = params['epsilon']
     well_shape = params['well_shape']
-    basis      = params['sub_basis']
+
+    if well_shape == 'flat':
+        def pen_func(pos, pos_cm):
+            N = pos.shape[0]
+            return np.zeros(N), np.zeros((N, 2)), np.zeros(N)
+
+        def en_func(pos, pos_cm):
+            return _calc_en_flat_core(
+                np.asarray(pos,    dtype=np.float64),
+                np.asarray(pos_cm, dtype=np.float64))
+
+        en_func._jit_core   = _calc_en_flat_core
+        en_func._jit_params = ()
+        en_inputs = []
+        return pen_func, en_func, en_inputs
+
+    epsilon = params['epsilon']
+    basis   = params['sub_basis']
 
     if well_shape == 'gaussian':
-        sigma = params['sigma']
-        a, b  = params['a'], params['b']
+        sigma    = params['sigma']
+        a, b     = params['a'], params['b']
         u, u_inv = calc_matrices_bvect(params['b1'], params['b2'])
-        pen_func = particle_en_gaussian
-        en_func  = calc_en_gaussian
-        en_inputs = [basis, a, b, sigma, epsilon, u, u_inv]
+
+        _basis   = np.array(basis,  dtype=np.float64).reshape(-1, 2)
+        _u       = np.asarray(u,    dtype=np.float64)
+        _u_inv   = np.asarray(u_inv, dtype=np.float64)
+        _a, _b   = float(a), float(b)
+        _sigma   = float(sigma)
+        _epsilon = float(epsilon)
+
+        def pen_func(pos, pos_cm):
+            return particle_en_gaussian(
+                pos, pos_cm, _basis, _a, _b, _sigma, _epsilon, _u, _u_inv)
+
+        def en_func(pos, pos_cm):
+            return _calc_en_gaussian_core(
+                np.asarray(pos,    dtype=np.float64),
+                np.asarray(pos_cm, dtype=np.float64),
+                _basis, _a, _b, _sigma, _epsilon, _u, _u_inv)
+
+        en_func._jit_core   = _calc_en_gaussian_core
+        en_func._jit_params = (_basis, _a, _b, _sigma, _epsilon, _u, _u_inv)
+        en_inputs = []
 
     elif well_shape == 'tanh':
         ww   = params['wd']   # 'wd' is the historical key; ww in the code
         a, b = params['a'], params['b']
         u, u_inv = calc_matrices_bvect(params['b1'], params['b2'])
-        pen_func = particle_en_tanh
-        en_func  = calc_en_tanh
-        en_inputs = [basis, a, b, ww, epsilon, u, u_inv]
+
+        _basis   = np.array(basis,  dtype=np.float64).reshape(-1, 2)
+        _u       = np.asarray(u,    dtype=np.float64)
+        _u_inv   = np.asarray(u_inv, dtype=np.float64)
+        _a, _b   = float(a), float(b)
+        _ww      = float(ww)
+        _epsilon = float(epsilon)
+
+        def pen_func(pos, pos_cm):
+            return particle_en_tanh(
+                pos, pos_cm, _basis, _a, _b, _ww, _epsilon, _u, _u_inv)
+
+        def en_func(pos, pos_cm):
+            return _calc_en_tanh_core(
+                np.asarray(pos,    dtype=np.float64),
+                np.asarray(pos_cm, dtype=np.float64),
+                _basis, _a, _b, _ww, _epsilon, _u, _u_inv)
+
+        en_func._jit_core   = _calc_en_tanh_core
+        en_func._jit_params = (_basis, _a, _b, _ww, _epsilon, _u, _u_inv)
+        en_inputs = []
 
     elif well_shape == 'sin':
-        ks = np.asarray(params['ks'], dtype=np.float64)
-        pen_func = particle_en_sin
-        en_func  = calc_en_sin
-        en_inputs = [basis, ks, epsilon]
+        _ks      = np.asarray(params['ks'], dtype=np.float64)
+        _basis   = np.array(basis, dtype=np.float64).reshape(-1, 2)
+        _epsilon = float(epsilon)
+
+        def pen_func(pos, pos_cm):
+            return particle_en_sin(pos, pos_cm, _basis, _ks, _epsilon)
+
+        def en_func(pos, pos_cm):
+            return _calc_en_sin_core(
+                np.asarray(pos,    dtype=np.float64),
+                np.asarray(pos_cm, dtype=np.float64),
+                _basis, _ks, _epsilon)
+
+        en_func._jit_core   = _calc_en_sin_core
+        en_func._jit_params = (_basis, _ks, _epsilon)
+        en_inputs = []
 
     else:
         raise NotImplementedError(
