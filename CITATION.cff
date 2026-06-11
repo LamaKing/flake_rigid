@@ -1,0 +1,107 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it and the reference papers below."
+title: "FLAKE: Friction and Lattice Analysis of Kinetics and Energetics"
+version: "0.1.0"
+date-released: "2025"
+authors:
+  - family-names: Silva
+    given-names: Andrea
+    email: ansilva@sissa.it
+    affiliation: "SISSA, Trieste, Italy"
+    orcid: "https://orcid.org/TODO"
+repository-code: "https://github.com/LamaKing/slides_rigid"
+license: GPL-3.0
+keywords:
+  - friction
+  - superlubricity
+  - nanoscale
+  - molecular dynamics
+  - rigid cluster
+abstract: >
+  FLAKE simulates the statics and overdamped Langevin dynamics of a rigid
+  2D cluster sliding over a crystalline substrate. It provides energy maps,
+  minimum energy path search (string method, 2D and 3D roto-translational),
+  and MD sweeps for depinning and scaling-law studies.
+references:
+  - type: article
+    title: "Frictionless nanohighways on crystalline surfaces"
+    authors:
+      - family-names: Panizon
+        given-names: Emanuele
+      - family-names: Silva
+        given-names: Andrea
+      - family-names: Cao
+        given-names: Xin
+      - family-names: Wang
+        given-names: Jin
+      - family-names: Bechinger
+        given-names: Clemens
+      - family-names: Vanossi
+        given-names: Andrea
+      - family-names: Tosatti
+        given-names: Erio
+      - family-names: Manini
+        given-names: Nicola
+    journal: Nanoscale
+    volume: 15
+    issue: 3
+    start: 1299
+    end: 1316
+    year: 2023
+    doi: "10.1039/D2NR04532J"
+  - type: article
+    title: >
+      Moire-pattern evolution couples rotational and translational friction
+      at crystalline interfaces
+    authors:
+      - family-names: Cao
+        given-names: Xin
+      - family-names: Silva
+        given-names: Andrea
+      - family-names: Panizon
+        given-names: Emanuele
+      - family-names: Vanossi
+        given-names: Andrea
+      - family-names: Manini
+        given-names: Nicola
+      - family-names: Tosatti
+        given-names: Erio
+      - family-names: Bechinger
+        given-names: Clemens
+    journal: "Physical Review X"
+    volume: 12
+    issue: 2
+    start: 021059
+    year: 2022
+    doi: "10.1103/PhysRevX.12.021059"
+  - type: article
+    title: >
+      Twisting dynamics of large lattice-mismatch van der Waals heterostructures
+    authors:
+      - family-names: Liao
+        given-names: Mengzhou
+      - family-names: Silva
+        given-names: Andrea
+      - family-names: Du
+        given-names: Luojun
+      - family-names: Nicolini
+        given-names: Paolo
+      - family-names: Claerbout
+        given-names: "Victor E. P."
+      - family-names: Kramer
+        given-names: Denis
+      - family-names: Yang
+        given-names: Rong
+      - family-names: Shi
+        given-names: Dongxia
+      - family-names: Polcar
+        given-names: Tomas
+      - family-names: Zhang
+        given-names: Guangyu
+    journal: "ACS Applied Materials and Interfaces"
+    volume: 15
+    issue: 15
+    start: 19616
+    end: 19623
+    year: 2023
+    doi: "10.1021/acsami.2c22860"

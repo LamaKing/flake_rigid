@@ -4,8 +4,8 @@ import sys, os, json, logging, argparse
 from argparse import RawTextHelpFormatter
 import numpy as np
 from time import time
-from tool_create_cluster import create_cluster, load_cluster, rotate, calc_cluster_langevin
-from tool_create_substrate import substrate_from_params
+from flake.cluster import create_cluster, load_cluster, rotate, calc_cluster_langevin
+from flake.substrate import substrate_from_params
 
 from monty.json import MSONable, MontyEncoder, MontyDecoder, MSONError
 

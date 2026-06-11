@@ -35,7 +35,7 @@ import warnings
 import logging
 import numpy as np
 
-from drift.dynamics import run_md
+from flake.dynamics import run_md
 
 _log = logging.getLogger(__name__)
 _log.addHandler(logging.NullHandler())
@@ -119,7 +119,7 @@ def _save_run(run_dir, traj_dict, run_params, save_traj=True):
         save_traj:  bool -- if True (default), write traj.h5.
     """
     try:
-        from drift.slides_io import save_trajectory, save_params
+        from flake.io import save_trajectory, save_params
     except ImportError:
         raise ImportError(
             "slides_io is required for _save_run. "
@@ -144,7 +144,7 @@ def _load_run(run_dir):
         (traj_dict, run_params) -- trajectory arrays and parameter dict.
     """
     try:
-        from drift.slides_io import load_trajectory, load_params
+        from flake.io import load_trajectory, load_params
     except ImportError:
         raise ImportError(
             "slides_io is required for _load_run."
@@ -190,11 +190,11 @@ def load_sweep(outdir):
     """
     import re
     try:
-        from drift.slides_io import load_trajectory, load_params
+        from flake.io import load_trajectory, load_params
     except ImportError:
         raise ImportError("slides_io is required for load_sweep.")
 
-    pattern = re.compile(r'^run_(\d{4})$')
+    pattern = re.compile(r'^run_(\d{4})')
 
     entries = sorted(
         d for d in os.listdir(outdir)
@@ -603,8 +603,18 @@ def sweep_md(pos, calc_en_f, en_params, sweep_spec,
 
     n_runs = len(run_kwargs_list)
 
+    # keys that vary across runs -- used to build informative directory names
+    _varying_keys = sorted({k for point in deduped for k in point})
+
+    def _run_dirname(i, kwargs):
+        suffix = '-'.join(
+            '%s_%s' % (k, ('%.4g' % kwargs[k]) if isinstance(kwargs[k], float) else str(kwargs[k]))
+            for k in _varying_keys if k in kwargs
+        )
+        return 'run_%04d-%s' % (i, suffix) if suffix else 'run_%04d' % i
+
     def _run_one(i, kwargs):
-        run_dir = os.path.join(outdir, 'run_%04d' % i) if save else None
+        run_dir = os.path.join(outdir, _run_dirname(i, kwargs)) if save else None
 
         # Resume: only when save_traj=True, traj.h5 exists, and overwrite=False.
         if run_dir is not None:
@@ -616,7 +626,7 @@ def sweep_md(pos, calc_en_f, en_params, sweep_spec,
                     "Delete %s to re-run." % (i, run_dir),
                     UserWarning
                 )
-                from drift.slides_io import load_trajectory
+                from flake.io import load_trajectory
                 traj, _ = load_trajectory(traj_path)
                 result = post_fn(traj, kwargs) if post_fn is not None else traj
                 return {'params': kwargs, 'result': result, 'run_dir': run_dir}

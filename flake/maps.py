@@ -33,7 +33,7 @@ faster due to process-spawn overhead.
 """
 
 import numpy as np
-from tool_create_cluster import rotate
+from flake.cluster import rotate
 
 
 def _eval_point(args):

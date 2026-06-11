@@ -27,9 +27,9 @@ _COMM_POS: 7-particle commensurate cluster for pinning test.
 import numpy as np
 import pytest
 
-from tool_create_substrate import substrate_from_params, get_ks, _calc_en_flat_core
-from tool_create_cluster import calc_cluster_langevin
-from dynamics import run_md, make_params_array
+from flake.substrate import substrate_from_params, get_ks, _calc_en_flat_core
+from flake.cluster import calc_cluster_langevin
+from flake.dynamics import run_md, make_params_array
 
 
 # ---------------------------------------------------------------------------
@@ -448,7 +448,7 @@ def test_jit_speedup_benchmark():
     A1 = np.array([1.0, 0.0])
     A2 = np.array([-0.5, np.sqrt(3.0) / 2.0])
 
-    from tool_create_cluster import make_cluster
+    from flake.cluster import make_cluster
     pos = make_cluster(A1, A2, 9, 10, shape='circle')   # N=85
     N   = len(pos)
 
@@ -545,7 +545,7 @@ def test_gauss_jit_speedup_benchmark():
     """
     import warnings
     from time import perf_counter
-    from tool_create_cluster import make_cluster
+    from flake.cluster import make_cluster
 
     pos = make_cluster(A1, A2, 9, 10, shape='circle')   # N=85
     N   = len(pos)

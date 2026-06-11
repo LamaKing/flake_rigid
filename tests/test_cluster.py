@@ -13,7 +13,7 @@ import os
 import numpy as np
 import pytest
 
-from tool_create_cluster import (
+from flake.cluster import (
     make_cluster,
     rotate,
     save_cluster,

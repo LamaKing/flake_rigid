@@ -22,7 +22,7 @@ from argparse import Namespace
 import numpy as np
 import pytest
 
-from cli import (
+from flake.cli import (
     _build_parser,
     _build_physics,
     _cmd_make_params,
@@ -34,7 +34,15 @@ from cli import (
     _load_yaml,
     _resolve_post_fn,
 )
-from tool_create_substrate import get_ks
+from flake.substrate import get_ks
+
+
+def _run_dir(outdir, n):
+    """Return the path of the n-th run directory (run_NNNN*) in outdir."""
+    prefix = 'run_%04d' % n
+    matches = sorted(d for d in os.listdir(outdir) if d.startswith(prefix))
+    assert matches, "No directory matching %s in %s" % (prefix, outdir)
+    return os.path.join(outdir, matches[0])
 
 
 # ============================================================
@@ -270,7 +278,7 @@ def test_map_translational(params_yaml, tmp_path):
         _cmd_map(ns)
 
     assert os.path.isfile(out_path)
-    from slides_io import load_map
+    from flake.io import load_map
     result, _ = load_map(out_path)
     assert 'energy' in result
     assert result['energy'].shape == (3 * 3,)
@@ -289,7 +297,7 @@ def test_map_rotational(params_yaml, tmp_path):
         _cmd_map(ns)
 
     assert os.path.isfile(out_path)
-    from slides_io import load_map
+    from flake.io import load_map
     result, _ = load_map(out_path)
     assert 'energy' in result
     assert result['energy'].shape == (4,)
@@ -353,10 +361,10 @@ def test_sweep_grid_spec_creates_run_dirs(params_yaml, tmp_path):
         warnings.simplefilter('ignore')
         _cmd_sweep(ns)
 
-    assert os.path.isdir(os.path.join(outdir, 'run_0000'))
-    assert os.path.isdir(os.path.join(outdir, 'run_0001'))
-    assert os.path.isfile(os.path.join(outdir, 'run_0000', 'params.yaml'))
-    assert os.path.isfile(os.path.join(outdir, 'run_0000', 'traj.h5'))
+    assert os.path.isdir(_run_dir(outdir, 0))
+    assert os.path.isdir(_run_dir(outdir, 1))
+    assert os.path.isfile(os.path.join(_run_dir(outdir, 0), 'params.yaml'))
+    assert os.path.isfile(os.path.join(_run_dir(outdir, 0), 'traj.h5'))
 
 
 def test_sweep_explicit_spec_list(params_yaml, tmp_path):
@@ -375,7 +383,9 @@ def test_sweep_explicit_spec_list(params_yaml, tmp_path):
         _cmd_sweep(ns)
 
     dirs = sorted(d for d in os.listdir(outdir) if d.startswith('run_'))
-    assert dirs == ['run_0000', 'run_0001']
+    assert len(dirs) == 2
+    assert dirs[0].startswith('run_0000')
+    assert dirs[1].startswith('run_0001')
 
 
 def test_sweep_no_save_traj(params_yaml, tmp_path):
@@ -395,7 +405,7 @@ def test_sweep_no_save_traj(params_yaml, tmp_path):
         warnings.simplefilter('ignore')
         _cmd_sweep(ns)
 
-    run_dir = os.path.join(outdir, 'run_0000')
+    run_dir = _run_dir(outdir, 0)
     assert     os.path.isfile(os.path.join(run_dir, 'params.yaml'))
     assert not os.path.isfile(os.path.join(run_dir, 'traj.h5'))
 
@@ -419,7 +429,7 @@ def test_sweep_with_post_fn(params_yaml, tmp_path):
         _cmd_sweep(ns)
 
     # params.yaml must exist; traj.h5 absent (save_traj=False).
-    run_dir = os.path.join(outdir, 'run_0000')
+    run_dir = _run_dir(outdir, 0)
     assert os.path.isfile(os.path.join(run_dir, 'params.yaml'))
 
 
@@ -468,7 +478,7 @@ def test_string_2d_creates_output(params_yaml, tmp_path):
         _cmd_string(ns)
 
     assert os.path.isfile(out_path)
-    from slides_io import load_map
+    from flake.io import load_map
     result, _ = load_map(out_path)
     assert 'points' in result
     assert result['points'].shape[1] == 2
@@ -651,7 +661,7 @@ def test_sweep_resume_skips_existing_traj(params_yaml, tmp_path):
         warnings.simplefilter('ignore')
         _cmd_sweep(ns)
 
-    traj_path = os.path.join(outdir, 'run_0000', 'traj.h5')
+    traj_path = os.path.join(_run_dir(outdir, 0), 'traj.h5')
     assert os.path.isfile(traj_path)
     mtime_first = os.path.getmtime(traj_path)
 
@@ -683,9 +693,9 @@ def test_sweep_no_resume_when_save_traj_false(params_yaml, tmp_path):
         # Second call: no traj.h5 exists, so the run must execute again
         # (result should be non-None, not None from a skipped run).
         results2 = None
-        from cli import _build_physics
+        from flake.cli import _build_physics
         pos, calc_en_f, en_params, p = _build_physics(params_yaml)
-        from sweep_md import sweep_md, grid_sweep
+        from flake.sweep import sweep_md, grid_sweep
         spec = grid_sweep({'Fx': [0.0]})
         results2 = sweep_md(pos, calc_en_f, en_params, spec,
                             base_md_kwargs={'eta': 1.0, 'kBT': 1e-8,

@@ -13,7 +13,7 @@ implicitly verifies this sign convention.
 import numpy as np
 import pytest
 
-from tool_create_substrate import (
+from flake.substrate import (
     calc_matrices_bvect,
     particle_en_gaussian,
     calc_en_gaussian,

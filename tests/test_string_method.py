@@ -18,9 +18,9 @@ New tests (8-12) cover:
 import numpy as np
 import pytest
 
-from tool_create_substrate import substrate_from_params, get_ks
-from tool_create_cluster import rotate
-from string_method import StringPath, StringPotential, find_mep
+from flake.substrate import substrate_from_params, get_ks
+from flake.cluster import rotate
+from flake.string_method import StringPath, StringPotential, find_mep
 
 
 # ---------------------------------------------------------------------------

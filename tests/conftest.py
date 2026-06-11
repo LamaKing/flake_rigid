@@ -1,5 +1,5 @@
 import sys
 import os
 
-# Allow pytest to import modules from src/ without installing the package.
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+# flake is installed via `pip install -e .` -- no path manipulation needed.
+# If imports fail, run: pip install -e ".[dev]" from the repo root.

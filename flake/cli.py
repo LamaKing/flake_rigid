@@ -79,8 +79,8 @@ def _build_physics(params_path):
 
     Imports are deferred so that the CLI starts fast even on cold Numba.
     """
-    from tool_create_substrate import substrate_from_params
-    from tool_create_cluster import cluster_from_params
+    from flake.substrate import substrate_from_params
+    from flake.cluster import cluster_from_params
 
     params = _load_yaml(params_path)
 
@@ -136,8 +136,8 @@ def _cmd_map(args):
     """
     import warnings
     import numpy as np
-    from maps import translational_map, rotational_map, rototrasl_map
-    from slides_io import save_map
+    from flake.maps import translational_map, rotational_map, rototrasl_map
+    from flake.io import save_map
 
     pos, calc_en_f, en_params, params = _build_physics(args.input)
 
@@ -160,7 +160,7 @@ def _cmd_map(args):
     # reference frame so the internal rotate() calls in *_map are not offset.
     theta = float(params.get('theta', 0.0))
     if map_type == 'translational' and theta != 0.0:
-        from tool_create_cluster import rotate as _rotate
+        from flake.cluster import rotate as _rotate
         pos = _rotate(pos, theta)
 
     well_shape = params.get('well_shape', 'sin')
@@ -184,7 +184,7 @@ def _cmd_map(args):
                     "cell; fractional coordinates are the correct tool."
                     % well_shape
                 )
-            from tool_create_substrate import calc_matrices_bvect
+            from flake.substrate import calc_matrices_bvect
             _, u_inv = calc_matrices_bvect(params['b1'], params['b2'])
 
         elif well_shape == 'sin':
@@ -202,7 +202,7 @@ def _cmd_map(args):
                     "separately, or add pos_cm_grid support to rototrasl_map."
                 )
             if 'x_range' not in grid or 'y_range' not in grid:
-                from tool_create_substrate import get_ks
+                from flake.substrate import get_ks
                 ks_arr = np.asarray(params.get('ks', []))
                 if len(ks_arr) == 0:
                     raise ValueError(
@@ -280,7 +280,7 @@ def _resolve_post_fn(name, spec_params):
         mean_velocity:  fraction (float, default 0.2)
         last_state:     keys    (list, default None)
     """
-    from sweep_md import last_state, mean_velocity, drift_velocity, drift_omega
+    from flake.sweep import last_state, mean_velocity, drift_velocity, drift_omega
 
     if name == 'drift_velocity':
         return drift_velocity()
@@ -316,7 +316,7 @@ def _cmd_sweep(args):
         save_traj:      bool (default True)
         outdir:         str  (default '.')
     """
-    from sweep_md import sweep_md, grid_sweep, line_sweep, force_sweep
+    from flake.sweep import sweep_md, grid_sweep, line_sweep, force_sweep
 
     pos, calc_en_f, en_params, params = _build_physics(args.input)
 
@@ -396,8 +396,8 @@ def _cmd_string(args):
     be rotated to the desired orientation.
     """
     import numpy as np
-    from string_method import find_mep
-    from slides_io import save_map
+    from flake.string_method import find_mep
+    from flake.io import save_map
 
     pos, calc_en_f, en_params, params = _build_physics(args.input)
 
@@ -423,7 +423,7 @@ def _cmd_string(args):
     # in the reference frame (theta=0) because find_mep rotates internally.
     theta = float(params.get('theta', 0.0))
     if dim == 2 and theta != 0.0:
-        from tool_create_cluster import rotate as _rotate
+        from flake.cluster import rotate as _rotate
         pos = _rotate(pos, theta)
     elif dim == 3 and theta != 0.0:
         import warnings
@@ -573,8 +573,8 @@ def _cmd_make_params(args):
             raise ValueError(
                 "--n must be one of %s for sin substrate." % list(_SIN_N_VALID)
             )
-        from slides_io import _SIN_PRESETS
-        from tool_create_substrate import get_ks
+        from flake.io import _SIN_PRESETS
+        from flake.substrate import get_ks
         c_n, alpha_n = _SIN_PRESETS[n]
         ks = get_ks(float(spacing), n, c_n, alpha_n)
         ks_lines = "ks:\n" + "".join(

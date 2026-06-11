@@ -20,10 +20,10 @@ Triangular lattice (spacing 1):
 import numpy as np
 import pytest
 
-from tool_create_substrate import substrate_from_params, get_ks, calc_matrices_bvect
-from tool_create_cluster import rotate
-from maps import translational_map, rotational_map, rototrasl_map
-from string_method import find_mep
+from flake.substrate import substrate_from_params, get_ks, calc_matrices_bvect
+from flake.cluster import rotate
+from flake.maps import translational_map, rotational_map, rototrasl_map
+from flake.string_method import find_mep
 
 # ---------------------------------------------------------------------------
 # Shared fixtures
