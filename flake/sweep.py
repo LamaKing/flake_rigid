@@ -16,8 +16,9 @@ Public API
     mean_velocity  -- post_fn factory: mean |v_cm| over a tail window.
     drift_velocity -- post_fn factory: net CM displacement / total time.
     drift_omega    -- post_fn factory: net angular displacement / total time.
-    load_sweep     -- reload a saved sweep from disk.
-    filter_sweep   -- remove None-result entries from load_sweep output.
+    load_sweep        -- reload all runs from a saved sweep directory.
+    load_sweep_points -- load only the runs matching a list of grid points.
+    filter_sweep      -- remove None-result entries from load_sweep output.
 
 I/O convention
 --------------
@@ -241,6 +242,144 @@ def load_sweep(outdir):
         "load_sweep: loaded %d complete runs, %d missing traj, "
         "%d missing params, out of %d directories found."
         % (n_ok, n_missing_traj, n_bad, n_total)
+    )
+    _log.info(summary)
+    print(summary, flush=True)
+
+    return results
+
+
+def load_sweep_points(outdir, grid_points, rtol=1e-5, atol=0.0):
+    """Load only the runs whose parameters match a given list of grid points.
+
+    Each grid point is a dict of key-value pairs that must match the
+    params.yaml of a run.  A run matches a grid point when every key in
+    the grid point is present in run_params and the values agree within
+    the specified tolerance (np.isclose for floats, exact equality for
+    everything else).
+
+    The function reads only params.yaml for non-matching runs (cheap);
+    traj.h5 is loaded only for the runs that pass the filter.
+
+    Args:
+        outdir:      str  -- sweep output directory (same as passed to sweep_md).
+        grid_points: list of dict  -- each dict is one requested point.
+                     Examples:
+                       [{'Fx': 32.32}]                       -- single Fx
+                       [{'Fx': 0.1, 'Tau': 5000}]           -- joint point
+                       [{'Fx': v} for v in [10, 20, 30]]    -- list of Fx
+                       grid_sweep({'Fx': Fx_vals, 'Tau': Tau_vals})  -- 2D grid
+        rtol:        float -- relative tolerance for float comparisons
+                     (np.isclose).  Default 1e-5.
+        atol:        float -- absolute tolerance for float comparisons.
+                     Default 0.0 (pure relative).
+
+    Returns:
+        list of dict, one per matched run, each with keys:
+            'params':  dict of run parameters from params.yaml.
+            'result':  full traj dict, or None if traj.h5 absent.
+            'run_dir': absolute path to the run directory.
+        Returned in disk order (sorted by run_NNNN index).
+
+    Raises:
+        ValueError: if grid_points is empty.
+
+    Example:
+        # Load only Fx in [10, 20, 30] from a force sweep:
+        runs = load_sweep_points(
+            'sweep_Fx_out',
+            [{'Fx': v} for v in [10.0, 20.0, 30.0]],
+        )
+        for r in runs:
+            print(r['params']['Fx'], r['result']['pos_cm'][-1])
+
+        # Load a 2D grid subset using grid_sweep:
+        runs = load_sweep_points(
+            'sweep_Fx_tau_out',
+            grid_sweep({'Fx': [10.0, 20.0], 'Tau': [1000.0, 2000.0]}),
+        )
+    """
+    import re
+
+    if not grid_points:
+        raise ValueError("grid_points must be a non-empty list of dicts.")
+
+    try:
+        from flake.io import load_trajectory, load_params
+    except ImportError:
+        raise ImportError("flake.io is required for load_sweep_points.")
+
+    def _matches(run_params, point):
+        for k, req in point.items():
+            if k not in run_params:
+                return False
+            got = run_params[k]
+            if isinstance(req, float) or isinstance(got, float):
+                if not np.isclose(float(got), float(req), rtol=rtol, atol=atol):
+                    return False
+            else:
+                if got != req:
+                    return False
+        return True
+
+    pattern = re.compile(r'^run_(\d{4})')
+
+    entries = sorted(
+        d for d in os.listdir(outdir)
+        if pattern.match(d) and os.path.isdir(os.path.join(outdir, d))
+    )
+
+    results  = []
+    n_matched = 0
+    remaining = list(grid_points)   # shrinks as points are matched
+
+    for entry in entries:
+        run_dir     = os.path.join(outdir, entry)
+        params_path = os.path.join(run_dir, 'params.yaml')
+
+        if not os.path.isfile(params_path):
+            continue
+
+        run_params = load_params(params_path)
+
+        matched_point = None
+        for pt in remaining:
+            if _matches(run_params, pt):
+                matched_point = pt
+                break
+
+        if matched_point is None:
+            continue
+
+        remaining.remove(matched_point)
+
+        traj_path = os.path.join(run_dir, 'traj.h5')
+        traj_dict = None
+        if os.path.isfile(traj_path):
+            traj_dict, _ = load_trajectory(traj_path)
+        else:
+            warnings.warn(
+                "%s: traj.h5 not found; result will be None." % entry,
+                UserWarning, stacklevel=2
+            )
+
+        results.append({'params': run_params, 'result': traj_dict,
+                        'run_dir': run_dir})
+        n_matched += 1
+
+        if not remaining:
+            break   # all requested points found, no need to scan further
+
+    if remaining:
+        warnings.warn(
+            "load_sweep_points: %d requested point(s) not found in %s: %s"
+            % (len(remaining), outdir, remaining),
+            UserWarning, stacklevel=2
+        )
+
+    summary = (
+        "load_sweep_points: matched %d / %d requested points in %s."
+        % (n_matched, len(grid_points), outdir)
     )
     _log.info(summary)
     print(summary, flush=True)
