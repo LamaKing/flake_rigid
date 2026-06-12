@@ -1,30 +1,30 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Modules &mdash; SLIDES 0.0.4 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Modules &mdash; FLAKE 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Substrate" href="tool_create_substrate.html" />
-    <link rel="prev" title="MD of a depinning transition" href="MD_depinning.html" /> 
+    <link rel="next" title="Substrate (flake.substrate)" href="tool_create_substrate.html" />
+    <link rel="prev" title="Depinning dynamics" href="MD_depinning.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,7 +36,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            SLIDES
+            FLAKE
               <img src="_static/logo_html.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -53,21 +53,20 @@
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Modules</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#tools">Tools</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tool_create_substrate.html">Substrate</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tool_create_cluster.html">Cluster</a></li>
-<li class="toctree-l3"><a class="reference internal" href="string_method.html">String method</a></li>
-<li class="toctree-l3"><a class="reference internal" href="misc.html">Miscellanous</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tool_create_substrate.html">Substrate (flake.substrate)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tool_create_cluster.html">Cluster (flake.cluster)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="string_method.html">String method (flake.string_method)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="misc.html">I/O (flake.io)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="misc.html#module-flake.plot">Plotting (flake.plot)</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#static">Static</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="static_maps.html">Static Translation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="static_maps.html#module-static_roto_map">Static Rotation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="static_maps.html#module-static_rototrasl_map">Static Rotation and Translation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#static-maps">Static maps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="static_maps.html">Static maps (flake.maps)</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#dynamics">Dynamics</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamic.html">Transition state barrier</a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamic.html#module-MD_rigid_rototrasl">Molecular Dynamics of rigid cluster</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamic.html">Dynamics (flake.dynamics)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamic.html#module-flake.sweep">Sweep infrastructure (flake.sweep)</a></li>
 </ul>
 </li>
 </ul>
@@ -80,7 +79,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">SLIDES</a>
+          <a href="index.html">FLAKE</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -99,100 +98,117 @@
            <div itemprop="articleBody">
              
   <section id="modules">
-<h1>Modules<a class="headerlink" href="#modules" title="Permalink to this heading"></a></h1>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The functions in <code class="docutils literal notranslate"><span class="pre">snips/</span></code> are snippets that might be useful to some but are not documented here as they address minor or technical aspects not relevant for the whole package.</p>
-</div>
+<h1>Modules<a class="headerlink" href="#modules" title="Link to this heading"></a></h1>
 <section id="tools">
-<h2>Tools<a class="headerlink" href="#tools" title="Permalink to this heading"></a></h2>
+<h2>Tools<a class="headerlink" href="#tools" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="tool_create_substrate.html">Substrate</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#tool_create_substrate.calc_en_gaussian"><code class="docutils literal notranslate"><span class="pre">calc_en_gaussian()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#tool_create_substrate.calc_en_sin"><code class="docutils literal notranslate"><span class="pre">calc_en_sin()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#tool_create_substrate.calc_en_sin_tri"><code class="docutils literal notranslate"><span class="pre">calc_en_sin_tri()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#tool_create_substrate.calc_en_tanh"><code class="docutils literal notranslate"><span class="pre">calc_en_tanh()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#tool_create_substrate.calc_matrices_bvect"><code class="docutils literal notranslate"><span class="pre">calc_matrices_bvect()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#tool_create_substrate.calc_matrices_square"><code class="docutils literal notranslate"><span class="pre">calc_matrices_square()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#tool_create_substrate.calc_matrices_triangle"><code class="docutils literal notranslate"><span class="pre">calc_matrices_triangle()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#tool_create_substrate.gaussian"><code class="docutils literal notranslate"><span class="pre">gaussian()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#tool_create_substrate.get_ks"><code class="docutils literal notranslate"><span class="pre">get_ks()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#tool_create_substrate.particle_en_gaussian"><code class="docutils literal notranslate"><span class="pre">particle_en_gaussian()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#tool_create_substrate.particle_en_sin"><code class="docutils literal notranslate"><span class="pre">particle_en_sin()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#tool_create_substrate.particle_en_sin_tri"><code class="docutils literal notranslate"><span class="pre">particle_en_sin_tri()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#tool_create_substrate.particle_en_tanh"><code class="docutils literal notranslate"><span class="pre">particle_en_tanh()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#tool_create_substrate.substrate_from_params"><code class="docutils literal notranslate"><span class="pre">substrate_from_params()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool_create_substrate.html">Substrate (flake.substrate)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#coordinate-convention">Coordinate convention</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#substrate-types">Substrate types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#jit-notes">JIT notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#flake.substrate.calc_en_gaussian"><code class="docutils literal notranslate"><span class="pre">calc_en_gaussian()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#flake.substrate.calc_en_sin"><code class="docutils literal notranslate"><span class="pre">calc_en_sin()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#flake.substrate.calc_en_tanh"><code class="docutils literal notranslate"><span class="pre">calc_en_tanh()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#flake.substrate.calc_matrices_bvect"><code class="docutils literal notranslate"><span class="pre">calc_matrices_bvect()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#flake.substrate.calc_matrices_square"><code class="docutils literal notranslate"><span class="pre">calc_matrices_square()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#flake.substrate.calc_matrices_triangle"><code class="docutils literal notranslate"><span class="pre">calc_matrices_triangle()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#flake.substrate.gaussian"><code class="docutils literal notranslate"><span class="pre">gaussian()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#flake.substrate.get_ks"><code class="docutils literal notranslate"><span class="pre">get_ks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#flake.substrate.particle_en_gaussian"><code class="docutils literal notranslate"><span class="pre">particle_en_gaussian()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#flake.substrate.particle_en_sin"><code class="docutils literal notranslate"><span class="pre">particle_en_sin()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#flake.substrate.particle_en_tanh"><code class="docutils literal notranslate"><span class="pre">particle_en_tanh()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_substrate.html#flake.substrate.substrate_from_params"><code class="docutils literal notranslate"><span class="pre">substrate_from_params()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tool_create_cluster.html">Cluster</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.add_basis"><code class="docutils literal notranslate"><span class="pre">add_basis()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.calc_cluster_langevin"><code class="docutils literal notranslate"><span class="pre">calc_cluster_langevin()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.cluster_from_params"><code class="docutils literal notranslate"><span class="pre">cluster_from_params()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.cluster_inhex_Nl"><code class="docutils literal notranslate"><span class="pre">cluster_inhex_Nl()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.cluster_poly"><code class="docutils literal notranslate"><span class="pre">cluster_poly()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.create_cluster"><code class="docutils literal notranslate"><span class="pre">create_cluster()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.create_cluster_circle"><code class="docutils literal notranslate"><span class="pre">create_cluster_circle()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.create_cluster_hex"><code class="docutils literal notranslate"><span class="pre">create_cluster_hex()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.create_cluster_rect"><code class="docutils literal notranslate"><span class="pre">create_cluster_rect()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.create_cluster_special"><code class="docutils literal notranslate"><span class="pre">create_cluster_special()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.create_cluster_tri"><code class="docutils literal notranslate"><span class="pre">create_cluster_tri()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.create_input_hex"><code class="docutils literal notranslate"><span class="pre">create_input_hex()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.get_poly"><code class="docutils literal notranslate"><span class="pre">get_poly()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.get_rotomatr"><code class="docutils literal notranslate"><span class="pre">get_rotomatr()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.load_cluster"><code class="docutils literal notranslate"><span class="pre">load_cluster()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.load_input_hex"><code class="docutils literal notranslate"><span class="pre">load_input_hex()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.params_from_ASE"><code class="docutils literal notranslate"><span class="pre">params_from_ASE()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.params_from_poscar"><code class="docutils literal notranslate"><span class="pre">params_from_poscar()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.rotate"><code class="docutils literal notranslate"><span class="pre">rotate()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#tool_create_cluster.save_xyz"><code class="docutils literal notranslate"><span class="pre">save_xyz()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool_create_cluster.html">Cluster (flake.cluster)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#flake.cluster.add_basis"><code class="docutils literal notranslate"><span class="pre">add_basis()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#flake.cluster.calc_cluster_langevin"><code class="docutils literal notranslate"><span class="pre">calc_cluster_langevin()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#flake.cluster.cluster_from_params"><code class="docutils literal notranslate"><span class="pre">cluster_from_params()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#flake.cluster.cluster_poly"><code class="docutils literal notranslate"><span class="pre">cluster_poly()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#flake.cluster.get_poly"><code class="docutils literal notranslate"><span class="pre">get_poly()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#flake.cluster.load_cluster"><code class="docutils literal notranslate"><span class="pre">load_cluster()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#flake.cluster.make_cluster"><code class="docutils literal notranslate"><span class="pre">make_cluster()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#flake.cluster.params_from_poscar"><code class="docutils literal notranslate"><span class="pre">params_from_poscar()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#flake.cluster.rotate"><code class="docutils literal notranslate"><span class="pre">rotate()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#flake.cluster.save_cluster"><code class="docutils literal notranslate"><span class="pre">save_cluster()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tool_create_cluster.html#flake.cluster.save_xyz"><code class="docutils literal notranslate"><span class="pre">save_xyz()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="string_method.html">String method</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="string_method.html#string_method.Path"><code class="docutils literal notranslate"><span class="pre">Path</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="string_method.html#string_method.PotentialPathAnalyt"><code class="docutils literal notranslate"><span class="pre">PotentialPathAnalyt</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="string_method.html">String method (flake.string_method)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="string_method.html#two-usage-modes">Two usage modes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="string_method.html#gradient-and-string-step">Gradient and string step</a></li>
+<li class="toctree-l2"><a class="reference internal" href="string_method.html#scale-parameter">Scale parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="string_method.html#algorithm">Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="string_method.html#flake.string_method.StringPath"><code class="docutils literal notranslate"><span class="pre">StringPath</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="string_method.html#flake.string_method.StringPotential"><code class="docutils literal notranslate"><span class="pre">StringPotential</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="string_method.html#flake.string_method.find_mep"><code class="docutils literal notranslate"><span class="pre">find_mep()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="misc.html">Miscellanous</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="misc.html#misc.get_brillouin_zone_2d"><code class="docutils literal notranslate"><span class="pre">get_brillouin_zone_2d()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="misc.html#misc.handle_run"><code class="docutils literal notranslate"><span class="pre">handle_run()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="misc.html#misc.plot_BZ2d"><code class="docutils literal notranslate"><span class="pre">plot_BZ2d()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="misc.html#misc.plot_UC"><code class="docutils literal notranslate"><span class="pre">plot_UC()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="misc.html#misc.plt_cosmetic"><code class="docutils literal notranslate"><span class="pre">plt_cosmetic()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">I/O (flake.io)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="misc.html#flake.io.load_map"><code class="docutils literal notranslate"><span class="pre">load_map()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html#flake.io.load_params"><code class="docutils literal notranslate"><span class="pre">load_params()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html#flake.io.load_trajectory"><code class="docutils literal notranslate"><span class="pre">load_trajectory()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html#flake.io.make_sin_params"><code class="docutils literal notranslate"><span class="pre">make_sin_params()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html#flake.io.save_map"><code class="docutils literal notranslate"><span class="pre">save_map()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html#flake.io.save_params"><code class="docutils literal notranslate"><span class="pre">save_params()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html#flake.io.save_trajectory"><code class="docutils literal notranslate"><span class="pre">save_trajectory()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html#module-flake.plot">Plotting (flake.plot)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="misc.html#public-api">Public API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html#flake.plot.get_brillouin_zone_2d"><code class="docutils literal notranslate"><span class="pre">get_brillouin_zone_2d()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html#flake.plot.plot_BZ2d"><code class="docutils literal notranslate"><span class="pre">plot_BZ2d()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html#flake.plot.plot_UC"><code class="docutils literal notranslate"><span class="pre">plot_UC()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html#flake.plot.plot_lattice_vectors"><code class="docutils literal notranslate"><span class="pre">plot_lattice_vectors()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html#flake.plot.plt_cosmetic"><code class="docutils literal notranslate"><span class="pre">plt_cosmetic()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </div>
 </section>
-<section id="static">
-<h2>Static<a class="headerlink" href="#static" title="Permalink to this heading"></a></h2>
+<section id="static-maps">
+<h2>Static maps<a class="headerlink" href="#static-maps" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="static_maps.html">Static Translation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="static_maps.html#static_trasl_map.static_traslmap"><code class="docutils literal notranslate"><span class="pre">static_traslmap()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="static_maps.html#module-static_roto_map">Static Rotation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="static_maps.html#static_roto_map.static_rotomap"><code class="docutils literal notranslate"><span class="pre">static_rotomap()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="static_maps.html#module-static_rototrasl_map">Static Rotation and Translation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="static_maps.html#static_rototrasl_map.static_rototraslmap"><code class="docutils literal notranslate"><span class="pre">static_rototraslmap()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="static_maps.html">Static maps (flake.maps)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="static_maps.html#grid-coordinate-convention">Grid coordinate convention</a></li>
+<li class="toctree-l2"><a class="reference internal" href="static_maps.html#parallelism">Parallelism</a></li>
+<li class="toctree-l2"><a class="reference internal" href="static_maps.html#flake.maps.rotational_map"><code class="docutils literal notranslate"><span class="pre">rotational_map()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="static_maps.html#flake.maps.rototrasl_map"><code class="docutils literal notranslate"><span class="pre">rototrasl_map()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="static_maps.html#flake.maps.translational_map"><code class="docutils literal notranslate"><span class="pre">translational_map()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </div>
 </section>
 <section id="dynamics">
-<h2>Dynamics<a class="headerlink" href="#dynamics" title="Permalink to this heading"></a></h2>
+<h2>Dynamics<a class="headerlink" href="#dynamics" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="dynamic.html">Transition state barrier</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="dynamic.html#static_barrier_string.static_barrier"><code class="docutils literal notranslate"><span class="pre">static_barrier()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic.html">Dynamics (flake.dynamics)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#physics">Physics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#integration">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#jit-path-vs-python-path">JIT path vs Python path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#public-api">Public API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#flake.dynamics.run_md"><code class="docutils literal notranslate"><span class="pre">run_md()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="dynamic.html#module-MD_rigid_rototrasl">Molecular Dynamics of rigid cluster</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="dynamic.html#MD_rigid_rototrasl.MD_rigid"><code class="docutils literal notranslate"><span class="pre">MD_rigid()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic.html#module-flake.sweep">Sweep infrastructure (flake.sweep)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#id1">Public API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#i-o-convention">I/O convention</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#flake.sweep.concat_sweeps"><code class="docutils literal notranslate"><span class="pre">concat_sweeps()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#flake.sweep.drift_omega"><code class="docutils literal notranslate"><span class="pre">drift_omega()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#flake.sweep.drift_velocity"><code class="docutils literal notranslate"><span class="pre">drift_velocity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#flake.sweep.filter_sweep"><code class="docutils literal notranslate"><span class="pre">filter_sweep()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#flake.sweep.force_sweep"><code class="docutils literal notranslate"><span class="pre">force_sweep()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#flake.sweep.grid_sweep"><code class="docutils literal notranslate"><span class="pre">grid_sweep()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#flake.sweep.last_state"><code class="docutils literal notranslate"><span class="pre">last_state()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#flake.sweep.line_sweep"><code class="docutils literal notranslate"><span class="pre">line_sweep()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#flake.sweep.load_sweep"><code class="docutils literal notranslate"><span class="pre">load_sweep()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#flake.sweep.load_sweep_points"><code class="docutils literal notranslate"><span class="pre">load_sweep_points()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#flake.sweep.mean_velocity"><code class="docutils literal notranslate"><span class="pre">mean_velocity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic.html#flake.sweep.sweep_md"><code class="docutils literal notranslate"><span class="pre">sweep_md()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -204,8 +220,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="MD_depinning.html" class="btn btn-neutral float-left" title="MD of a depinning transition" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="tool_create_substrate.html" class="btn btn-neutral float-right" title="Substrate" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="MD_depinning.html" class="btn btn-neutral float-left" title="Depinning dynamics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tool_create_substrate.html" class="btn btn-neutral float-right" title="Substrate (flake.substrate)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

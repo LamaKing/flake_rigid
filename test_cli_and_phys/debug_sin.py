@@ -17,7 +17,7 @@ import yaml
 with open('params.yaml') as fh:
     params_yaml = yaml.safe_load(fh)
 
-from drift.tool_create_substrate import substrate_from_params, get_ks
+from flake.substrate import substrate_from_params, get_ks
 
 # --- Path A: from YAML (what CLI does) ---
 pen_A, en_A, enp_A = substrate_from_params(params_yaml)

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Analysis script for DRIFT CLI test runs.
+Analysis script for FLAKE CLI test runs.
 
 Loads HDF5 outputs produced by:
-    drift map    -i params.yaml --grid grid_trasl.yaml  -o map_trasl.h5
-    drift map    -i params.yaml --grid grid_roto.yaml   -o map_roto.h5
-    drift string -i params.yaml --cfg  string_roto.yaml     -o mep_roto.h5
-    drift string -i params.yaml --cfg  string_rototrasl.yaml -o mep_rototrasl.h5
-    drift sweep  -i params.yaml --spec sweep_Fx.yaml
-    drift sweep  -i params.yaml --spec sweep_tau.yaml
+    flake map    -i params.yaml --grid grid_trasl.yaml  -o map_trasl.h5
+    flake map    -i params.yaml --grid grid_roto.yaml   -o map_roto.h5
+    flake string -i params.yaml --cfg  string_roto.yaml     -o mep_roto.h5
+    flake string -i params.yaml --cfg  string_rototrasl.yaml -o mep_rototrasl.h5
+    flake sweep  -i params.yaml --spec sweep_Fx.yaml
+    flake sweep  -i params.yaml --spec sweep_tau.yaml
 
 Checks:
   - Translational map: barrier = max(E) - min(E), symmetry of landscape.
@@ -29,13 +29,13 @@ import matplotlib.pyplot as plt
 # ---------------------------------------------------------------------------
 
 def _load(path):
-    from drift.slides_io import load_map
+    from flake.io import load_map
     result, params = load_map(path)
     return result, params
 
 
 def _load_sweep_dir(outdir):
-    from drift.sweep_md import load_sweep, filter_sweep
+    from flake.sweep import load_sweep, filter_sweep
     raw = load_sweep(outdir)
     return filter_sweep(raw)   # drops None-result entries with warning if > 10%
 
@@ -260,9 +260,9 @@ def plot_depinning_Fx(outdir='sweep_Fx_out', N=85):
         print('ERROR: no complete runs in %s' % outdir); return
     Fx_vals = np.array([d['params']['Fx'] for d in data])
 
-    # load_sweep returns full traj dicts; apply drift_velocity here.
+    # load_sweep returns full traj dicts; apply dift velocity here.
     # With save_traj=False runs have result=None and are dropped by filter_sweep.
-    def _vdrift(traj):
+    def _drift(traj):
         pos_cm = traj['pos_cm']
         t      = traj['t']
         dt_tot = float(t[-1] - t[0])
@@ -270,7 +270,7 @@ def plot_depinning_Fx(outdir='sweep_Fx_out', N=85):
             return np.zeros(2)
         return (pos_cm[-1] - pos_cm[0]) / dt_tot
 
-    vx = np.array([_vdrift(d['result'])[0] for d in data])
+    vx = np.array([_drift(d['result'])[0] for d in data])
 
     F1s, Fc_analytical = analytical_Fc(N)
     print('Depinning Fx: F1s=%.4f  Fc_analytical=%.4f (N=%i)' % (F1s, Fc_analytical, N))

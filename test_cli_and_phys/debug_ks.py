@@ -13,7 +13,7 @@ import yaml
 with open('params.yaml') as fh:
     params_yaml = yaml.safe_load(fh)
 
-from drift.tool_create_substrate import substrate_from_params, get_ks
+from flake.substrate import substrate_from_params, get_ks
 
 ks_from_yaml  = np.asarray(params_yaml['ks'], dtype=np.float64)
 ks_from_get   = get_ks(1, 3, 4./3., 0.)

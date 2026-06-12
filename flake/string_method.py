@@ -1,60 +1,68 @@
-"""
+r"""
 String method for minimum energy path (MEP) search.
 
 Two usage modes
 ---------------
-2D translational (x_cm, y_cm) -- fixed orientation:
-    Caller pre-rotates the cluster to the desired angle before calling.
+**2D translational** :math:`(x_\mathrm{cm}, y_\mathrm{cm})` — fixed orientation:
+pre-rotate the cluster before calling::
 
-        from flake.cluster import rotate
-        pos_rot = rotate(pos, theta_deg)
-        result  = find_mep(pos_rot, calc_en_f, en_params,
-                           p0=[x0, y0], p1=[x1, y1])
+    from flake.cluster import rotate
+    pos_rot = rotate(pos, theta_deg)
+    result  = find_mep(pos_rot, calc_en_f, en_params,
+                       p0=[x0, y0], p1=[x1, y1])
 
-    result['points'] has shape (n_pt, 2).
+``result['points']`` has shape ``(n_pt, 2)``.
 
-3D roto-translational (x_cm, y_cm, theta_deg):
-    pos is the cluster in the reference (theta=0) frame.  The string
-    method rotates pos internally at each path point.
+**3D roto-translational** :math:`(x_\mathrm{cm}, y_\mathrm{cm}, \theta)` — pos in
+reference frame; the method rotates internally::
 
-        result = find_mep(pos, calc_en_f, en_params,
-                          p0=[x0, y0, th0], p1=[x1, y1, th1],
-                          scale=[lambda_x, lambda_y, lambda_theta])
+    result = find_mep(pos, calc_en_f, en_params,
+                      p0=[x0, y0, th0], p1=[x1, y1, th1],
+                      scale=[lx, ly, ltheta])
 
-    result['points'] has shape (n_pt, 3).  theta is in degrees.
-    Typical scale values: lambda_x = lambda_y = substrate lattice
-    spacing; lambda_theta = angular period (e.g. 60 deg for a 6-fold
-    symmetric contact, 30 deg for 12-fold).
+``result['points']`` has shape ``(n_pt, 3)``; :math:`\theta` is in degrees.
+Typical scales: :math:`\lambda_x = \lambda_y =` substrate lattice spacing;
+:math:`\lambda_\theta = 60°` for 6-fold contact, :math:`30°` for 12-fold.
 
-Gradients and string step
---------------------------
-The gradient of E with respect to path coordinates:
-    -dE/dx  = Fx,   -dE/dy  = Fy,   -dE/dtheta = tau
+Gradient and string step
+------------------------
+The gradient of :math:`E` with respect to path coordinates is:
 
-The string step moves each interior point along the gradient of -E:
-    delta_p = (Fx, Fy)        for 2D
-    delta_p = (Fx, Fy, tau)   for 3D
+.. math::
+
+    \nabla_\mathbf{p} E = \left(-F_x,\; -F_y\right) \quad \text{(2D)}
+    \qquad\text{or}\qquad
+    \left(-F_x,\; -F_y,\; -\tau\right) \quad \text{(3D)}
+
+Each interior point steps along :math:`-\nabla E`:
+
+.. math::
+
+    \mathbf{p}_i \;\leftarrow\; \mathbf{p}_i + dt \cdot (-\nabla_{\mathbf{p}_i} E)
 
 Scale parameter
 ---------------
-scale affects ONLY the arc-length reparametrization, not the gradient
-step.  It ensures that coordinates with different physical units (e.g.
-Angstrom and degrees) contribute equally to arc length:
-    ds^2 = sum_i (dp_i / lambda_i)^2
+``scale`` affects **only** arc-length reparametrization, not the gradient step.
+It ensures coordinates with different physical units contribute equally:
 
-Pass scale=None (default) for 2D: all coordinates share the same units.
+.. math::
+
+    ds^2 = \sum_i \left(\frac{dp_i}{\lambda_i}\right)^2
+
+Pass ``scale=None`` (default) for pure 2D: all coordinates share the same units.
 
 Algorithm
 ---------
-Reference: E, Ren, Vanden-Eijnden, J. Chem. Phys. 126, 164103 (2007).
+Reference: E, Ren, Vanden-Eijnden, *J. Chem. Phys.* 126, 164103 (2007).
 
-  1. Initialise n_pt points on a straight line from p0 to p1.
-  2. Each interior point steps along the gradient: p_i += dt * grad_i.
-  3. Reparametrize to equal arc-length (scaled, linear interpolation).
-  4. Repeat until convergence or max_steps.
+1. Initialise :math:`n_\mathrm{pt}` points on a straight line from :math:`p_0` to :math:`p_1`.
+2. Each interior point steps along the gradient: :math:`\mathbf{p}_i \mathrel{+}= dt \cdot \nabla_i(-E)`.
+3. Reparametrize to equal arc-length (scaled, linear interpolation).
+4. Repeat until convergence or ``max_steps``.
 
-Classes:  StringPath, StringPotential
-Function: find_mep
+Classes:  ``StringPath``, ``StringPotential``
+
+Function: ``find_mep``
 """
 
 import numpy as np

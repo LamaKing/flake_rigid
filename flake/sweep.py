@@ -178,12 +178,12 @@ def load_sweep(outdir):
         outdir: str -- directory written by sweep_md with save=True.
 
     Returns:
-        list of dict, one per run_NNNN directory found, each with keys:
-            'params':  dict of run parameters, or None if params.yaml absent.
-            'result':  full traj dict, or None if traj.h5 absent.
-            'run_dir': absolute path to the run_NNNN directory.
+        list of dict, one per ``run_NNNN`` directory found.
+        Each dict has keys ``'params'`` (run parameters or ``None``),
+        ``'result'`` (full traj dict or ``None``), and ``'run_dir'``.
 
-    Example:
+    Example::
+
         raw     = load_sweep('output/my_sweep')
         results = filter_sweep(raw)
         for r in results:
@@ -501,12 +501,13 @@ def concat_sweeps(*specs):
     Order is preserved; later occurrences of a duplicate are dropped.
 
     Args:
-        *specs: sweep spec lists (output of grid_sweep, line_sweep, etc.)
+        specs: sweep spec lists (output of ``grid_sweep``, ``line_sweep``, etc.).
 
     Returns:
         list of dict.
 
-    Example:
+    Example::
+
         spec = concat_sweeps(
             force_sweep(np.linspace(0, 0.3, 10), phi_deg=0.0),
             force_sweep(np.linspace(0, 0.3, 10), phi_deg=30.0),

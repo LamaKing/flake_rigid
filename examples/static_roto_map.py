@@ -1,1 +1,0 @@
-../src/static_roto_map.py

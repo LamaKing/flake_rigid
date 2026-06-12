@@ -1,1 +1,0 @@
-../src/static_rototrasl_map.py

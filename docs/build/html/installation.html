@@ -1,25 +1,25 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; SLIDES 0.0.4 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Installation &mdash; FLAKE 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -36,7 +36,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            SLIDES
+            FLAKE
               <img src="_static/logo_html.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -50,8 +50,8 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Intro</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#from-pip">From PIP</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#from-source">From source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#from-source-recommended">From source (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
@@ -64,7 +64,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">SLIDES</a>
+          <a href="index.html">FLAKE</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -83,31 +83,45 @@
            <div itemprop="articleBody">
              
   <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
-<p>SLIDES is written in python3. The following packages are required:</p>
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
+<p>FLAKE is written in Python 3 (&gt;=3.10). Required dependencies (installed automatically):</p>
 <ul class="simple">
-<li><p>nbsphinx==0.9.2</p></li>
-<li><p>sphinx-rtd-theme==1.2.1</p></li>
-<li><p>matplotlib==3.7.1</p></li>
-<li><p>numpy==1.24.3</p></li>
-<li><p>scipy==1.10.1</p></li>
-<li><p>shapely==2.0.1</p></li>
-<li><p>ase==3.22.1</p></li>
+<li><p>numpy</p></li>
+<li><p>scipy</p></li>
+<li><p>numba</p></li>
 </ul>
-<section id="from-pip">
-<h2>From PIP<a class="headerlink" href="#from-pip" title="Permalink to this heading"></a></h2>
-<p>The easiest way to install SLIDES is via <a class="reference external" href="https://pypi.org/project/pip/">pip</a>, see the project page <a class="reference external" href="https://test.pypi.org/project/SLIDES/">here</a>.
-To install type the following in your command line</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install -i https://test.pypi.org/simple/ SLIDES</span>
+<p>Optional dependencies (for examples and documentation):</p>
+<ul class="simple">
+<li><p>matplotlib</p></li>
+<li><p>shapely</p></li>
+<li><p>ase (for POSCAR import)</p></li>
+<li><p>h5py (for HDF5 map/trajectory files)</p></li>
+<li><p>joblib (for parallel sweeps)</p></li>
+<li><p>pyyaml (for CLI YAML input)</p></li>
+</ul>
+<section id="from-source-recommended">
+<h2>From source (recommended)<a class="headerlink" href="#from-source-recommended" title="Link to this heading"></a></h2>
+<p>Clone the repository and install in editable mode:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone https://github.com/LamaKing/slides_rigid.git</span>
+<span class="go">cd slides_rigid</span>
+<span class="go">pip install -e &quot;.[dev]&quot;</span>
 </pre></div>
 </div>
-<p>This will put the sources in your python path so that all the functions of this package will be accessible from any python script.</p>
+<p>This registers the <code class="docutils literal notranslate"><span class="pre">flake</span></code> command-line entry point and installs pytest for running the test suite.</p>
+<p>Verify the installation:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">flake --help</span>
+<span class="go">python -m pytest tests/ -q</span>
+</pre></div>
+</div>
+<p>Numba will JIT-compile the hot loops on the first run; subsequent runs are fast.</p>
 </section>
-<section id="from-source">
-<h2>From source<a class="headerlink" href="#from-source" title="Permalink to this heading"></a></h2>
-<p>You can get the source code by cloning our <a class="reference external" href="https://github.com/LamaKing/slide_rigid/tree/main">git repository</a>.
-SLIDES is fully written in python, so no compiling is needed.</p>
-<p>In the examples folder you will find the notebook underlying the examples shown in the documentation here. These notebooks are editable, so you can play around with different substrate, geometries and driver, ultimately tailoring the design to your system of interest!</p>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">examples/</span></code> folder contains Jupyter notebooks covering all major features.
+Open them with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">jupyter notebook examples/</span>
+</pre></div>
+</div>
 </section>
 </section>
 

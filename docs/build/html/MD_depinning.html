@@ -1,27 +1,27 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MD of a depinning transition &mdash; SLIDES 0.0.4 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Depinning dynamics &mdash; FLAKE 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -38,7 +38,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            SLIDES
+            FLAKE
               <img src="_static/logo_html.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -55,10 +55,11 @@
 <li class="toctree-l1 current"><a class="reference internal" href="examples.html">Examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="0-Substrate_types.html">Substrates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="1-Cluster_creation.html">Cluster creation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="2-Cluster_on_substrate.html">Put a cluster on a substrate</a></li>
-<li class="toctree-l2"><a class="reference internal" href="3-Barrier_from_stirng.html">Barrier</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2-Cluster_on_substrate.html">Cluster on a substrate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3-Barrier_from_string.html">Energy barrier and minimum energy path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4-Dynamics.html">Molecular dynamics: depinning under applied force and torque</a></li>
 <li class="toctree-l2"><a class="reference internal" href="5-Scaling_laws.html">Scaling laws of translational static friction</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">MD of a depinning transition</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Depinning dynamics</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
@@ -70,7 +71,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">SLIDES</a>
+          <a href="index.html">FLAKE</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -79,7 +80,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="examples.html">Examples</a></li>
-      <li class="breadcrumb-item active">MD of a depinning transition</li>
+      <li class="breadcrumb-item active">Depinning dynamics</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/MD_depinning.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -89,35 +90,40 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="md-of-a-depinning-transition">
-<h1>MD of a depinning transition<a class="headerlink" href="#md-of-a-depinning-transition" title="Permalink to this heading"></a></h1>
-<p>The previous examples dealt more with static properties of the interface.
-The <code class="docutils literal notranslate"><span class="pre">MD_rigid_rototrasl.py</span></code> module allows you to integrate the overdamped equation of motion (see introduction) and follow the trajectory of a cluster in time. See the example folder molecular_dynamics for more details and inputs.</p>
-<p>An example of interesting time evolution is the depinning of a cluster under the action of external drivers, like a torque and a force applied on its center of mass (CM).
-If these drivers are above a critical threshold, the cluster will depin and starting to translate and rotate.</p>
-<p>The animation below shows the evolution of the cluster during the depining, with each particle coloured according to its potential energy. The applied torque is in the counter-clockwise direction and the force along <span class="math notranslate nohighlight">\(x\)</span>.</p>
+  <section id="depinning-dynamics">
+<h1>Depinning dynamics<a class="headerlink" href="#depinning-dynamics" title="Link to this heading"></a></h1>
+<p>The previous examples dealt with static properties of the interface.
+<code class="docutils literal notranslate"><span class="pre">flake.dynamics.run_md</span></code> integrates the overdamped equation of motion (see <a class="reference internal" href="intro.html"><span class="doc">Intro</span></a>) and follows the trajectory of a cluster in time.
+See <code class="docutils literal notranslate"><span class="pre">examples/4-Dynamics.ipynb</span></code> for a worked example.</p>
+<p>An example of interesting time evolution is the depinning of a cluster under external drivers: a torque and a force applied to its center of mass (CM).
+If these drivers exceed the critical threshold, the cluster depins and begins to translate and rotate.</p>
+<p>The animation below shows the cluster evolving during depinning, with each particle coloured according to its potential energy. The applied torque is counter-clockwise and the force is along <span class="math notranslate nohighlight">\(x\)</span>.</p>
 <figure class="align-default" id="id1">
-<a class="reference internal image-reference" href="_images/trajectory.gif"><img alt="_images/trajectory.gif" src="_images/trajectory.gif" style="height: 400px;" /></a>
+<a class="reference internal image-reference" href="_images/trajectory.gif"><img alt="_images/trajectory.gif" src="_images/trajectory.gif" style="height: 400px;" />
+</a>
 <figcaption>
-<p><span class="caption-text">Depinning cluster under the action of torque and force. The color of each particle indicates the substrate potential energy, increasing from blue to yello. Arrows in dicate the force acting on each particle (the legth is proportional to the magnitude).</span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
+<p><span class="caption-text">Depinning cluster under torque and force. Particle colour indicates substrate potential energy (blue: low, yellow: high). Arrows show the force on each particle (length proportional to magnitude).</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
 </figcaption>
 </figure>
-<p>From the output file, we can also plot the evolution of the total energy of the cluster as a function of time.</p>
+<p>From the trajectory we can plot the total energy of the cluster as a function of time.</p>
 <figure class="align-default" id="id2">
-<a class="reference internal image-reference" href="_images/energy.png"><img alt="_images/energy.png" src="_images/energy.png" style="height: 400px;" /></a>
+<a class="reference internal image-reference" href="_images/energy.png"><img alt="_images/energy.png" src="_images/energy.png" style="height: 400px;" />
+</a>
 <figcaption>
-<p><span class="caption-text">Energy per particle as a function of time</span><a class="headerlink" href="#id2" title="Permalink to this image"></a></p>
+<p><span class="caption-text">Energy per particle as a function of time.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
 </figcaption>
 </figure>
-<p>As the drivers in this example are not much larger than the critical value, the motion is characterised by an <em>intermittent</em> dynamics reminiscent of <a class="reference external" href="https://en.wikipedia.org/wiki/Stick-slip_phenomenon">stick-slip</a> (strincly speaking, there cannot be stick-slip in a rigid system under a constant force), as highlight by the evolution of the <span class="math notranslate nohighlight">\(x\)</span> coordinate of the CM below.
-In the limit of large drives, the cluster will move in an almost-smooth fashion, as the force imposed by the substrate will be negligible.</p>
+<p>Because the drivers in this example are only slightly above the critical value, the motion is <em>intermittent</em> — reminiscent of <a class="reference external" href="https://en.wikipedia.org/wiki/Stick-slip_phenomenon">stick-slip</a> (strictly speaking, true stick-slip cannot occur in a rigid system under a constant force).
+In the limit of large drives, the cluster moves in an almost-smooth fashion as the substrate force becomes negligible.</p>
 <figure class="align-default" id="id3">
-<a class="reference internal image-reference" href="_images/x_trajectory.png"><img alt="_images/x_trajectory.png" src="_images/x_trajectory.png" style="height: 400px;" /></a>
+<a class="reference internal image-reference" href="_images/x_trajectory.png"><img alt="_images/x_trajectory.png" src="_images/x_trajectory.png" style="height: 400px;" />
+</a>
 <figcaption>
-<p><span class="caption-text">Position of the cluster CM along x as a function of time</span><a class="headerlink" href="#id3" title="Permalink to this image"></a></p>
+<p><span class="caption-text">Position of the cluster CM along <span class="math notranslate nohighlight">\(x\)</span> as a function of time.</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
 </figcaption>
 </figure>
-<p>Note how the amplitude of the “slips” is not constant, but decreases with time, toward an almost smooth sliding. This is due to the coupling of rotation and translation: as the cluster rotates the depth of the energy landscape decreases, thus making the applied force effectively larger, closer to the smooth sliding limit.</p>
+<p>Note that the amplitude of the “slips” decreases with time, converging toward smooth sliding.
+This is due to the coupling of rotation and translation: as the cluster rotates, the effective depth of the energy landscape decreases, making the applied force proportionally larger relative to the barrier — pushing the system closer to the smooth-sliding limit.</p>
 </section>
 
 

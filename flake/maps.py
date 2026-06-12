@@ -1,34 +1,34 @@
-"""
+r"""
 Static energy maps for rigid-cluster simulations.
 
 Three maps are provided:
 
-    translational_map  -- E(x, y) at fixed orientation theta
-    rotational_map     -- E(theta) at fixed CM position
-    rototrasl_map      -- E(theta, x, y) full 3-D scan
+- ``translational_map`` — :math:`E(x_\mathrm{cm},\, y_\mathrm{cm})` at fixed :math:`\theta`
+- ``rotational_map``    — :math:`E(\theta)` at fixed CM position
+- ``rototrasl_map``     — :math:`E(\theta,\, x_\mathrm{cm},\, y_\mathrm{cm})` full 3-D scan
 
-All maps return plain dicts of numpy arrays.  No file I/O, no logging,
-no argparse.  The caller (io.py or user code) decides what to do with
-the results.
+All maps return plain dicts of numpy arrays.  No file I/O, no logging.
 
 Grid coordinate convention
 --------------------------
-For Bravais-lattice substrates (gaussian, tanh), fractional coordinates
-(dda1, dda2) in [0, 1) x [0, 1) are converted to real-space CM positions via:
+For Bravais-lattice substrates (Gaussian, tanh), fractional coordinates
+:math:`(\xi_1, \xi_2) \in [0,1)^2` are converted to real-space CM positions via:
 
-    pos_cm = u_inv @ np.array([dda1, dda2])
+.. math::
 
-where u_inv is the 2x2 matrix from calc_matrices_bvect (columns are the
-primitive vectors).
+    \mathbf{r}_\mathrm{cm} = U^{-1} \begin{pmatrix} \xi_1 \\ \xi_2 \end{pmatrix}
 
-For sinusoidal substrates (no unique unit cell) and quasicrystal variants
-(no unit cell at all), pass a pre-built Cartesian grid directly via
-pos_cm_grid and leave u_inv=None.
+where :math:`U^{-1}` is the matrix from ``calc_matrices_bvect`` (columns are the
+primitive vectors :math:`\mathbf{b}_1, \mathbf{b}_2`).
+
+For sinusoidal substrates (no unique unit cell) and quasicrystals (no unit
+cell at all), pass a pre-built Cartesian grid directly via ``pos_cm_grid``
+and set ``u_inv=None``.
 
 Parallelism
 -----------
-Set n_jobs > 1 to parallelise over grid points with joblib (loky backend).
-n_jobs = -1 uses all available cores.  For small grids, n_jobs = 1 is
+Set ``n_jobs > 1`` to parallelise over grid points with joblib (loky backend).
+``n_jobs = -1`` uses all available cores.  For small grids ``n_jobs = 1`` is
 faster due to process-spawn overhead.
 """
 

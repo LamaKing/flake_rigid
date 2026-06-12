@@ -1,26 +1,7 @@
-Static Translation
-===================
+Static maps (flake.maps)
+========================
 
-.. automodule:: static_trasl_map
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-Static Rotation
-===================
-
-.. automodule:: static_roto_map
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-
-Static Rotation and Translation
-================================
-
-.. automodule:: static_rototrasl_map
+.. automodule:: flake.maps
    :members:
    :undoc-members:
    :show-inheritance:

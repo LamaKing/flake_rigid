@@ -22,6 +22,7 @@ base_md_kwargs:
   print_every: 500
 post_fn: drift_velocity
 save_traj: true
-n_jobs: 4
+overwrite: true    
+n_jobs: -1
 backend: loky
 outdir: sweep_Fx_out

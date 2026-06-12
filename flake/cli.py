@@ -1,5 +1,5 @@
 """
-Unified command-line interface for the DRIFT package.
+Unified command-line interface for the FLAKE package.
 
 Usage
 -----
@@ -314,7 +314,9 @@ def _cmd_sweep(args):
         n_jobs:         int  (default 1)
         backend:        str  (default 'loky')
         save_traj:      bool (default True)
+        overwrite:      bool (default False) -- re-run even if traj.h5 exists
         outdir:         str  (default '.')
+        (any other key accepted by sweep_md is forwarded transparently)
     """
     from flake.sweep import sweep_md, grid_sweep, line_sweep, force_sweep
 
@@ -350,25 +352,26 @@ def _cmd_sweep(args):
         base_md_kwargs = dict(base_md_kwargs)   # don't mutate the original
         base_md_kwargs['theta0'] = theta_params
 
-    n_jobs         = int(spec_dict.get('n_jobs', 1))
-    backend        = str(spec_dict.get('backend', 'loky'))
-    save_traj      = bool(spec_dict.get('save_traj', True))
-    outdir         = args.outdir if args.outdir else spec_dict.get('outdir', '.')
+    outdir = args.outdir if args.outdir else spec_dict.get('outdir', '.')
 
     post_fn = None
     if 'post_fn' in spec_dict:
         post_fn = _resolve_post_fn(spec_dict['post_fn'],
                                    spec_dict.get('post_fn_params', {}))
 
-    print("drift sweep: %d points  n_jobs=%d  backend=%s  outdir=%s"
-          % (len(sweep_spec), n_jobs, backend, outdir), flush=True)
+    # Strip CLI-only keys; pass everything else straight to sweep_md.
+    _cli_keys = {'sweep_type', 'grid', 'line', 'F_vals', 'phi_deg',
+                 'sweep_spec', 'post_fn', 'post_fn_params', 'outdir'}
+    sweep_kwargs = {k: v for k, v in spec_dict.items() if k not in _cli_keys}
+    sweep_kwargs['outdir'] = outdir
+
+    print("drift sweep: %d points  outdir=%s" % (len(sweep_spec), outdir),
+          flush=True)
 
     results = sweep_md(pos, calc_en_f, en_params, sweep_spec,
-                       base_md_kwargs=base_md_kwargs,
                        post_fn=post_fn,
-                       n_jobs=n_jobs, backend=backend,
-                       outdir=outdir, save=True, save_traj=save_traj,
-                       verbose=True)
+                       save=True, verbose=True,
+                       **sweep_kwargs)
 
     print("drift sweep: done. %d runs written to %s" % (len(results), outdir),
           flush=True)
@@ -643,8 +646,8 @@ def _cmd_make_params(args):
 
 def _build_parser():
     parser = argparse.ArgumentParser(
-        prog='drift',
-        description='DRIFT: rigid-cluster statics and dynamics on a substrate.',
+        prog='flake',
+        description='FLAKE: rigid-cluster statics and dynamics on a substrate.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument('--verbose', '-v', action='store_true',

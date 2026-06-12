@@ -22,8 +22,8 @@ with open('params.yaml') as fh:
     params = yaml.safe_load(fh)
 
 print(params)
-from drift.tool_create_substrate import substrate_from_params
-from drift.tool_create_cluster   import cluster_from_params
+from flake.substrate import substrate_from_params
+from flake.cluster   import cluster_from_params
 
 _, calc_en_f, en_params = substrate_from_params(params)
 pos = cluster_from_params(params)
@@ -93,7 +93,7 @@ else:
 # Compute maps with both grids
 # ---------------------------------------------------------------------------
 
-from drift.maps import translational_map
+from flake.maps import translational_map
 
 print('\nComputing CLI-style map ...')
 res_cli = translational_map(pos, calc_en_f, en_params, None, n_x, n_y,

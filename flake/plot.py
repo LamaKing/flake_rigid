@@ -17,7 +17,7 @@ _log = logging.getLogger(__name__)
 _log.addHandler(logging.NullHandler())
 
 
-def plot_UC(ax, u, params={'ls': ':', 'color': 'tab:gray', 'lw': 1}):
+def plot_UC(ax, u, params=None):
     """Draw the real-space unit cell spanned by u[0], u[1] on ax.
 
     Args:
@@ -28,6 +28,8 @@ def plot_UC(ax, u, params={'ls': ':', 'color': 'tab:gray', 'lw': 1}):
     Returns:
         ax
     """
+    if params is None:
+        params = {'ls': ':', 'color': 'tab:gray', 'lw': 1}
     BZ_corner = np.array([(n*u[0] + m*u[1])
                           for n, m in [[0,0], [1,0], [1,1], [0,1], [0,0]]])
     for i in range(4):
@@ -50,7 +52,8 @@ def get_brillouin_zone_2d(cell):
     from scipy.spatial import Voronoi
 
     cell = np.asarray(cell, dtype=float)
-    assert cell.shape == (2, 2)
+    if cell.shape != (2, 2):
+        raise ValueError("cell must have shape (2, 2); got %s" % (cell.shape,))
 
     nn = np.array([i*cell[0] + j*cell[1]
                    for j in range(-1, 2) for i in range(-1, 2)])
@@ -60,8 +63,7 @@ def get_brillouin_zone_2d(cell):
     return vor.vertices[orig_region]
 
 
-def plot_BZ2d(ax, ws_verts,
-              params={'ls': '--', 'color': 'tab:gray', 'lw': 1, 'fill': False}):
+def plot_BZ2d(ax, ws_verts, params=None):
     """Add the Brillouin Zone polygon to a matplotlib axis.
 
     Args:
@@ -72,6 +74,8 @@ def plot_BZ2d(ax, ws_verts,
     Returns:
         (ax, ws_cell) -- axis and the Polygon patch.
     """
+    if params is None:
+        params = {'ls': '--', 'color': 'tab:gray', 'lw': 1, 'fill': False}
     from matplotlib.patches import Polygon
 
     ws_cell = Polygon(ws_verts, **params)

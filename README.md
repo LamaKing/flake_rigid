@@ -1,105 +1,119 @@
 
 ![logo](https://github.com/LamaKing/slides_rigid/assets/19472018/04d7b496-8ed0-4655-beed-f5092dface51)
 
-# SuperLubric Interface DESigner
+# FLAKE — rigid cluster friction simulator
 
-SLIDES computes the interlocking potential between a periodic substrate and a finite-size adsorbate, in the rigid approximation.
-The adsorbate is treated as a rigid body at a given orientation $\theta$ and center of mass (CM) position $x_\mathrm{cm}, y_\mathrm{cm}$
+FLAKE computes the interlocking potential between a periodic substrate and a finite-size adsorbate, in the rigid approximation.
+The adsorbate is treated as a rigid body at a given orientation $\theta$ and center of mass (CM) position $x_\mathrm{cm}, y_\mathrm{cm}$.
 
-This package is a collection of functions implementing the above physical system and automating routines usually needed to study the static, dynamics and scaling laws of friction at nanoscale interfaces.
-This software was developed at SISSA, Trieste, Italy in the group of Prof.
-Erio Tosatti and Andrea Vanossi and based on the experiments by Xin Cao and Clemens Bechinger at Univeristy of Konstanz, Germany.
+This package implements the physical system and automates routines needed to study the statics, dynamics, and scaling laws of friction at nanoscale interfaces.
+It was developed at SISSA, Trieste, Italy in the group of Prof. Erio Tosatti and Andrea Vanossi, based on experiments by Xin Cao and Clemens Bechinger at the University of Konstanz, Germany.
 
 See the [documentation](https://slides-rigid.readthedocs.io/en/latest/) for more details.
 
+## Installation
+
+Clone the repository and install in editable mode with the development extras:
+
+```console
+git clone https://github.com/LamaKing/slides_rigid.git
+cd slides_rigid
+pip install -e ".[dev]"
+```
+
+This registers the `flake` command-line entry point.
+Numba will JIT-compile the hot loops on first run; subsequent runs are fast.
+
+## Quick start
+
+```console
+# Compute a translational energy map
+flake map -i my_params.yaml --grid grid_trasl.yaml -o map_trasl.h5
+
+# Find the minimum energy path between two configurations
+flake string -i my_params.yaml --cfg string_roto.yaml -o mep.h5
+
+# Run a sweep of MD trajectories over a force grid
+flake sweep -i my_params.yaml --spec sweep_Fx.yaml
+```
+
+See `test_cli_and_phys/` for working YAML examples of all three subcommands.
+
 ## Substrate
-The substrate is defined as a periodic function resulting from either a monocromaitc superposition of plane waves or a potential well of a given shape repeated in space.
-The functions handling the substrate creation are in ```tool_create_substrate.py```.
 
-For a plane wave superposition, the substrate is defined by a suitable set of wave vectors, where the number of vectors defines the symmetry and length of vectors defines the spacing [1].
+The substrate is defined as a periodic function, either a superposition of plane waves or a potential well repeated on a Bravais lattice.
+The relevant module is `flake.substrate`.
 
-For a lattice of wells, the substrate is defined by the shape parameters of the well and the lattice vectors [2-5]. This substrate can be decorated with a lattice basis.
+For a plane-wave (sinusoidal) substrate, the substrate is defined by a set of wave vectors: the number of vectors controls the symmetry and the length sets the spacing [1].
+For a lattice of wells, the substrate is defined by the well shape parameters and the lattice vectors [2–5].
+The substrate can be decorated with a multi-site basis.
 
-The parameters are specified in a JSON file.
-See Example/0-Substrate_types.ipynb for details.
+See `examples/0-Substrate_types.ipynb` for details.
 
 ## Cluster
-The cluster is defined as a collection of points (optionally decorate with a basis) belonging to a given lattice.
-For convenience, there are functions returning clusters in regular shapses, e.g. rectangles, hexagons, circles, etc.
-Using the [Shapely package](https://shapely.readthedocs.io/en/stable/), clusters of arbitrary shapes (e.g. imaged in experiments) can be created.
-The functions handling the substrate creation are in ```tool_create_substrate.py```.
 
-See example/1-Cluster_creation.ipynb for details.
+The cluster is a collection of points (optionally decorated with a basis) belonging to a 2D Bravais lattice, cut to a given shape (circle, hexagon, rectangle, triangle, ellipse, or arbitrary polygon via Shapely).
+The relevant module is `flake.cluster`.
 
-## Static Maps
+See `examples/1-Cluster_creation.ipynb` for details.
 
-See example/2-Cluster_on_substrate.ipynb for details on the following functions.
+## Static maps
 
-### Translations
-To explore the energy landscape of an adsorbate over a substrate as a function of the CM at fixed orientation, see ```static_trasl_map.py```
-### Rotations
-To explore the energy landscape of an adsorbate over a substrate as a function of the imposed rotation $\theta$, at fixed CM, see ```static_roto_map.py```
-### Roto-translations
-To search for the global minimum of an adosrbate, one needs to combine rotations and translation, and locate the energy minimum in the $(x_\mathrm{cm}, y_\mathrm{cm}, \theta)$ space. See ```static_rototrasl_map.py``` for details.
+The module `flake.maps` provides translational, rotational, and roto-translational energy landscapes:
 
-## Dynamics Maps
+- **Translational**: $E(x_\mathrm{cm}, y_\mathrm{cm})$ at fixed $\theta$
+- **Rotational**: $E(\theta)$ at fixed CM
+- **Roto-translational**: global minimum search in $(x_\mathrm{cm}, y_\mathrm{cm}, \theta)$ space
 
-To go beyond rigid maps, there are two essential tools: compute the minimum energy path between two minimum or perform a molecular dynamics calculation under given translational and rotational drives $(F_x, F_y, \tau)$.
+See `examples/2-Cluster_on_substrate.ipynb` for details.
 
-### Barrier finding
-The barrier between two points in the configurational space $(x_\mathrm{cm}, y_\mathrm{cm})$ at fixed orientation can be estimated be the string algorithm [6], similar to the NEB methods.
-The ideal can be summarised like this: imagine the potential energy to be a hill landscape. Place a string between two points of the landscape and let it relax. The string would relax downhill until the gradient on the string vanishes, i.e. the string layes on the pass between the valleys and below the peaks.
+## Barrier finding
 
-See example/3-Barrier_from_stirng.ipynb
+The minimum energy path (MEP) between two configurations in $(x_\mathrm{cm}, y_\mathrm{cm})$ or $(x_\mathrm{cm}, y_\mathrm{cm}, \theta)$ space is found with the string method [6] implemented in `flake.string_method`.
+The maximum energy along the MEP is the static friction force Fs.
 
-### Molecular dynamics
-The script ```MD_rigid_rototrasl.py``` solve the equation of motion for the center of mass and orientation of the cluster in the overdamped regime (no interial term).
+See `examples/3-Barrier_from_stirng.ipynb` for details.
 
-See example/molecular_dynamics for an example of a system depinning under a constant force and torque.
+## Molecular dynamics
 
-#### Equations of motion
-In the overdamped limit, the equation of motion are the following first order equations:
+`flake.dynamics.run_md` integrates the overdamped Langevin equation:
 
-$$ \gamma_{t} \frac{d\mathbf{r}}{dt} = (\mathbf{F}_{ext} - \nabla U) $$
+$$\gamma_t \frac{d\mathbf{r}}{dt} = \mathbf{F}_\mathrm{ext} - \nabla U + \text{noise}$$
 
-$$ \gamma_{r} \frac{d\theta}{dt} = (\tau_{ext} - \frac{dU}{d\theta}) $$
+$$\gamma_r \frac{d\theta}{dt} = \tau_\mathrm{ext} - \frac{dU}{d\theta} + \text{noise}$$
 
-The dissipation constants of the CM for a cluster of $N$ particles are linked the "particle-like" damping constant $\gamma$ by
-$\gamma_t = N \gamma$
-and
-$\gamma_r = \gamma \sum_i r_i^2 $, where $r_i$ is the position of the $i$-th particle with respect to the center of mass.
+The drag coefficients are $\gamma_t = N\gamma$ and $\gamma_r = \gamma \sum_i r_i^2$.
+Sweep infrastructure (`flake.sweep`) parallelises trajectories over a grid of external drives.
 
-In this picture energy is not conserved (fully dissipated in the Langevin bath between successive timesteps) and the value of the dissipation constant $\gamma$ effectively sets how quickly the time flows.
-Thus by lowering $\gamma$ one can "speed up" the simulations and match timescales similar to experiments.
+See `examples/4-Dynamics.ipynb` for depinning sweeps.
+
+## Scaling laws
+
+`examples/5-Scaling_laws.ipynb` demonstrates:
+
+- Commensurate contact: $F_s \propto N$ (all particles contribute coherently)
+- Incommensurate contact: $F_s \propto \sqrt{N}$ (structural superlubricity)
 
 ## Units
-No internal units conversion is performed, so the choice of a coherent set of units is left to the user.
 
-A coherent set of units useful to compare with experimental colloidal system [2,3] is:
-  - energy in zJ=10 $^{-21}$ J
-  - length in $\mu\mathrm{m}$
-  - mass in fKg
+No internal units conversion is performed; the user chooses a coherent set.
 
-From which follows:
-  - force in fN
-  - torque in fN $\cdot \mu \mathrm{m}$
-  - time in ms
-  - translational damping constant $\gamma$ in fKg/ms
+**Colloidal experiments** [2, 3]:
+- energy: zJ = $10^{-21}$ J
+- length: $\mu$m
+- mass: fg = $10^{-15}$ g
+- force: fN, torque: fN·$\mu$m, time: ms
 
-
-A coherent set of units useful to compare with nanoscale experiments, e.g. AFM nanomanipulation, is:
-  - energy in eV = $1.602176634 \times 10^{-19}$ J
-  - length in  Å = $10^{-10}$ m
-  - mass in fKg
-
-From which follows:
-  - force in eV/Å = 1.602176634 nN
-  - time in $100 \sqrt{10/1.602176634}$ ns
+**Nanoscale / AFM experiments**:
+- energy: eV
+- length: Å
+- force: eV/Å $\approx$ 1.6 nN
 
 ## References
-1. Vanossi, Andrea, Nicola Manini, and Erio Tosatti. “Static and Dynamic Friction in Sliding Colloidal Monolayers.” Proceedings of the National Academy of Sciences 109, no. 41 (October 9, 2012): 16429–33. https://doi.org/10.1073/pnas.1213930109.
-2. Panizon, Emanuele, Andrea Silva, Xin Cao, Jin Wang, Clemens Bechinger, Andrea Vanossi, Erio Tosatti, and Nicola Manini. “Frictionless Nanohighways on Crystalline Surfaces.” Nanoscale 15, no. 3 (2023): 1299–1316. https://doi.org/10.1039/D2NR04532J.
-3. Cao, Xin, Andrea Silva, Emanuele Panizon, Andrea Vanossi, Nicola Manini, Erio Tosatti, and Clemens Bechinger. “Moiré-Pattern Evolution Couples Rotational and Translational Friction at Crystalline Interfaces.” Physical Review X 12, no. 2 (June 15, 2022): 021059. https://doi.org/10.1103/PhysRevX.12.021059.
-4. Cao, Xin, Emanuele Panizon, Andrea Vanossi, Nicola Manini, and Clemens Bechinger. “Orientational and Directional Locking of Colloidal Clusters Driven across Periodic Surfaces.” Nature Physics 15, no. 8 (August 2019): 776–80. https://doi.org/10.1038/s41567-019-0515-7.
-5. Cao, Xin, Emanuele Panizon, Andrea Vanossi, Nicola Manini, Erio Tosatti, and Clemens Bechinger. “Pervasive Orientational and Directional Locking at Geometrically Heterogeneous Sliding Interfaces.” Physical Review E 103, no. 1 (January 13, 2021): 012606. https://doi.org/10.1103/PhysRevE.103.012606.
-6. E, Weinan, Weiqing Ren, and Eric Vanden-Eijnden. “Simplified and Improved String Method for Computing the Minimum Energy Paths in Barrier-Crossing Events.” The Journal of Chemical Physics 126, no. 16 (April 28, 2007): 164103. https://doi.org/10.1063/1.2720838.
+
+1. Vanossi, Manini, Tosatti. *Proc. Natl. Acad. Sci.* **109**, 16429 (2012). https://doi.org/10.1073/pnas.1213930109
+2. Panizon, Silva et al. *Nanoscale* **15**, 1299 (2023). https://doi.org/10.1039/D2NR04532J
+3. Cao, Silva et al. *Phys. Rev. X* **12**, 021059 (2022). https://doi.org/10.1103/PhysRevX.12.021059
+4. Cao et al. *Nature Physics* **15**, 776 (2019). https://doi.org/10.1038/s41567-019-0515-7
+5. Cao et al. *Phys. Rev. E* **103**, 012606 (2021). https://doi.org/10.1103/PhysRevE.103.012606
+6. E, Ren, Vanden-Eijnden. *J. Chem. Phys.* **126**, 164103 (2007). https://doi.org/10.1063/1.2720838

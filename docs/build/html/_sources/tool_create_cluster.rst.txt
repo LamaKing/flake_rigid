@@ -1,7 +1,7 @@
-Cluster
-===================
+Cluster (flake.cluster)
+=======================
 
-.. automodule:: tool_create_cluster
+.. automodule:: flake.cluster
    :members:
    :undoc-members:
    :show-inheritance:

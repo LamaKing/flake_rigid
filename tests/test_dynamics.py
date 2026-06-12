@@ -29,7 +29,7 @@ import pytest
 
 from flake.substrate import substrate_from_params, get_ks, _calc_en_flat_core
 from flake.cluster import calc_cluster_langevin
-from flake.dynamics import run_md, make_params_array
+from flake.dynamics import run_md
 
 
 # ---------------------------------------------------------------------------

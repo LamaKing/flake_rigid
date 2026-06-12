@@ -14,8 +14,8 @@ import yaml
 with open('params.yaml') as fh:
     params = yaml.safe_load(fh)
 
-from drift.tool_create_substrate import substrate_from_params
-from drift.tool_create_cluster   import cluster_from_params
+from flake.substrate import substrate_from_params
+from flake.cluster   import cluster_from_params
 
 pen_func, calc_en_f, en_params = substrate_from_params(params)
 pos = cluster_from_params(params)
@@ -44,7 +44,7 @@ en_single, _, _ = pen_func(p_grid, np.zeros(2), *en_params)
 
 # Cluster landscape
 pos_cm_grid = np.array([[x, y] for x in xx for y in yy])
-from drift.maps import translational_map
+from flake.maps import translational_map
 res = translational_map(pos, calc_en_f, en_params, None, 80, 80,
                         pos_cm_grid=pos_cm_grid, n_jobs=1)
 en_cluster = res['energy']

@@ -42,7 +42,7 @@ markers = [
 ]
 
 [project.scripts]
-drift = "flake.cli:main"
+flake = "flake.cli:main"
 
 [project.urls]
 "Homepage" = "https://slides-rigid.readthedocs.io/en/latest/"

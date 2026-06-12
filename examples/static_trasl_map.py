@@ -1,1 +1,0 @@
-../src/static_trasl_map.py

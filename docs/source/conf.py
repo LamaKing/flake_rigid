@@ -12,16 +12,16 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../src/'))
+sys.path.insert(0, os.path.abspath('../../'))
 
 source_suffix = ['.rst']
 
 # -- Project information -----------------------------------------------------
 
-project = 'SLIDES'
+project = 'FLAKE'
 copyright = 'GNU under General Public License v3.0'
 author = 'Andrea Silva'
-release = '0.0.6'
+release = '0.1.0'
 
 # -- General configuration ---------------------------------------------------
 # -- General configuration
@@ -32,6 +32,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.mathjax",
     "sphinx_copybutton",
     "nbsphinx"
 ]

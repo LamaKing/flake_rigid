@@ -1,7 +1,15 @@
-Miscellanous
-=============
+I/O (flake.io)
+===============
 
-.. automodule:: misc
+.. automodule:: flake.io
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Plotting (flake.plot)
+======================
+
+.. automodule:: flake.plot
    :members:
    :undoc-members:
    :show-inheritance:

@@ -1,30 +1,30 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cluster &mdash; SLIDES 0.0.4 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Cluster (flake.cluster) &mdash; FLAKE 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="String method" href="string_method.html" />
-    <link rel="prev" title="Substrate" href="tool_create_substrate.html" /> 
+    <link rel="next" title="String method (flake.string_method)" href="string_method.html" />
+    <link rel="prev" title="Substrate (flake.substrate)" href="tool_create_substrate.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,7 +36,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            SLIDES
+            FLAKE
               <img src="_static/logo_html.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -53,35 +53,27 @@
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="modules.html#tools">Tools</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="tool_create_substrate.html">Substrate</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Cluster</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.add_basis"><code class="docutils literal notranslate"><span class="pre">add_basis()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.calc_cluster_langevin"><code class="docutils literal notranslate"><span class="pre">calc_cluster_langevin()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.cluster_from_params"><code class="docutils literal notranslate"><span class="pre">cluster_from_params()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.cluster_inhex_Nl"><code class="docutils literal notranslate"><span class="pre">cluster_inhex_Nl()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.cluster_poly"><code class="docutils literal notranslate"><span class="pre">cluster_poly()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.create_cluster"><code class="docutils literal notranslate"><span class="pre">create_cluster()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.create_cluster_circle"><code class="docutils literal notranslate"><span class="pre">create_cluster_circle()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.create_cluster_hex"><code class="docutils literal notranslate"><span class="pre">create_cluster_hex()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.create_cluster_rect"><code class="docutils literal notranslate"><span class="pre">create_cluster_rect()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.create_cluster_special"><code class="docutils literal notranslate"><span class="pre">create_cluster_special()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.create_cluster_tri"><code class="docutils literal notranslate"><span class="pre">create_cluster_tri()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.create_input_hex"><code class="docutils literal notranslate"><span class="pre">create_input_hex()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.get_poly"><code class="docutils literal notranslate"><span class="pre">get_poly()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.get_rotomatr"><code class="docutils literal notranslate"><span class="pre">get_rotomatr()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.load_cluster"><code class="docutils literal notranslate"><span class="pre">load_cluster()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.load_input_hex"><code class="docutils literal notranslate"><span class="pre">load_input_hex()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.params_from_ASE"><code class="docutils literal notranslate"><span class="pre">params_from_ASE()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.params_from_poscar"><code class="docutils literal notranslate"><span class="pre">params_from_poscar()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.rotate"><code class="docutils literal notranslate"><span class="pre">rotate()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_cluster.save_xyz"><code class="docutils literal notranslate"><span class="pre">save_xyz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tool_create_substrate.html">Substrate (flake.substrate)</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Cluster (flake.cluster)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#flake.cluster.add_basis"><code class="docutils literal notranslate"><span class="pre">add_basis()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.cluster.calc_cluster_langevin"><code class="docutils literal notranslate"><span class="pre">calc_cluster_langevin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.cluster.cluster_from_params"><code class="docutils literal notranslate"><span class="pre">cluster_from_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.cluster.cluster_poly"><code class="docutils literal notranslate"><span class="pre">cluster_poly()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.cluster.get_poly"><code class="docutils literal notranslate"><span class="pre">get_poly()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.cluster.load_cluster"><code class="docutils literal notranslate"><span class="pre">load_cluster()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.cluster.make_cluster"><code class="docutils literal notranslate"><span class="pre">make_cluster()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.cluster.params_from_poscar"><code class="docutils literal notranslate"><span class="pre">params_from_poscar()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.cluster.rotate"><code class="docutils literal notranslate"><span class="pre">rotate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.cluster.save_cluster"><code class="docutils literal notranslate"><span class="pre">save_cluster()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.cluster.save_xyz"><code class="docutils literal notranslate"><span class="pre">save_xyz()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="string_method.html">String method</a></li>
-<li class="toctree-l3"><a class="reference internal" href="misc.html">Miscellanous</a></li>
+<li class="toctree-l3"><a class="reference internal" href="string_method.html">String method (flake.string_method)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="misc.html">I/O (flake.io)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="misc.html#module-flake.plot">Plotting (flake.plot)</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#static">Static</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#static-maps">Static maps</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modules.html#dynamics">Dynamics</a></li>
 </ul>
 </li>
@@ -93,7 +85,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">SLIDES</a>
+          <a href="index.html">FLAKE</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -102,7 +94,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">Modules</a></li>
-      <li class="breadcrumb-item active">Cluster</li>
+      <li class="breadcrumb-item active">Cluster (flake.cluster)</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/tool_create_cluster.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -112,158 +104,217 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-tool_create_cluster">
-<span id="cluster"></span><h1>Cluster<a class="headerlink" href="#module-tool_create_cluster" title="Permalink to this heading"></a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.add_basis">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">add_basis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.add_basis" title="Permalink to this definition"></a></dt>
-<dd><p>Add a crystal basis to a simple Bravais lattice</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.calc_cluster_langevin">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">calc_cluster_langevin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.calc_cluster_langevin" title="Permalink to this definition"></a></dt>
-<dd><p>Compute the effective translational and rotational damping acting on a CM of a cluster of N particles</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.cluster_from_params">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">cluster_from_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.cluster_from_params" title="Permalink to this definition"></a></dt>
-<dd><p>Create cluster from parameters in dictionary.</p>
-<p>Return xy positions</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.cluster_inhex_Nl">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">cluster_inhex_Nl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a1=array([4.45</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">0.</span>&#160; <span class="pre">])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a2=array([-2.225</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">3.85381305])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clgeom_fname='input_pos.hex'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_f=&lt;function</span> <span class="pre">create_cluster_circle&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X0=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y0=0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.cluster_inhex_Nl" title="Permalink to this definition"></a></dt>
-<dd><p>Create a cluster from lattice details (equivalent to .hex file) and specific shape function.</p>
-<p>The .hex file will be created and removed using tempfile.
-Returns only xy positions.</p>
-<p>Default values relate to Xin/EP colloids [Nat. Phys 2019, PRE 2021] and circular shape</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.cluster_poly">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">cluster_poly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polygon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.cluster_poly" title="Permalink to this definition"></a></dt>
-<dd><p>Use a polygon (shapely object) to mask a lattice (defined in params).</p>
-<p>Direction = 0: select the interior of the polygon (use bounds of polygon to define lattice big enough for mask)
-Direction = 1: select the exterior of the polygon (up to the N1 N2 in params)</p>
-<p>Return xy pos</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.create_cluster">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">create_cluster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_cluster</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.create_cluster" title="Permalink to this definition"></a></dt>
-<dd><p>Create clusters taking as input the two primitive vectors a1 and a2 and the indices of lattice points.
-Put center of mass in zero.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.create_cluster_circle">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">create_cluster_circle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_hex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outstream=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X0=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y0=0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.create_cluster_circle" title="Permalink to this definition"></a></dt>
-<dd><p>Circle cluster</p>
-<p>The 6 dimensions are for backward compatibility with EP.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.create_cluster_hex">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">create_cluster_hex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_hex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outstream=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X0=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y0=0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.create_cluster_hex" title="Permalink to this definition"></a></dt>
-<dd><p>Hexagonal cluster</p>
-<p>The 6 dimensions are for backward compatibility with EP.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.create_cluster_rect">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">create_cluster_rect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_hex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outstream=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X0=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y0=0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.create_cluster_rect" title="Permalink to this definition"></a></dt>
-<dd><p>Rectangular cluster</p>
-<p>The 6 dimensions are for backward compatibility with EP.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.create_cluster_special">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">create_cluster_special</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_hex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outstream=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X0=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y0=0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.create_cluster_special" title="Permalink to this definition"></a></dt>
-<dd><p>Special-parall cluster. See paper on XXX.</p>
-<p>The 6 dimensions are for backward compatibility with EP.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.create_cluster_tri">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">create_cluster_tri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_hex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outstream=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X0=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y0=0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.create_cluster_tri" title="Permalink to this definition"></a></dt>
-<dd><p>Triangular cluster</p>
-<p>The 6 dimensions are for backward compatibility with EP.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.create_input_hex">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">create_input_hex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clgeom_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'in.hex'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([4.45,</span> <span class="pre">0.])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([-2.225,</span> <span class="pre">3.85381305])</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.create_input_hex" title="Permalink to this definition"></a></dt>
-<dd><p>Create input file in EP .hex format</p>
-<p>Cluster is created from Bravais lattice a1 a2 with N1 repetition along a1 and N2 repetitions along N2.
-Default is Xin colloids: triangular with spacing 4.45</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.get_poly">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">get_poly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.get_poly" title="Permalink to this definition"></a></dt>
-<dd><p>Get a polygon (Shapely obejct) from a set of points.</p>
-<p>Optinally rotate, scale and shfit</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.get_rotomatr">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">get_rotomatr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.get_rotomatr" title="Permalink to this definition"></a></dt>
-<dd><p>Get ACW rotation matrix of an angle [degree]</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.load_cluster">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">load_cluster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_hex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.load_cluster" title="Permalink to this definition"></a></dt>
-<dd><p>Load cluster form numpy file data. Optionally adjust CM and rotate.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.load_input_hex">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">load_input_hex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instream</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.load_input_hex" title="Permalink to this definition"></a></dt>
-<dd><p>Load .hex file defining lattice and size</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.params_from_ASE">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">params_from_ASE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ase_geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.params_from_ASE" title="Permalink to this definition"></a></dt>
-<dd><p>Create JSON parameters to create clusters from ASE Atoms object.</p>
-<p>Assume this is already a 2D surface oriented along z to extract 2x2 matrix:
-From:</p>
+  <section id="module-flake.cluster">
+<span id="cluster-flake-cluster"></span><h1>Cluster (flake.cluster)<a class="headerlink" href="#module-flake.cluster" title="Link to this heading"></a></h1>
+<p>Cluster creation utilities for rigid-cluster simulations.</p>
+<p>A cluster is always an (N, 2) float64 ndarray of (x, y) positions with the
+center of mass at the origin.  Nothing else – no (N,6) legacy format, no
+hidden state, no file intermediaries in the shape functions.</p>
+<p>The cluster is built from a Bravais lattice defined by two primitive vectors
+a1, a2 (each shape (2,)).  N1, N2 count unit cells along each direction and
+control the cluster size.  The precise meaning of N1, N2 depends on shape:</p>
 <blockquote>
-<div><p>a b 0
-c d 0
-0 0 1</p>
+<div><p>circle       : encloses N1*N2 particles at correct areal density
+hexagon      : N1 particles per edge of the hexagon
+rectangle    : N1 (N2) cells along the a1 (a2) direction
+triangle     : triangle spanned by N1*a1, N2*a2
+parallelogram: sqrt(N1*N2) x sqrt(N1*N2) lattice (sqrt must be odd int)
+ellipse      : semi-axes rx = N1*|a1|, ry = N2*|a2|</p>
 </div></blockquote>
-<dl class="simple">
-<dt>Take:</dt><dd><p>a b
-c d</p>
+<p>Units follow the calling code; no unit conversion is done here.</p>
+<p>ASE and Shapely are optional dependencies – their imports are guarded and
+raise ImportError with installation hints if absent.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="flake.cluster.add_basis">
+<span class="sig-prename descclassname"><span class="pre">flake.cluster.</span></span><span class="sig-name descname"><span class="pre">add_basis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.cluster.add_basis" title="Link to this definition"></a></dt>
+<dd><p>Tile a Bravais lattice with a crystal basis.</p>
+<p>Each lattice point is displaced by every basis vector; the results are
+flattened into a single (N*M, 2) array.</p>
+<dl>
+<dt>Args:</dt><dd><p>lat_pos: (N, 2) array-like – Bravais lattice positions.
+basis:   (M, 2) array-like – basis site offsets relative to each</p>
+<blockquote>
+<div><p>lattice point.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>(N*M, 2) float64 ndarray.</p>
 </dd>
 </dl>
-<p>Positions are flattend out: (x,y) from (x,y,z)</p>
-<p>Return parameters dictionary and list of z coordinates considered</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.params_from_poscar">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">params_from_poscar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">poscar_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.params_from_poscar" title="Permalink to this definition"></a></dt>
-<dd><p>Create JSON parameters to create clusters from POSCAR file.</p>
-<p>Use ASE to read.</p>
-<p>Return parameters file.</p>
+<dt class="sig sig-object py" id="flake.cluster.calc_cluster_langevin">
+<span class="sig-prename descclassname"><span class="pre">flake.cluster.</span></span><span class="sig-name descname"><span class="pre">calc_cluster_langevin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.cluster.calc_cluster_langevin" title="Link to this definition"></a></dt>
+<dd><p>Effective translational and rotational damping for overdamped dynamics.</p>
+<dl class="simple">
+<dt>For a cluster of N identical particles with friction coefficient eta:</dt><dd><p>etat_eff = eta * N               (translational, scales as N)
+etar_eff = eta * sum_i <a href="#id1"><span class="problematic" id="id2">|</span></a>r_i|^2  (rotational, varies with shape)</p>
+</dd>
+<dt>Args:</dt><dd><p>eta: float        – single-particle friction coefficient.
+pos: (N, 2) ndarray – particle positions (CM at origin).</p>
+</dd>
+<dt>Returns:</dt><dd><p>(etat_eff, etar_eff): floats.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.rotate">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.rotate" title="Permalink to this definition"></a></dt>
-<dd><p>Rotate positions pos of angle [degree] with respect to center c (default 0,0)</p>
+<dt class="sig sig-object py" id="flake.cluster.cluster_from_params">
+<span class="sig-prename descclassname"><span class="pre">flake.cluster.</span></span><span class="sig-name descname"><span class="pre">cluster_from_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.cluster.cluster_from_params" title="Link to this definition"></a></dt>
+<dd><p>Build a cluster from a parameter dictionary (for JSON input files).</p>
+<dl>
+<dt>Required keys:</dt><dd><p>a1, a2:         primitive lattice vectors.
+N1, N2:         grid repetitions.
+cluster_shape:  shape string as in make_cluster, plus ‘polygon’.</p>
+</dd>
+<dt>Optional keys:</dt><dd><dl class="simple">
+<dt>cl_basis:  list of (2,) offsets for a multi-site basis</dt><dd><p>(default [[0,0]] – single-site Bravais lattice).</p>
+</dd>
+</dl>
+<p>cl_poly:   vertex list for polygon masking (required if shape=’polygon’).
+direction: polygon masking direction – 0 interior, 1 exterior.
+theta:     float, rotation in degrees applied after cluster creation.
+(ellipse semi-axes are N1*|a1| and N2*|a2|; no extra keys needed.)</p>
+</dd>
+<dt>Returns:</dt><dd><p>(N, 2) float64 ndarray, CM at origin.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tool_create_cluster.save_xyz">
-<span class="sig-prename descclassname"><span class="pre">tool_create_cluster.</span></span><span class="sig-name descname"><span class="pre">save_xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cluster.xyz'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'X'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_cluster.save_xyz" title="Permalink to this definition"></a></dt>
-<dd><p>Save cluster as xyz in given file (default ‘cluster.xyz’)</p>
+<dt class="sig sig-object py" id="flake.cluster.cluster_poly">
+<span class="sig-prename descclassname"><span class="pre">flake.cluster.</span></span><span class="sig-name descname"><span class="pre">cluster_poly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polygon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.cluster.cluster_poly" title="Link to this definition"></a></dt>
+<dd><p>Mask a lattice with a Shapely polygon.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>polygon:   shapely.geometry.Polygon – masking region.
+params:    dict – cluster parameters (see cluster_from_params).
+direction: int  – 0 = keep interior, 1 = keep exterior.</p>
+</dd>
+<dt>Returns:</dt><dd><p>(N, 2) float64 ndarray.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="flake.cluster.get_poly">
+<span class="sig-prename descclassname"><span class="pre">flake.cluster.</span></span><span class="sig-name descname"><span class="pre">get_poly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.cluster.get_poly" title="Link to this definition"></a></dt>
+<dd><p>Build a Shapely Polygon from a list of vertices.</p>
+<p>Optionally scale, rotate, and shift the polygon before returning.</p>
+<dl>
+<dt>Args:</dt><dd><p>points: array-like (M, 2) – polygon vertices.
+scale:  float             – uniform scale factor.
+tho:    float             – rotation angle in degrees (ACW).
+c:      (2,)              – rotation centre.
+shift:  float or (2,)    – translation applied after rotation.
+cm:     bool              – if True, translate vertices so their</p>
+<blockquote>
+<div><p>mean is at the origin before rotating.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>shapely.geometry.Polygon</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="flake.cluster.load_cluster">
+<span class="sig-prename descclassname"><span class="pre">flake.cluster.</span></span><span class="sig-name descname"><span class="pre">load_cluster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.cluster.load_cluster" title="Link to this definition"></a></dt>
+<dd><p>Load cluster from .npy file, optionally rotate, then re-centre CM.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>filename:  str   – path to .npy file (with or without ‘.npy’).
+angle_deg: float – ACW rotation applied before recentring (degrees).</p>
+</dd>
+<dt>Returns:</dt><dd><p>(N, 2) float64 ndarray, CM at origin.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="flake.cluster.make_cluster">
+<span class="sig-prename descclassname"><span class="pre">flake.cluster.</span></span><span class="sig-name descname"><span class="pre">make_cluster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'circle'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.cluster.make_cluster" title="Link to this definition"></a></dt>
+<dd><p>Build a finite-size 2D lattice cluster of the requested shape.</p>
+<dl>
+<dt>Args:</dt><dd><p>a1, a2: array-like (2,) – primitive lattice vectors.
+N1, N2: int – grid repetitions; meaning depends on shape (see module docstring).
+shape: str – one of ‘circle’, ‘hexagon’, ‘rectangle’, ‘triangle’,</p>
+<blockquote>
+<div><p>‘parallelogram’, ‘ellipse’.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>(N, 2) float64 ndarray – particle positions with CM at origin.</p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>ValueError: if shape is not recognised, or if shape constraints</dt><dd><p>are violated (e.g. parallelogram with even sqrt(N)).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="flake.cluster.params_from_poscar">
+<span class="sig-prename descclassname"><span class="pre">flake.cluster.</span></span><span class="sig-name descname"><span class="pre">params_from_poscar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.cluster.params_from_poscar" title="Link to this definition"></a></dt>
+<dd><p>Extract lattice parameters from a POSCAR file via ASE.</p>
+<p>Reads the primitive vectors and atomic basis from a 2D slab POSCAR.
+The returned dict can be passed directly to cluster_from_params to
+create a cluster of any shape with the correct lattice geometry.</p>
+<p>The POSCAR must have the 2D periodicity in the first two lattice
+vectors (a, b); the third vector c must be along z. All z information
+is discarded – the geometry is projected to the (x, y) plane.
+If the slab has multiple layers, use cut_z to select one.</p>
+<dl>
+<dt>Args:</dt><dd><p>filename: str   – path to POSCAR file.
+cut_z:    float – keep only atoms with z &lt; cut_z. If 0 (default),</p>
+<blockquote>
+<div><p>uses one standard deviation of z as threshold.</p>
+</div></blockquote>
+<p>tol:      float – fractional tolerance on cut_z (default 0.9).</p>
+</dd>
+<dt>Returns:</dt><dd><p>Tuple <code class="docutils literal notranslate"><span class="pre">(params_dict,</span> <span class="pre">pos_z)</span></code> where <code class="docutils literal notranslate"><span class="pre">params_dict</span></code> has keys
+<code class="docutils literal notranslate"><span class="pre">'a1',</span> <span class="pre">'a2',</span> <span class="pre">'cl_basis'</span></code> and <code class="docutils literal notranslate"><span class="pre">pos_z</span></code> is a <code class="docutils literal notranslate"><span class="pre">(M,)</span></code> array of
+z coordinates of atoms excluded by the z filter.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ImportError:  if ASE is not installed.
+RuntimeError: if no atoms pass the z filter.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="flake.cluster.rotate">
+<span class="sig-prename descclassname"><span class="pre">flake.cluster.</span></span><span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_deg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.cluster.rotate" title="Link to this definition"></a></dt>
+<dd><p>Rotate positions counter-clockwise by angle_deg degrees about center.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>pos:       (N, 2) array-like – input positions.
+angle_deg: float             – rotation angle in degrees (ACW positive).
+center:    (2,) array-like   – rotation center (default origin).</p>
+</dd>
+<dt>Returns:</dt><dd><p>(N, 2) float64 ndarray – rotated positions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="flake.cluster.save_cluster">
+<span class="sig-prename descclassname"><span class="pre">flake.cluster.</span></span><span class="sig-name descname"><span class="pre">save_cluster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.cluster.save_cluster" title="Link to this definition"></a></dt>
+<dd><p>Save cluster positions as a .npy file.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>pos:      (N, 2) array-like – particle positions.
+filename: str               – output path (extension added by np.save).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="flake.cluster.save_xyz">
+<span class="sig-prename descclassname"><span class="pre">flake.cluster.</span></span><span class="sig-name descname"><span class="pre">save_xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'X'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.cluster.save_xyz" title="Link to this definition"></a></dt>
+<dd><p>Write an XYZ file for visualisation (z coordinate set to zero).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>pos:      (N, 2) array-like – particle positions.
+filename: str               – output path.
+elem:     str               – element symbol written in each line.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -272,8 +323,8 @@ c d</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="tool_create_substrate.html" class="btn btn-neutral float-left" title="Substrate" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="string_method.html" class="btn btn-neutral float-right" title="String method" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tool_create_substrate.html" class="btn btn-neutral float-left" title="Substrate (flake.substrate)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="string_method.html" class="btn btn-neutral float-right" title="String method (flake.string_method)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

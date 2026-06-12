@@ -1,0 +1,20 @@
+{
+    "0-Substrate_types": 1.315,
+    "1-Cluster_creation": 1.23,
+    "2-Cluster_on_substrate": 1.237,
+    "3-Barrier_from_string": 1.296,
+    "4-Dynamics": 0.838,
+    "5-Scaling_laws": 1.001,
+    "MD_depinning": 0.008,
+    "dynamic": 0.168,
+    "examples": 0.002,
+    "index": 0.007,
+    "installation": 0.005,
+    "intro": 0.016,
+    "misc": 0.051,
+    "modules": 0.004,
+    "static_maps": 0.144,
+    "string_method": 0.05,
+    "tool_create_cluster": 0.047,
+    "tool_create_substrate": 0.086
+}

@@ -1,28 +1,28 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Substrates &mdash; SLIDES 0.0.4 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
-      <link rel="stylesheet" href="_static/nbsphinx-code-cells.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Substrates &mdash; FLAKE 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/nbsphinx-code-cells.css?v=2aa19091" />
+
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -39,7 +39,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            SLIDES
+            FLAKE
               <img src="_static/logo_html.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -62,21 +62,20 @@
 <li class="toctree-l4"><a class="reference internal" href="#Well-shape">Well shape</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#Plane-wave-substrate">Plane wave substrate</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Plot">Plot</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#Grid-and-compute-energetics">Grid and compute energetics</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#2D-maps">2D maps</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#1D-lines">1D lines</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#Init-from-param">Init from param</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Visualising-the-substrate">Visualising the substrate</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#2D-energy-and-force-maps">2D energy and force maps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#1D-cross-section-along-x">1D cross-section along x</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#Substrate-from-parameter-dictionary">Substrate from parameter dictionary</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="1-Cluster_creation.html">Cluster creation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="2-Cluster_on_substrate.html">Put a cluster on a substrate</a></li>
-<li class="toctree-l2"><a class="reference internal" href="3-Barrier_from_stirng.html">Barrier</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2-Cluster_on_substrate.html">Cluster on a substrate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3-Barrier_from_string.html">Energy barrier and minimum energy path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4-Dynamics.html">Molecular dynamics: depinning under applied force and torque</a></li>
 <li class="toctree-l2"><a class="reference internal" href="5-Scaling_laws.html">Scaling laws of translational static friction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="MD_depinning.html">MD of a depinning transition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MD_depinning.html">Depinning dynamics</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
@@ -88,7 +87,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">SLIDES</a>
+          <a href="index.html">FLAKE</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -108,411 +107,274 @@
            <div itemprop="articleBody">
              
   <section id="Substrates">
-<h1>Substrates<a class="headerlink" href="#Substrates" title="Permalink to this heading"></a></h1>
+<h1>Substrates<a class="headerlink" href="#Substrates" title="Link to this heading"></a></h1>
 <section id="Benchmark-substrate-potentials:-different-wells-and-symmetries">
-<h2>Benchmark substrate potentials: different wells and symmetries<a class="headerlink" href="#Benchmark-substrate-potentials:-different-wells-and-symmetries" title="Permalink to this heading"></a></h2>
-<p>The clusters move on a rigid substrate potential. This is defined in terms of a lattice or in terms of a superposition of plane waves (so it can also be a quasi-crystal).</p>
-<p>For plane waves, the number and realtive phase of waves controls the symmetry and a parameter <span class="math notranslate nohighlight">\(\epsilon\)</span> the amplitude.</p>
-<p>In case of a lattice, the repeated unit, or <span class="math">\textit{well}</span>, can be an arbitrary function. We do not put any restriction on it, but one would usually assume the substrate is a continous function. Hence to avoid discontinuities, the well function should go to zero at the cell border.</p>
+<h2>Benchmark substrate potentials: different wells and symmetries<a class="headerlink" href="#Benchmark-substrate-potentials:-different-wells-and-symmetries" title="Link to this heading"></a></h2>
+<p>The cluster moves on a rigid substrate potential. It is defined either as a lattice of repeated potential wells or as a superposition of plane waves (which can also represent a quasicrystal).</p>
+<p>For the plane-wave (sinusoidal) substrate, the number of waves and their relative phases control the symmetry; the amplitude is set by epsilon.</p>
+<p>For lattice-based substrates, the repeated unit (the “well”) can be any smooth function – in practice it should vanish at the cell boundary to avoid discontinuities.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">sqrt</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">sqrt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="c1"># Matrices defining substrate periodicity</span>
-<span class="kn">from</span> <span class="nn">tool_create_substrate</span> <span class="kn">import</span> <span class="n">calc_matrices_triangle</span><span class="p">,</span> <span class="n">calc_matrices_square</span><span class="p">,</span> <span class="n">calc_matrices_bvect</span>
-<span class="c1"># Substrate types (particles-wise functions)</span>
-<span class="kn">from</span> <span class="nn">tool_create_substrate</span> <span class="kn">import</span> <span class="n">particle_en_gaussian</span><span class="p">,</span> <span class="n">particle_en_sin</span><span class="p">,</span> <span class="n">particle_en_tanh</span>
-<span class="c1"># Misc</span>
-<span class="kn">from</span> <span class="nn">tool_create_substrate</span> <span class="kn">import</span> <span class="n">gaussian</span><span class="p">,</span> <span class="n">get_ks</span>
-<span class="kn">from</span> <span class="nn">misc</span> <span class="kn">import</span> <span class="n">get_brillouin_zone_2d</span><span class="p">,</span> <span class="n">plot_BZ2d</span><span class="p">,</span> <span class="n">plot_UC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flake.substrate</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">calc_matrices_bvect</span><span class="p">,</span>
+                              <span class="n">particle_en_gaussian</span><span class="p">,</span>
+                              <span class="n">particle_en_sin</span><span class="p">,</span>
+                              <span class="n">particle_en_tanh</span><span class="p">,</span>
+                              <span class="n">gaussian</span><span class="p">,</span> <span class="n">get_ks</span><span class="p">,</span>
+                              <span class="n">substrate_from_params</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flake.plot</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">get_brillouin_zone_2d</span><span class="p">,</span> <span class="n">plot_BZ2d</span><span class="p">,</span>
+                        <span class="n">plot_UC</span><span class="p">,</span> <span class="n">plot_lattice_vectors</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </section>
 <section id="Lattice-substrate">
-<h2>Lattice substrate<a class="headerlink" href="#Lattice-substrate" title="Permalink to this heading"></a></h2>
-<p>Define the susbstrate as a lattice of repeated potential wells.</p>
+<h2>Lattice substrate<a class="headerlink" href="#Lattice-substrate" title="Link to this heading"></a></h2>
+<p>A lattice substrate is defined by two primitive vectors, just like a cluster. The <code class="docutils literal notranslate"><span class="pre">calc_matrices_bvect</span></code> function returns both the direct-space matrix <code class="docutils literal notranslate"><span class="pre">u</span></code> (columns are b1, b2) and its inverse <code class="docutils literal notranslate"><span class="pre">u_inv</span></code> (used for fractional coordinates).</p>
 <section id="Substrate-symmetry">
-<h3>Substrate symmetry<a class="headerlink" href="#Substrate-symmetry" title="Permalink to this heading"></a></h3>
-<p>The substrate lattice is defined giving the two primitive vectors, just like a cluster.</p>
+<h3>Substrate symmetry<a class="headerlink" href="#Substrate-symmetry" title="Link to this heading"></a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the substrate lattice using vectors</span>
-<span class="c1">### Ortho</span>
-<span class="c1">#b1, b2, R = np.array([1,0]), np.array([0,2]), None # Ortho</span>
-<span class="c1">#(u, u_inv), sym = calc_matrices_bvect(b1, b2), &#39;ortho&#39;</span>
-<span class="c1">### Triangle</span>
-<span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">]),</span> <span class="kc">None</span> <span class="c1"># Triangle</span>
-<span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u_inv</span><span class="p">),</span> <span class="n">sym</span> <span class="o">=</span> <span class="n">calc_matrices_bvect</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">),</span> <span class="s1">&#39;triangle&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Substrate primitive vectors.</span>
+<span class="c1"># Uncomment the geometry you want; only one should be active at a time.</span>
+<span class="c1"># If sin potential, you should match the lattice with the wave vector</span>
 
-<span class="c1"># Shortcut for common lattice (R is lattice spacing)</span>
-<span class="c1"># R = 1</span>
-<span class="c1"># Triangle (shortcut)</span>
-<span class="c1"># (u, u_inv), sym = calc_matrices_triangle(R), &#39; triangle&#39;</span>
+<span class="c1"># Triangular lattice, spacing R=1</span>
+<span class="n">R</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">b1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">R</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
+<span class="n">b2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="n">R</span><span class="o">/</span><span class="mf">2.</span><span class="p">,</span> <span class="n">R</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">3.</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span><span class="p">])</span>
+<span class="n">u</span><span class="p">,</span> <span class="n">u_inv</span> <span class="o">=</span> <span class="n">calc_matrices_bvect</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span>
+<span class="n">sym</span> <span class="o">=</span> <span class="s1">&#39;triangular&#39;</span>
 
-<span class="c1"># Square (shortcut)</span>
-<span class="c1"># (u, u_inv), sym = calc_matrices_square(R), &#39; square&#39;</span>
+<span class="c1"># Square lattice, spacing R=1</span>
+<span class="c1"># R = 1.0</span>
+<span class="c1"># b1 = np.array([R, 0.])</span>
+<span class="c1"># b2 = np.array([0., R])</span>
+<span class="c1"># u, u_inv = calc_matrices_bvect(b1, b2)</span>
+<span class="c1"># sym = &#39;square&#39;</span>
+
+<span class="c1"># Oblique example</span>
+<span class="c1"># b1 = np.array([1., 0.])</span>
+<span class="c1"># b2 = np.array([0., 2.])</span>
+<span class="c1"># u, u_inv = calc_matrices_bvect(b1, b2)</span>
+<span class="c1"># sym = &#39;oblique&#39;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Lattice: </span><span class="si">%s</span><span class="s1">, b1=</span><span class="si">%s</span><span class="s1">, b2=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sym</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 </section>
 <section id="Basis">
-<h3>Basis<a class="headerlink" href="#Basis" title="Permalink to this heading"></a></h3>
-<p>The Bravais lattice of the substrate can be decorated with a basis</p>
+<h3>Basis<a class="headerlink" href="#Basis" title="Link to this heading"></a></h3>
+<p>The Bravais lattice can be decorated with a multi-site basis. For most substrates a single site at the origin is sufficient.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">basis</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])]</span> <span class="c1"># Simple lattice</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Substrate basis: list of (2,) positions within the unit cell.</span>
+<span class="n">basis</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])]</span>
 
-<span class="c1"># Decorated lattice examples</span>
-<span class="c1"># basis = [[0,0], [0.6, 1]]</span>
-<span class="c1"># basis = [[0,0], [0.5, 0.75]]</span>
-<span class="c1"># basis = [[0,0], [0.5, 1.5]]</span>
+<span class="c1"># Decorated examples (uncomment to try):</span>
+<span class="c1"># basis = [np.array([0., 0.]), np.array([0.5, sqrt(3)/6.])]  # honeycomb</span>
 </pre></div>
 </div>
 </div>
 </section>
 <section id="Well-shape">
-<h3>Well shape<a class="headerlink" href="#Well-shape" title="Permalink to this heading"></a></h3>
-<p>This is the functino repeated at each lattice point</p>
+<h3>Well shape<a class="headerlink" href="#Well-shape" title="Link to this heading"></a></h3>
+<p>This is the function repeated at each lattice site (gaussian/tanh), or the set of plane-wave vectors defining a sinusoidal landscape.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Select according to below: Gauss, Tanh, LJ // Sin to swi</span>
-<span class="n">sub_type</span> <span class="o">=</span> <span class="s1">&#39;Sin&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Choose substrate type: &#39;gaussian&#39;, &#39;tanh&#39;, &#39;sin&#39;</span>
+<span class="n">sub_type</span> <span class="o">=</span> <span class="s1">&#39;sin&#39;</span>
+
+<span class="k">if</span> <span class="n">sub_type</span> <span class="o">==</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">:</span>
+    <span class="c1"># Gaussian well: smooth, localized, vanishes at r=b.</span>
+    <span class="c1"># Ref: Cao, Silva et al., Phys. Rev. X 12, 021059 (2022)</span>
+    <span class="n">epsilon</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.45</span>
+    <span class="n">en_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">basis</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">u_inv</span><span class="p">]</span>
+    <span class="n">en_func</span>   <span class="o">=</span> <span class="n">particle_en_gaussian</span>
+    <span class="n">title</span>     <span class="o">=</span> <span class="s1">&#39;Gaussian well, </span><span class="si">%s</span><span class="s1"> lattice&#39;</span> <span class="o">%</span> <span class="n">sym</span>
+
+<span class="k">elif</span> <span class="n">sub_type</span> <span class="o">==</span> <span class="s1">&#39;tanh&#39;</span><span class="p">:</span>
+    <span class="c1"># Tanh well: flat bottom with steep walls, width controlled by ww.</span>
+    <span class="c1"># Ref: Cao et al., Phys. Rev. E 103, 012606 (2021)</span>
+    <span class="n">epsilon</span><span class="p">,</span> <span class="n">ww</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.45</span>
+    <span class="n">en_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">basis</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">ww</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">u_inv</span><span class="p">]</span>
+    <span class="n">en_func</span>   <span class="o">=</span> <span class="n">particle_en_tanh</span>
+    <span class="n">title</span>     <span class="o">=</span> <span class="s1">&#39;Tanh well, </span><span class="si">%s</span><span class="s1"> lattice&#39;</span> <span class="o">%</span> <span class="n">sym</span>
+
+<span class="k">elif</span> <span class="n">sub_type</span> <span class="o">==</span> <span class="s1">&#39;sin&#39;</span><span class="p">:</span>
+    <span class="c1"># Plane-wave (sinusoidal) substrate: sum of n plane waves.</span>
+    <span class="c1"># Ref: Vanossi, Manini, Tosatti, PNAS 109, 16429 (2012)</span>
+    <span class="c1"># get_ks(R, n, c_n, alpha_n) generates the n wave vectors:</span>
+    <span class="c1">#   R      -- lattice spacing (sets the length scale)</span>
+    <span class="c1">#   n      -- number of waves (controls symmetry)</span>
+    <span class="c1">#   c_n    -- normalisation constant so that E_min = -epsilon</span>
+    <span class="c1">#   alpha_n -- global rotation of the wave-vector set [degrees]</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">c_n</span><span class="p">,</span> <span class="n">alpha_n</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">4.</span><span class="o">/</span><span class="mf">3.</span><span class="p">,</span> <span class="mf">0.</span>       <span class="c1"># triangular symmetry</span>
+    <span class="c1"># n, c_n, alpha_n = 2, 1., 0.         # parallel lines (1D)</span>
+    <span class="c1">#n, c_n, alpha_n = 4, sqrt(2), np.pi/4.   # square symmetry</span>
+    <span class="c1"># n, c_n, alpha_n = 5, 2., 0.         # 5-fold quasicrystal</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="n">ks</span>      <span class="o">=</span> <span class="n">get_ks</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">c_n</span><span class="p">,</span> <span class="n">alpha_n</span><span class="p">)</span>
+    <span class="n">en_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">basis</span><span class="p">,</span> <span class="n">ks</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">]</span>
+    <span class="n">en_func</span>   <span class="o">=</span> <span class="n">particle_en_sin</span>
+    <span class="n">title</span>     <span class="o">=</span> <span class="s1">&#39;Sinusoidal, n=</span><span class="si">%i</span><span class="s1">-fold&#39;</span> <span class="o">%</span> <span class="n">n</span>
+
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown sub_type: </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sub_type</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<p>Gauss</p>
-<p>See Xin Cao, Andrea Silva, Emanuele Panizon, Andrea Vanossi, Nicola Manini, Erio Tosatti, and Clemens Bechinger Phys. Rev. X 12, 021059 (2022)</p>
+</section>
+</section>
+<section id="Visualising-the-substrate">
+<h2>Visualising the substrate<a class="headerlink" href="#Visualising-the-substrate" title="Link to this heading"></a></h2>
+<section id="2D-energy-and-force-maps">
+<h3>2D energy and force maps<a class="headerlink" href="#2D-energy-and-force-maps" title="Link to this heading"></a></h3>
+<p>We evaluate the substrate energy, force, and torque on a 2D grid and plot them. The torque is computed with respect to the origin; for an extended layer it is not physically meaningful on its own, but it is useful for debugging.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">sub_type</span> <span class="o">==</span> <span class="s1">&#39;Gauss&#39;</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Gaussian substrate&#39;</span><span class="p">)</span>
-    <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Gauss well - Sym: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sym</span>
-    <span class="n">R</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.45</span>
-    <span class="n">en_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">basis</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">u_inv</span><span class="p">]</span>
-    <span class="n">en_func</span> <span class="o">=</span> <span class="n">particle_en_gaussian</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">side</span> <span class="o">=</span> <span class="mf">2.5</span>
+<span class="n">nx</span><span class="p">,</span> <span class="n">ny</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span>
+<span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">side</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="n">nx</span><span class="p">),</span>
+                     <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">side</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="n">ny</span><span class="p">))</span>
+<span class="c1"># Flatten to (N,2) -- substrate functions expect a list of positions.</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">xx</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">yy</span><span class="o">.</span><span class="n">ravel</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">en</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">en_func</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]),</span> <span class="o">*</span><span class="n">en_inputs</span><span class="p">)</span>
+
+<span class="c1"># 1D cross-section along x for profile plots.</span>
+<span class="n">x_line</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="mi">4</span><span class="o">*</span><span class="n">nx</span><span class="p">)</span>
+<span class="n">p_line</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">x_line</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x_line</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">en_line</span><span class="p">,</span> <span class="n">F_line</span><span class="p">,</span> <span class="n">tau_line</span> <span class="o">=</span> <span class="n">en_func</span><span class="p">(</span><span class="n">p_line</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]),</span> <span class="o">*</span><span class="n">en_inputs</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<p>Tanh</p>
-<p>See Xin Cao, Emanuele Panizon, Andrea Vanossi, Nicola Manini, Erio Tosatti, and Clemens Bechinger Phys. Rev. E 103, 012606 (2021)</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">sub_type</span> <span class="o">==</span> <span class="s1">&#39;Tanh&#39;</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Tanh substrate&#39;</span><span class="p">)</span>
-    <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Tanh well - Sym: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sym</span>
-    <span class="n">epsilon</span><span class="p">,</span> <span class="n">ww</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.45</span>
-    <span class="c1">#epsilon, ww, a, b = 1, 0.1, 0.1, 0.45</span>
-    <span class="n">en_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">basis</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">ww</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">u_inv</span><span class="p">]</span>
-    <span class="n">en_func</span> <span class="o">=</span> <span class="n">particle_en_tanh</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span>
+                         <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+<span class="p">(</span><span class="n">axE</span><span class="p">,</span> <span class="n">axFx</span><span class="p">),</span> <span class="p">(</span><span class="n">axFy</span><span class="p">,</span> <span class="n">axTau</span><span class="p">)</span> <span class="o">=</span> <span class="n">axes</span>
+
+<span class="n">s0</span> <span class="o">=</span> <span class="mf">0.5</span>   <span class="c1"># scatter marker size -- tiny to approximate a continuous map</span>
+<span class="n">S</span>  <span class="o">=</span> <span class="n">u_inv</span><span class="o">.</span><span class="n">T</span> <span class="k">if</span> <span class="n">sub_type</span> <span class="o">!=</span> <span class="s1">&#39;sin&#39;</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">cmap</span> <span class="ow">in</span> <span class="p">[</span>
+    <span class="p">(</span><span class="n">axE</span><span class="p">,</span>   <span class="n">en</span><span class="p">,</span>     <span class="sa">r</span><span class="s1">&#39;$E$&#39;</span><span class="p">,</span>    <span class="s1">&#39;viridis&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">axFx</span><span class="p">,</span>  <span class="n">F</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="sa">r</span><span class="s1">&#39;$F_x$&#39;</span><span class="p">,</span>  <span class="s1">&#39;PiYG&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">axFy</span><span class="p">,</span>  <span class="n">F</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="sa">r</span><span class="s1">&#39;$F_y$&#39;</span><span class="p">,</span>  <span class="s1">&#39;PiYG&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">axTau</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span>    <span class="sa">r</span><span class="s1">&#39;$\tau$&#39;</span><span class="p">,</span> <span class="s1">&#39;RdBu&#39;</span><span class="p">),</span>
+<span class="p">]:</span>
+    <span class="n">sc</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">p</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">vals</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s0</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">rasterized</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+    <span class="n">plot_lattice_vectors</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sub_type</span> <span class="o">!=</span> <span class="s1">&#39;sin&#39;</span><span class="p">:</span>
+        <span class="n">plot_BZ2d</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">get_brillouin_zone_2d</span><span class="p">(</span><span class="n">S</span><span class="p">),</span>
+                  <span class="p">{</span><span class="s1">&#39;ls&#39;</span><span class="p">:</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="s1">&#39;lw&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span> <span class="s1">&#39;fill&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+
+<span class="n">axFy</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;x  [a.u.]&#39;</span><span class="p">)</span>
+<span class="n">axTau</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;x  [a.u.]&#39;</span><span class="p">)</span>
+<span class="n">axE</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;y  [a.u.]&#39;</span><span class="p">)</span>
+<span class="n">axFy</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;y  [a.u.]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </section>
-</section>
-<section id="Plane-wave-substrate">
-<h2>Plane wave substrate<a class="headerlink" href="#Plane-wave-substrate" title="Permalink to this heading"></a></h2>
-<p>See Vanossi, Manini, Tosatti, PNAS 9 109 16429–16433 (2012)</p>
-<div class="nbinput docutils container">
+<section id="1D-cross-section-along-x">
+<h3>1D cross-section along x<a class="headerlink" href="#1D-cross-section-along-x" title="Link to this heading"></a></h3>
+<p>The same quantities along the horizontal line y=0 shown above.</p>
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">sub_type</span> <span class="o">==</span> <span class="s1">&#39;Sin&#39;</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Sin substrate&#39;</span><span class="p">)</span>
-    <span class="c1"># Substrate params</span>
-    <span class="n">R</span><span class="p">,</span> <span class="n">epsilon</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span>
-    <span class="c1"># Define symmetry of substrate (number of PW and phase)</span>
-    <span class="c1">#n, c_n, alpha_n = 2, 1, 0 # Lines</span>
-    <span class="n">n</span><span class="p">,</span> <span class="n">c_n</span><span class="p">,</span> <span class="n">alpha_n</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span> <span class="c1"># Tri</span>
-    <span class="c1">#n, c_n, alpha_n = 4, np.sqrt(2), pi/4 # Square</span>
-    <span class="c1">#n, c_n, alpha_n = 5, 2, 0 # Qausi-cristal</span>
-    <span class="c1">#n, c_n, alpha_n = 6, 4/np.sqrt(3), -pi/6</span>
-    <span class="n">ks</span> <span class="o">=</span> <span class="n">get_ks</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">c_n</span><span class="p">,</span> <span class="n">alpha_n</span><span class="p">)</span> <span class="c1"># Get the reciprocal vectors defined by the coefficients above</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span> <span class="o">+</span> <span class="s1">&#39; — cross-section along y=0&#39;</span><span class="p">)</span>
+<span class="p">(</span><span class="n">axE</span><span class="p">,</span> <span class="n">axFx</span><span class="p">),</span> <span class="p">(</span><span class="n">axFy</span><span class="p">,</span> <span class="n">axTau</span><span class="p">)</span> <span class="o">=</span> <span class="n">axes</span>
 
-    <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Sin - sym n=</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span>
+<span class="n">axE</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_line</span><span class="p">,</span>   <span class="n">en_line</span><span class="p">,</span>     <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:blue&#39;</span><span class="p">)</span>
+<span class="n">axFx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_line</span><span class="p">,</span>  <span class="n">F_line</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:orange&#39;</span><span class="p">)</span>
+<span class="n">axFy</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_line</span><span class="p">,</span>  <span class="n">F_line</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:green&#39;</span><span class="p">)</span>
+<span class="n">axTau</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_line</span><span class="p">,</span> <span class="n">tau_line</span><span class="p">,</span>    <span class="n">color</span><span class="o">=</span><span class="s1">&#39;tab:red&#39;</span><span class="p">)</span>
 
-    <span class="n">en_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">basis</span><span class="p">,</span> <span class="n">ks</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">]</span>
-    <span class="n">en_func</span> <span class="o">=</span> <span class="n">particle_en_sin</span>
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="p">[(</span><span class="n">axE</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$E$&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">axFx</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$F_x$&#39;</span><span class="p">),</span>
+                  <span class="p">(</span><span class="n">axFy</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$F_y$&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">axTau</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$\tau$&#39;</span><span class="p">)]:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+<span class="n">axFy</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;x  [a.u.]&#39;</span><span class="p">)</span>
+<span class="n">axTau</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;x  [a.u.]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Sin substrate
-</pre></div></div>
-</div>
 </section>
-<section id="Plot">
-<h2>Plot<a class="headerlink" href="#Plot" title="Permalink to this heading"></a></h2>
-<div class="nbinput docutils container">
+</section>
+<section id="Substrate-from-parameter-dictionary">
+<h2>Substrate from parameter dictionary<a class="headerlink" href="#Substrate-from-parameter-dictionary" title="Link to this heading"></a></h2>
+<p>In practice, the substrate is loaded from a YAML file via <code class="docutils literal notranslate"><span class="pre">substrate_from_params</span></code>. It returns three objects:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pen_func</span></code>: per-particle energy function (penalty/energy per site)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">en_func</span></code>: total energy function for the whole cluster</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">en_inputs</span></code>: always an empty list (parameters are captured in a closure)</p></li>
+</ul>
+<p>Here we build a Gaussian substrate from a dict and compare its landscape with the sinusoidal one above.</p>
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Matrix describing the lattice: S[0] first vector, S[1] second</span>
-<span class="k">if</span> <span class="n">sub_type</span> <span class="o">==</span> <span class="s1">&#39;Sin&#39;</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sin potential: no matrix S, u, u_inv&quot;</span><span class="p">)</span>
-    <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="n">R</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span> <span class="c1"># Migtht not be well defined, q-crystals</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gauss/Tanh/LJ potential: use S, u, u_inv&quot;</span><span class="p">)</span>
-    <span class="n">S</span> <span class="o">=</span> <span class="n">u_inv</span><span class="o">.</span><span class="n">T</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Sin potential: no matrix S, u, u_inv
-</pre></div></div>
-</div>
-<section id="Grid-and-compute-energetics">
-<h3>Grid and compute energetics<a class="headerlink" href="#Grid-and-compute-energetics" title="Permalink to this heading"></a></h3>
-<p>Let’s look at a portion of this infinite substrate. Define a grid in real space, and</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">nx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">150</span>
-<span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">ny</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">150</span>
-<span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">nx</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">ny</span><span class="p">))</span>
-<span class="c1"># I am a physics not a computer scientist, so I don&#39;t like this meshgrid format.</span>
-<span class="c1"># I want N points in two dimension, so N x 2</span>
-<span class="n">pp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">pp</span><span class="p">,</span> <span class="p">(</span><span class="n">pp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">pp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">))</span>
-
-<span class="n">en</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">en_func</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">en_inputs</span><span class="p">)</span>
-
-<span class="c1"># x line</span>
-<span class="n">xyline</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x1</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">nx</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">nx</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="c1"># skwed line</span>
-<span class="c1">#xyline = np.stack([np.linspace(0, x1, nx), 0.5*np.linspace(0, y1, ny)], axis=1)</span>
-<span class="n">tline</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">xyline</span><span class="p">))</span>
-<span class="n">enl</span><span class="p">,</span> <span class="n">Fl</span><span class="p">,</span> <span class="n">taul</span> <span class="o">=</span> <span class="n">en_func</span><span class="p">(</span><span class="n">xyline</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">en_inputs</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_UC</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ls&#39;</span><span class="p">:</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;tab:gray&#39;</span><span class="p">,</span> <span class="s1">&#39;lw&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Shortcut to plot the Brillouin zone of the lattice&quot;&quot;&quot;</span>
-    <span class="n">BZ_corner</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">n</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">m</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-                          <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">m</span> <span class="ow">in</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]]</span>
-                         <span class="p">])</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">BZ_corner</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">BZ_corner</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span>
-                <span class="p">[</span><span class="n">BZ_corner</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">BZ_corner</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">ax</span>
-</pre></div>
-</div>
-</div>
-</section>
-<section id="2D-maps">
-<h3>2D maps<a class="headerlink" href="#2D-maps" title="Permalink to this heading"></a></h3>
-<p>First plot the energy density, the two components of the force density field.</p>
-<p>We can also plot the torque density field with repsect to the origin. Just remember that for an infinite layer like this it makes not so much sense.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="p">((</span><span class="n">axE</span><span class="p">,</span> <span class="n">axFx</span><span class="p">),</span> <span class="p">(</span><span class="n">axFy</span><span class="p">,</span> <span class="n">axtau</span><span class="p">))</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-<span class="n">ws_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ls&#39;</span><span class="p">:</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;tab:gray&#39;</span><span class="p">,</span> <span class="s1">&#39;lw&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;fill&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
-<span class="n">s0</span> <span class="o">=</span> <span class="mi">1</span>
-
-<span class="c1"># Energy</span>
-<span class="n">sc</span> <span class="o">=</span> <span class="n">axE</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">p</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">en</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s0</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$E(x,y)$&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axE</span><span class="p">)</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xyline</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">xyline</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;$t$ line&#39;</span><span class="p">)</span>
-<span class="k">if</span> <span class="n">sub_type</span> <span class="o">!=</span> <span class="s1">&#39;Sin&#39;</span><span class="p">:</span> <span class="n">plot_BZ2d</span><span class="p">(</span><span class="n">axE</span><span class="p">,</span> <span class="n">get_brillouin_zone_2d</span><span class="p">(</span><span class="n">S</span><span class="p">),</span> <span class="n">ws_params</span><span class="p">)</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">S</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;b1&#39;</span><span class="p">)</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;b2&#39;</span><span class="p">)</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">])</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">])</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
-<span class="c1">#-------------------------</span>
-
-<span class="c1"># Force along x</span>
-<span class="n">sc</span> <span class="o">=</span> <span class="n">axFx</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">p</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">F</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="n">s0</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;PiYG&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$F_x(x,y)$&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axFx</span><span class="p">)</span>
-<span class="n">axFx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xyline</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">xyline</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
-<span class="k">if</span> <span class="n">sub_type</span> <span class="o">!=</span> <span class="s1">&#39;Sin&#39;</span><span class="p">:</span> <span class="n">plot_BZ2d</span><span class="p">(</span><span class="n">axFx</span><span class="p">,</span> <span class="n">get_brillouin_zone_2d</span><span class="p">(</span><span class="n">S</span><span class="p">),</span> <span class="n">ws_params</span><span class="p">)</span>
-<span class="n">axFx</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">])</span>
-<span class="n">axFx</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">])</span>
-<span class="n">axFx</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
-<span class="c1">#-------------------------</span>
-
-<span class="c1"># Force along y</span>
-<span class="n">sc</span> <span class="o">=</span> <span class="n">axFy</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">p</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">F</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="n">s0</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;PiYG&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$F_y(x,y)$&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axFy</span><span class="p">)</span>
-<span class="n">axFy</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xyline</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">xyline</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
-<span class="k">if</span> <span class="n">sub_type</span> <span class="o">!=</span> <span class="s1">&#39;Sin&#39;</span><span class="p">:</span> <span class="n">plot_BZ2d</span><span class="p">(</span><span class="n">axFy</span><span class="p">,</span> <span class="n">get_brillouin_zone_2d</span><span class="p">(</span><span class="n">S</span><span class="p">),</span> <span class="n">ws_params</span><span class="p">)</span>
-<span class="n">axFy</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">])</span>
-<span class="n">axFy</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">])</span>
-<span class="n">axFy</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
-<span class="n">axFy</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
-<span class="n">axFy</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
-<span class="c1">#-------------------------</span>
-
-<span class="c1"># Torque</span>
-<span class="n">sc</span> <span class="o">=</span> <span class="n">axtau</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">p</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">tau</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s0</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;RdBu&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$\tau(x,y)$&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axtau</span><span class="p">)</span>
-<span class="n">axtau</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xyline</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">xyline</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
-<span class="k">if</span> <span class="n">sub_type</span> <span class="o">!=</span> <span class="s1">&#39;Sin&#39;</span><span class="p">:</span> <span class="n">plot_BZ2d</span><span class="p">(</span><span class="n">axtau</span><span class="p">,</span> <span class="n">get_brillouin_zone_2d</span><span class="p">(</span><span class="n">S</span><span class="p">),</span> <span class="n">ws_params</span><span class="p">)</span>
-<span class="n">axtau</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">])</span>
-<span class="n">axtau</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">])</span>
-<span class="n">axtau</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
-<span class="n">axtau</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
-<span class="c1">#-------------------------</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="_images/0-Substrate_types_20_0.png" src="_images/0-Substrate_types_20_0.png" />
-</div>
-</div>
-</section>
-<section id="1D-lines">
-<h3>1D lines<a class="headerlink" href="#1D-lines" title="Permalink to this heading"></a></h3>
-<p>The same quantities above along the black dashed line</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="p">((</span><span class="n">axE</span><span class="p">,</span> <span class="n">axFx</span><span class="p">),</span> <span class="p">(</span><span class="n">axFy</span><span class="p">,</span> <span class="n">axtau</span><span class="p">))</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-
-<span class="n">axE</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tline</span><span class="p">,</span> <span class="n">enl</span><span class="p">)</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$E(x(t), y(t))$&#39;</span><span class="p">)</span>
-
-<span class="n">axFx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tline</span><span class="p">,</span> <span class="n">Fl</span><span class="p">[:,</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">axFx</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$F_x(x(t), y(t))$&#39;</span><span class="p">)</span>
-
-<span class="n">axFy</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tline</span><span class="p">,</span> <span class="n">Fl</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
-<span class="n">axFy</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$F_y(x(t), y(t))$&#39;</span><span class="p">)</span>
-<span class="n">axFy</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;t&#39;</span><span class="p">)</span>
-
-<span class="n">axtau</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tline</span><span class="p">,</span> <span class="n">taul</span><span class="p">)</span>
-<span class="n">axtau</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\tau(x(t), y(t))$&#39;</span><span class="p">)</span>
-<span class="n">axtau</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;t&#39;</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="_images/0-Substrate_types_22_0.png" src="_images/0-Substrate_types_22_0.png" />
-</div>
-</div>
-</section>
-<section id="Init-from-param">
-<h3>Init from param<a class="headerlink" href="#Init-from-param" title="Permalink to this heading"></a></h3>
-<p>You can define the substrate potential simply by putting the parameters in a dictionary and loading it with the <code class="docutils literal notranslate"><span class="pre">substrate_from_params</span></code> function. It returns the right per particle and total energy functions, along with the right parameters.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tool_create_substrate</span> <span class="kn">import</span> <span class="n">substrate_from_params</span>
-
-<span class="c1"># Define symmetry of substrate</span>
-<span class="c1">#n, c_n, alpha_n = 2, 1, 0 # Lines</span>
-<span class="n">n</span><span class="p">,</span> <span class="n">c_n</span><span class="p">,</span> <span class="n">alpha_n</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span> <span class="c1"># Tri</span>
-<span class="c1"># n, c_n, alpha_n = 4, np.sqrt(2), pi/4 # Square</span>
-<span class="c1"># n, c_n, alpha_n = 5, 2, 0 # Qausi-cristal</span>
-<span class="c1">#n, c_n, alpha_n = 6, 4/np.sqrt(3), -pi/6</span>
-<span class="n">R</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">ks</span> <span class="o">=</span> <span class="n">get_ks</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">c_n</span><span class="p">,</span> <span class="n">alpha_n</span><span class="p">)</span> <span class="c1"># Get the reciprocal vectors defined  che coefficients above</span>
-
-<span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;sub_basis&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span>
-    <span class="s1">&#39;b1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
-    <span class="s1">&#39;b2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">],</span>
-    <span class="c1">#&#39;b2&#39;: [0,1],</span>
-    <span class="s1">&#39;epsilon&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="c1">#------ Gaussian</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;well_shape&#39;</span><span class="p">:</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;sigma&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mf">0.45</span><span class="p">,</span>
-    <span class="c1">#------ LJ</span>
-    <span class="c1">#&#39;well_shape&#39;: &#39;lj&#39;,</span>
-    <span class="c1">#&#39;sigma&#39;: 0.1, &#39;d0&#39;: 0.11224620483093731, &#39;a&#39;: 0.1, &#39;b&#39;: 0.45,</span>
-    <span class="c1">#------ Tanh</span>
-    <span class="c1">#&#39;well_shape&#39;: &#39;tanh&#39;,</span>
-    <span class="s1">&#39;wd&#39;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mf">0.45</span><span class="p">,</span>
-    <span class="c1">#------ Sin</span>
-    <span class="c1">#&#39;well_shape&#39;: &#39;sin&#39;,</span>
-    <span class="s1">&#39;ks&#39;</span><span class="p">:</span> <span class="n">ks</span>
+    <span class="s1">&#39;sub_basis&#39;</span><span class="p">:</span>  <span class="p">[[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]],</span>
+    <span class="s1">&#39;b1&#39;</span><span class="p">:</span>         <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+    <span class="s1">&#39;b2&#39;</span><span class="p">:</span>         <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mf">2.</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">(</span><span class="mf">3.</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span><span class="p">],</span>
+    <span class="s1">&#39;epsilon&#39;</span><span class="p">:</span>    <span class="mf">1.</span><span class="p">,</span>
+    <span class="s1">&#39;sigma&#39;</span><span class="p">:</span>      <span class="mf">0.1</span><span class="p">,</span>
+    <span class="s1">&#39;a&#39;</span><span class="p">:</span>          <span class="mf">0.2</span><span class="p">,</span>
+    <span class="s1">&#39;b&#39;</span><span class="p">:</span>          <span class="mf">0.45</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">pen_func</span><span class="p">,</span> <span class="n">en_func</span><span class="p">,</span> <span class="n">en_inputs</span> <span class="o">=</span> <span class="n">substrate_from_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-<span class="n">side</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">nx</span> <span class="o">=</span> <span class="o">-</span><span class="n">side</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="mi">150</span>
-<span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">ny</span> <span class="o">=</span> <span class="o">-</span><span class="n">side</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="mi">150</span>
-<span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">nx</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">ny</span><span class="p">))</span>
-<span class="n">pp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">pp</span><span class="p">,</span> <span class="p">(</span><span class="n">pp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">pp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">pen_func</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">en_inputs_g</span> <span class="o">=</span> <span class="n">substrate_from_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="n">en_g</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pen_func</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]),</span> <span class="o">*</span><span class="n">en_inputs_g</span><span class="p">)</span>
 
-<span class="n">en</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">pen_func</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">en_inputs</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span>
+                                <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Sinusoidal (left) vs Gaussian (right) &#39;</span><span class="p">)</span>
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">axE</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Well </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;well_shape&#39;</span><span class="p">])</span>
-<span class="n">s0</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">sc1</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">p</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">en</span><span class="p">,</span>   <span class="n">s</span><span class="o">=</span><span class="n">s0</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">rasterized</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">sc2</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">p</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">en_g</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s0</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">rasterized</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$E$&#39;</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$E$&#39;</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
 
-<span class="c1"># Energy</span>
-<span class="n">sc</span> <span class="o">=</span> <span class="n">axE</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">p</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">en</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s0</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$E(x,y)$&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axE</span><span class="p">)</span>
-<span class="n">_</span><span class="p">,</span> <span class="n">u_inv</span> <span class="o">=</span> <span class="n">calc_matrices_bvect</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;b1&#39;</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;b2&#39;</span><span class="p">])</span>
-<span class="n">S</span> <span class="o">=</span> <span class="n">u_inv</span><span class="o">.</span><span class="n">T</span>
-<span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;well_shape&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;sin&#39;</span><span class="p">:</span> <span class="n">plot_BZ2d</span><span class="p">(</span><span class="n">axE</span><span class="p">,</span> <span class="n">get_brillouin_zone_2d</span><span class="p">(</span><span class="n">S</span><span class="p">),</span> <span class="n">ws_params</span><span class="p">)</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">S</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;b1&#39;</span><span class="p">)</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;b2&#39;</span><span class="p">)</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">])</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">])</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
-<span class="n">axE</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
-<span class="c1">#-------------------------</span>
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[(</span><span class="n">ax1</span><span class="p">,</span> <span class="s1">&#39;Sinusoidal n=3&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">ax2</span><span class="p">,</span> <span class="s1">&#39;Gaussian&#39;</span><span class="p">)]:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;x  [a.u.]&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;y  [a.u.]&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="_images/0-Substrate_types_24_0.png" src="_images/0-Substrate_types_24_0.png" />
-</div>
-</div>
-</section>
 </section>
 </section>
 

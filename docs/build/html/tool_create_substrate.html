@@ -1,29 +1,31 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Substrate &mdash; SLIDES 0.0.4 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Substrate (flake.substrate) &mdash; FLAKE 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Cluster" href="tool_create_cluster.html" />
+    <link rel="next" title="Cluster (flake.cluster)" href="tool_create_cluster.html" />
     <link rel="prev" title="Modules" href="modules.html" /> 
 </head>
 
@@ -36,7 +38,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            SLIDES
+            FLAKE
               <img src="_static/logo_html.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -53,29 +55,31 @@
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="modules.html#tools">Tools</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Substrate</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_substrate.calc_en_gaussian"><code class="docutils literal notranslate"><span class="pre">calc_en_gaussian()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_substrate.calc_en_sin"><code class="docutils literal notranslate"><span class="pre">calc_en_sin()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_substrate.calc_en_sin_tri"><code class="docutils literal notranslate"><span class="pre">calc_en_sin_tri()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_substrate.calc_en_tanh"><code class="docutils literal notranslate"><span class="pre">calc_en_tanh()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_substrate.calc_matrices_bvect"><code class="docutils literal notranslate"><span class="pre">calc_matrices_bvect()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_substrate.calc_matrices_square"><code class="docutils literal notranslate"><span class="pre">calc_matrices_square()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_substrate.calc_matrices_triangle"><code class="docutils literal notranslate"><span class="pre">calc_matrices_triangle()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_substrate.gaussian"><code class="docutils literal notranslate"><span class="pre">gaussian()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_substrate.get_ks"><code class="docutils literal notranslate"><span class="pre">get_ks()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_substrate.particle_en_gaussian"><code class="docutils literal notranslate"><span class="pre">particle_en_gaussian()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_substrate.particle_en_sin"><code class="docutils literal notranslate"><span class="pre">particle_en_sin()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_substrate.particle_en_sin_tri"><code class="docutils literal notranslate"><span class="pre">particle_en_sin_tri()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_substrate.particle_en_tanh"><code class="docutils literal notranslate"><span class="pre">particle_en_tanh()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tool_create_substrate.substrate_from_params"><code class="docutils literal notranslate"><span class="pre">substrate_from_params()</span></code></a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Substrate (flake.substrate)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#coordinate-convention">Coordinate convention</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#substrate-types">Substrate types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#jit-notes">JIT notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.substrate.calc_en_gaussian"><code class="docutils literal notranslate"><span class="pre">calc_en_gaussian()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.substrate.calc_en_sin"><code class="docutils literal notranslate"><span class="pre">calc_en_sin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.substrate.calc_en_tanh"><code class="docutils literal notranslate"><span class="pre">calc_en_tanh()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.substrate.calc_matrices_bvect"><code class="docutils literal notranslate"><span class="pre">calc_matrices_bvect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.substrate.calc_matrices_square"><code class="docutils literal notranslate"><span class="pre">calc_matrices_square()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.substrate.calc_matrices_triangle"><code class="docutils literal notranslate"><span class="pre">calc_matrices_triangle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.substrate.gaussian"><code class="docutils literal notranslate"><span class="pre">gaussian()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.substrate.get_ks"><code class="docutils literal notranslate"><span class="pre">get_ks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.substrate.particle_en_gaussian"><code class="docutils literal notranslate"><span class="pre">particle_en_gaussian()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.substrate.particle_en_sin"><code class="docutils literal notranslate"><span class="pre">particle_en_sin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.substrate.particle_en_tanh"><code class="docutils literal notranslate"><span class="pre">particle_en_tanh()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.substrate.substrate_from_params"><code class="docutils literal notranslate"><span class="pre">substrate_from_params()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="tool_create_cluster.html">Cluster</a></li>
-<li class="toctree-l3"><a class="reference internal" href="string_method.html">String method</a></li>
-<li class="toctree-l3"><a class="reference internal" href="misc.html">Miscellanous</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tool_create_cluster.html">Cluster (flake.cluster)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="string_method.html">String method (flake.string_method)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="misc.html">I/O (flake.io)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="misc.html#module-flake.plot">Plotting (flake.plot)</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#static">Static</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#static-maps">Static maps</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modules.html#dynamics">Dynamics</a></li>
 </ul>
 </li>
@@ -87,7 +91,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">SLIDES</a>
+          <a href="index.html">FLAKE</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -96,7 +100,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">Modules</a></li>
-      <li class="breadcrumb-item active">Substrate</li>
+      <li class="breadcrumb-item active">Substrate (flake.substrate)</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/tool_create_substrate.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -106,143 +110,286 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-tool_create_substrate">
-<span id="substrate"></span><h1>Substrate<a class="headerlink" href="#module-tool_create_substrate" title="Permalink to this heading"></a></h1>
+  <section id="module-flake.substrate">
+<span id="substrate-flake-substrate"></span><h1>Substrate (flake.substrate)<a class="headerlink" href="#module-flake.substrate" title="Link to this heading"></a></h1>
+<p>Substrate potential functions for rigid-cluster simulations.</p>
+<p>Each substrate type exposes two public functions:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">particle_en_&lt;type&gt;</span></code> — per-particle energy, force, and torque contribution</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">calc_en_&lt;type&gt;</span></code>     — total (summed) energy, force, and torque on the CM</p></li>
+</ul>
+<p>Both return <code class="docutils literal notranslate"><span class="pre">(energy,</span> <span class="pre">force,</span> <span class="pre">torque)</span></code>.  The particle-level functions are
+useful for diagnostics; production code calls <code class="docutils literal notranslate"><span class="pre">calc_en_&lt;type&gt;</span></code> through the
+<code class="docutils literal notranslate"><span class="pre">substrate_from_params</span></code> factory.</p>
+<section id="coordinate-convention">
+<h2>Coordinate convention<a class="headerlink" href="#coordinate-convention" title="Link to this heading"></a></h2>
+<p>All positions are 2-D Cartesian <span class="math notranslate nohighlight">\((x, y)\)</span>.  The cluster CM is at
+<code class="docutils literal notranslate"><span class="pre">pos_cm</span></code>; the rigid-body orientation is handled externally.  Torque is
+computed about <code class="docutils literal notranslate"><span class="pre">pos_torque</span></code> (normally the CM):</p>
+<div class="math notranslate nohighlight">
+\[\tau_i = (\mathbf{r}_i - \mathbf{r}_\mathrm{cm}) \times \mathbf{F}_i\]</div>
+<p>Units are consistent with the calling code (distances in μm, forces in fN,
+energies in zJ for colloidal systems; or Å/eV/nN for nanoscale).</p>
+</section>
+<section id="substrate-types">
+<h2>Substrate types<a class="headerlink" href="#substrate-types" title="Link to this heading"></a></h2>
+<p><strong>Gaussian well</strong> — smooth, localised well vanishing at cutoff <span class="math notranslate nohighlight">\(b\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}V(r) = \begin{cases}
+    -\epsilon \, e^{-r^2/(2\sigma^2)}              &amp; r \le a \\
+    -\epsilon \, e^{-r^2/(2\sigma^2)} \, f(\rho)   &amp; a &lt; r &lt; b \\
+    0                                               &amp; r \ge b
+\end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\rho = (r-a)/(b-a)\)</span> and <span class="math notranslate nohighlight">\(f\)</span> is the <span class="math notranslate nohighlight">\(C^2\)</span> smoothstep
+<span class="math notranslate nohighlight">\(f(\rho) = 1 - 10\rho^3 + 15\rho^4 - 6\rho^5\)</span>.</p>
+<p><strong>Tanh well</strong> — flat bottom with steep walls (Cao, Phys. Rev. E 103, 2021):</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}V(r) = \begin{cases}
+    -\epsilon                                                    &amp; r \le a \\
+    \tfrac{\epsilon}{2}\!\left(\tanh\!\frac{\rho - w}{\rho(1-\rho)} - 1\right) &amp; a &lt; r &lt; b \\
+    0                                                            &amp; r \ge b
+\end{cases}\end{split}\]</div>
+<p><strong>Sinusoidal (plane-wave)</strong> — superposition of <span class="math notranslate nohighlight">\(n\)</span> plane waves
+(Vanossi, Manini, Tosatti, PNAS 109, 2012):</p>
+<div class="math notranslate nohighlight">
+\[V(\mathbf{r}) = -\frac{\epsilon}{n^2}
+    \left|\sum_{l=0}^{n-1} e^{i \mathbf{k}_l \cdot \mathbf{r}}\right|^2\]</div>
+<p>which ranges from <span class="math notranslate nohighlight">\(-\epsilon\)</span> (well minimum) to <span class="math notranslate nohighlight">\(0\)</span> (saddle).</p>
+</section>
+<section id="jit-notes">
+<h2>JIT notes<a class="headerlink" href="#jit-notes" title="Link to this heading"></a></h2>
+<p>Inner loops use Numba <code class="docutils literal notranslate"><span class="pre">&#64;njit</span></code>: no NumPy fancy indexing or boolean masks
+inside jitted functions; explicit for-loops over particles.  Non-jitted
+wrappers handle array allocation and call the jitted core.</p>
+</section>
 <dl class="py function">
-<dt class="sig sig-object py" id="tool_create_substrate.calc_en_gaussian">
-<span class="sig-prename descclassname"><span class="pre">tool_create_substrate.</span></span><span class="sig-name descname"><span class="pre">calc_en_gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_torque</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_inv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_substrate.calc_en_gaussian" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate energy, forces and torque on CM.</p>
-<p>See corresponding particle function for details on parameters.</p>
-<p>Return total energy (scalar) force (2d vector) torque (scalar).</p>
+<dt class="sig sig-object py" id="flake.substrate.calc_en_gaussian">
+<span class="sig-prename descclassname"><span class="pre">flake.substrate.</span></span><span class="sig-name descname"><span class="pre">calc_en_gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_torque</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_inv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.substrate.calc_en_gaussian" title="Link to this definition"></a></dt>
+<dd><p>Total energy, force, and torque on the CM for a Gaussian-well substrate.</p>
+<p>Sums particle_en_gaussian over all particles.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>(float, (2,) ndarray, float) – total energy, total force, total torque.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tool_create_substrate.calc_en_sin">
-<span class="sig-prename descclassname"><span class="pre">tool_create_substrate.</span></span><span class="sig-name descname"><span class="pre">calc_en_sin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_torque</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_substrate.calc_en_sin" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate energy, forces and torque on CM.</p>
-<p>Substrate energy is modelled as sum of plane waves defined by the reciprocal vecotrs ks.</p>
-<p>See corresponding particle function for details on parameters.</p>
-<p>Return total energy (scalar) force (2d vector) torque (scalar).</p>
+<dt class="sig sig-object py" id="flake.substrate.calc_en_sin">
+<span class="sig-prename descclassname"><span class="pre">flake.substrate.</span></span><span class="sig-name descname"><span class="pre">calc_en_sin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_torque</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.substrate.calc_en_sin" title="Link to this definition"></a></dt>
+<dd><p>Total energy, force, and torque on the CM for a plane-wave substrate.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>(float, (2,) ndarray, float) – total energy, total force, total torque.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tool_create_substrate.calc_en_sin_tri">
-<span class="sig-prename descclassname"><span class="pre">tool_create_substrate.</span></span><span class="sig-name descname"><span class="pre">calc_en_sin_tri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_torque</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_inv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_substrate.calc_en_sin_tri" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate energy, forces and torque on CM.</p>
-<p>!!! Coefficients are for triangular lattice only !!!
-Substrate energy is modelled as sum of three plane waves.</p>
+<dt class="sig sig-object py" id="flake.substrate.calc_en_tanh">
+<span class="sig-prename descclassname"><span class="pre">flake.substrate.</span></span><span class="sig-name descname"><span class="pre">calc_en_tanh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_torque</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ww</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_inv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.substrate.calc_en_tanh" title="Link to this definition"></a></dt>
+<dd><p>Total energy, force, and torque on the CM for a tanh-well substrate.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>(float, (2,) ndarray, float) – total energy, total force, total torque.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tool_create_substrate.calc_en_tanh">
-<span class="sig-prename descclassname"><span class="pre">tool_create_substrate.</span></span><span class="sig-name descname"><span class="pre">calc_en_tanh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_torque</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ww</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_inv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_substrate.calc_en_tanh" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate energy, forces and torque on CM.</p>
-<p>Substrate energy is modelled as a lattice of tanh-shaped wells.</p>
-<p>See corresponding particle function for details on parameters.</p>
-<p>Return total energy (scalar) force (2d vector) torque (scalar).</p>
+<dt class="sig sig-object py" id="flake.substrate.calc_matrices_bvect">
+<span class="sig-prename descclassname"><span class="pre">flake.substrate.</span></span><span class="sig-name descname"><span class="pre">calc_matrices_bvect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.substrate.calc_matrices_bvect" title="Link to this definition"></a></dt>
+<dd><p>Metric matrices from two arbitrary primitive lattice vectors.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>b1, b2: array-like, shape (2,).</p>
+</dd>
+</dl>
+<p>Returns (u, u_inv) such that u &#64; r gives fractional coordinates and
+u_inv &#64; frac gives real-space coordinates.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tool_create_substrate.calc_matrices_bvect">
-<span class="sig-prename descclassname"><span class="pre">tool_create_substrate.</span></span><span class="sig-name descname"><span class="pre">calc_matrices_bvect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_substrate.calc_matrices_bvect" title="Permalink to this definition"></a></dt>
-<dd><p>Metric matrices from primitive lattice vectors b1, b2.</p>
-<p>Return 2x2 matrices to map to unit cell (u) and inverse (u_inv), back to real space.</p>
+<dt class="sig sig-object py" id="flake.substrate.calc_matrices_square">
+<span class="sig-prename descclassname"><span class="pre">flake.substrate.</span></span><span class="sig-name descname"><span class="pre">calc_matrices_square</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.substrate.calc_matrices_square" title="Link to this definition"></a></dt>
+<dd><p>Metric matrices for a square lattice of spacing R.</p>
+<p>Returns (u, u_inv): 2x2 matrices that map real-space displacements to
+fractional coordinates and back.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tool_create_substrate.calc_matrices_square">
-<span class="sig-prename descclassname"><span class="pre">tool_create_substrate.</span></span><span class="sig-name descname"><span class="pre">calc_matrices_square</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_substrate.calc_matrices_square" title="Permalink to this definition"></a></dt>
-<dd><p>Metric matrices of square lattice of spacing R.</p>
-<p>Return 2x2 matrices to map to unit cell (u) and inverse (u_inv), back to real space.</p>
+<dt class="sig sig-object py" id="flake.substrate.calc_matrices_triangle">
+<span class="sig-prename descclassname"><span class="pre">flake.substrate.</span></span><span class="sig-name descname"><span class="pre">calc_matrices_triangle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.substrate.calc_matrices_triangle" title="Link to this definition"></a></dt>
+<dd><p>Metric matrices for a triangular lattice of spacing R.</p>
+<p>Nearest-neighbour direction is along x (consistent with the cluster
+creation conventions in flake.cluster).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tool_create_substrate.calc_matrices_triangle">
-<span class="sig-prename descclassname"><span class="pre">tool_create_substrate.</span></span><span class="sig-name descname"><span class="pre">calc_matrices_triangle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_substrate.calc_matrices_triangle" title="Permalink to this definition"></a></dt>
-<dd><p>Metric matrices of triangular lattice of spacing R.</p>
-<p>Return 2x2 matrices to map to unit cell (u) and inverse (u_inv), back to real space.</p>
+<dt class="sig sig-object py" id="flake.substrate.gaussian">
+<span class="sig-prename descclassname"><span class="pre">flake.substrate.</span></span><span class="sig-name descname"><span class="pre">gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.substrate.gaussian" title="Link to this definition"></a></dt>
+<dd><p>Unnormalised Gaussian: exp(-(x-mu)^2 / (2*sigma^2)).</p>
+<p>Kept public because tool_reciprocal_space.py uses it directly.
+Not normalised by design – it represents a well <em>shape</em>, not a PDF.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tool_create_substrate.gaussian">
-<span class="sig-prename descclassname"><span class="pre">tool_create_substrate.</span></span><span class="sig-name descname"><span class="pre">gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_substrate.gaussian" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_substrate.get_ks">
-<span class="sig-prename descclassname"><span class="pre">tool_create_substrate.</span></span><span class="sig-name descname"><span class="pre">get_ks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_substrate.get_ks" title="Permalink to this definition"></a></dt>
-<dd><p>Compute wave vectors k of interfering plane waves</p>
-<p>Coefficients for reciprical space
-from Vanossi, Manini, Tosatti www.pnas.org/cgi/doi/10.1073/pnas.1213930109 PNAS∣October 9, 2012∣vol. 109∣no. 41∣16429–16433</p>
-<p>Lines: n, c_n, alpha_n = 2, 1, 0</p>
-<p>Triangular: n, c_n, alpha_n = 3, 4/3, 0</p>
-<p>Square: n, c_n, alpha_n = 4, np.sqrt(2), pi/4</p>
-<p>Quasi-crystal 5-fold sym: n, c_n, alpha_n = 5, 2, 0</p>
-<p>Quasi-crystal 6-fold sym: n, c_n, alpha_n = 6, 4/np.sqrt(3), -pi/6</p>
+<dt class="sig sig-object py" id="flake.substrate.get_ks">
+<span class="sig-prename descclassname"><span class="pre">flake.substrate.</span></span><span class="sig-name descname"><span class="pre">get_ks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.substrate.get_ks" title="Link to this definition"></a></dt>
+<dd><p>Wave vectors for an <em>n</em>-fold symmetric sinusoidal substrate.</p>
+<p>Constructs <span class="math notranslate nohighlight">\(n\)</span> plane waves whose interference gives a potential with
+the desired lattice symmetry.  Coefficients from Vanossi, Manini, Tosatti,
+<em>PNAS</em> 109, 16429 (2012).  The <span class="math notranslate nohighlight">\(l\)</span>-th wave vector is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mathbf{k}_l = \frac{c_n \pi}{R}
+    \begin{pmatrix}
+        \cos\!\left(\tfrac{2\pi l}{n} + \alpha_n\right) \\
+        \sin\!\left(\tfrac{2\pi l}{n} + \alpha_n\right)
+    \end{pmatrix}, \quad l = 0, \ldots, n-1\end{split}\]</div>
+<p>Preset recipes:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Symmetry</p></th>
+<th class="head"><p>n</p></th>
+<th class="head"><p>c_n</p></th>
+<th class="head"><p>alpha_n (deg)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Lines</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>Triangular</p></td>
+<td><p>3</p></td>
+<td><p>4/3</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>Square</p></td>
+<td><p>4</p></td>
+<td><p><span class="math notranslate nohighlight">\(\sqrt{2}\)</span></p></td>
+<td><p>45</p></td>
+</tr>
+<tr class="row-odd"><td><p>Quasicrystal 5</p></td>
+<td><p>5</p></td>
+<td><p>2</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>Quasicrystal 6</p></td>
+<td><p>6</p></td>
+<td><p><span class="math notranslate nohighlight">\(4/\sqrt{3}\)</span></p></td>
+<td><p>−30</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="simple">
+<dt>Args:</dt><dd><p>R:       float – lattice spacing.
+n:       int   – number of plane waves (controls symmetry).
+c_n:     float – amplitude pre-factor; sets <span class="math notranslate nohighlight">\(|\mathbf{k}|\)</span>.
+alpha_n: float – global rotation of the wave-vector star <strong>[radians]</strong>.</p>
+</dd>
+<dt>Returns:</dt><dd><p>ks: (n, 2) float64 ndarray of wave vectors.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tool_create_substrate.particle_en_gaussian">
-<span class="sig-prename descclassname"><span class="pre">tool_create_substrate.</span></span><span class="sig-name descname"><span class="pre">particle_en_gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_torque</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_inv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_substrate.particle_en_gaussian" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate energy, forces and torque on each particle.</p>
-<p>Substrate energy is modelled as a lattice of gaussian-shaped wells.</p>
-<p>Inputs are:
-- pos: position of particles in rigid cluster, as (N,2) array.
-- pos_torque: reference point (1,2 array) to compute the torque (usually CM).
-- basis: list of position of the substrate basis (N,2 array).</p>
-<p>Well specific inputs (usually passed as <a href="#id1"><span class="problematic" id="id2">*</span></a>en_input):
-- a, b: beginning and end of tempered region (W=0 for x&gt;b).
-- sigma: width of the gaussian.
-- epsilon: depth of the well.
-- u, u_inv: matrices to map to subsrtate unit cell (see calc_matrices_bvect)</p>
-<p>Returns (for each particle) energy (N array), force (N,2), torque (N)</p>
+<dt class="sig sig-object py" id="flake.substrate.particle_en_gaussian">
+<span class="sig-prename descclassname"><span class="pre">flake.substrate.</span></span><span class="sig-name descname"><span class="pre">particle_en_gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_torque</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_inv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.substrate.particle_en_gaussian" title="Link to this definition"></a></dt>
+<dd><p>Per-particle energy, force, and torque for a Gaussian-well substrate.</p>
+<p>See _particle_en_gaussian_core for the potential definition.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>pos:        (N, 2) ndarray – particle positions.
+pos_torque: (2,)   ndarray – torque reference point (usually CM).
+basis:      list of (2,) arrays – substrate basis site positions.
+a:          float – inner cutoff (bulk region ends here).
+b:          float – outer cutoff (tail region ends here).
+sigma:      float – Gaussian width.
+epsilon:    float – well depth (positive = attractive).
+u, u_inv:   (2,2) ndarrays – metric matrices from calc_matrices_bvect.</p>
+</dd>
+<dt>Returns:</dt><dd><p>en:  (N,) ndarray – potential energy per particle.
+F:   (N, 2) ndarray – force on each particle.
+tau: (N,) ndarray – torque contribution per particle.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tool_create_substrate.particle_en_sin">
-<span class="sig-prename descclassname"><span class="pre">tool_create_substrate.</span></span><span class="sig-name descname"><span class="pre">particle_en_sin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_torque</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_substrate.particle_en_sin" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate energy, forces and torque on each particle.</p>
-<p>Substrate energy is modelled as sum of plane waves defined by the reciprocal vecotrs ks.</p>
-<p>Inputs are:
-- pos: position of particles in rigid cluster, as (N,2) array.
-- pos_torque: reference point (1,2 array) to compute the torque (usually CM).
-- basis: list of position of the substrate basis (N,2 array).</p>
-<p>Well specific inputs (usually passed as <a href="#id3"><span class="problematic" id="id4">*</span></a>en_input):
-- ks: list of wavevector generating the potential.
-- epsilon: depth of the potential.</p>
-<p>Returns (for each particle) energy (N array), force (N,2), torque (N)</p>
+<dt class="sig sig-object py" id="flake.substrate.particle_en_sin">
+<span class="sig-prename descclassname"><span class="pre">flake.substrate.</span></span><span class="sig-name descname"><span class="pre">particle_en_sin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_torque</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.substrate.particle_en_sin" title="Link to this definition"></a></dt>
+<dd><p>Per-particle energy, force, and torque for a plane-wave substrate.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>pos:        (N, 2) ndarray – particle positions.
+pos_torque: (2,)   ndarray – torque reference point.
+basis:      list of (2,) arrays – substrate basis site positions.
+ks:         (n, 2) ndarray  – wave vectors (from get_ks).
+epsilon:    float           – well depth.</p>
+</dd>
+<dt>Returns:</dt><dd><p>en, F, tau: same shapes as particle_en_gaussian.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tool_create_substrate.particle_en_sin_tri">
-<span class="sig-prename descclassname"><span class="pre">tool_create_substrate.</span></span><span class="sig-name descname"><span class="pre">particle_en_sin_tri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_torque</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_inv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_substrate.particle_en_sin_tri" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate energy, forces and torque on each particle.</p>
-<p>!!! Coefficients are for triangular lattice only !!!
-Substrate energy is modelled as sum of three plane waves.</p>
+<dt class="sig sig-object py" id="flake.substrate.particle_en_tanh">
+<span class="sig-prename descclassname"><span class="pre">flake.substrate.</span></span><span class="sig-name descname"><span class="pre">particle_en_tanh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_torque</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ww</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_inv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.substrate.particle_en_tanh" title="Link to this definition"></a></dt>
+<dd><p>Per-particle energy, force, and torque for a tanh-well substrate.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>pos:        (N, 2) ndarray – particle positions.
+pos_torque: (2,)   ndarray – torque reference point.
+basis:      list of (2,) arrays – substrate basis site positions.
+a:          float – flat-bottom radius.
+b:          float – outer cutoff radius.
+ww:         float – wall shape parameter.
+epsilon:    float – well depth.
+u, u_inv:   (2, 2) ndarrays – metric matrices.</p>
+</dd>
+<dt>Returns:</dt><dd><p>en, F, tau: same as particle_en_gaussian.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tool_create_substrate.particle_en_tanh">
-<span class="sig-prename descclassname"><span class="pre">tool_create_substrate.</span></span><span class="sig-name descname"><span class="pre">particle_en_tanh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_torque</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ww</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_inv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_substrate.particle_en_tanh" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate energy, forces and torque on each particle.</p>
-<p>Substrate energy is modelled as a lattice of tanh-shaped wells.</p>
-<p>Inputs are:
-- pos: position of particles in rigid cluster, as (N,2) array.
-- pos_torque: reference point (1,2 array) to compute the torque (usually CM).
-- basis: list of position of the substrate basis (N,2 array).</p>
-<p>Well specific inputs (usually passed as <a href="#id5"><span class="problematic" id="id6">*</span></a>en_input):
-- a, b: beginning and end of tanh well (W=-epsilon for r&lt;a, W=0 for x&gt;b).
-- ww: shape factor for the tanh potential.
-- epsilon: depth of the well.
-- u, u_inv: matrices to map to subsrtate unit cell (see calc_matrices_bvect)</p>
-<p>Returns (for each particle) energy (N array), force (N,2), torque (N)</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tool_create_substrate.substrate_from_params">
-<span class="sig-prename descclassname"><span class="pre">tool_create_substrate.</span></span><span class="sig-name descname"><span class="pre">substrate_from_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tool_create_substrate.substrate_from_params" title="Permalink to this definition"></a></dt>
-<dd><p>Initialise a substrate from a parameter dictionary (usually from JSON file)</p>
-<p>Returns the functions computing the particle-wise and total energy, and the list of potential-specific paramters to pass to these functions.</p>
+<dt class="sig sig-object py" id="flake.substrate.substrate_from_params">
+<span class="sig-prename descclassname"><span class="pre">flake.substrate.</span></span><span class="sig-name descname"><span class="pre">substrate_from_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.substrate.substrate_from_params" title="Link to this definition"></a></dt>
+<dd><p>Build substrate energy functions from a parameter dictionary.</p>
+<p>This is the standard entry point for production use.  The dictionary
+is typically loaded from a JSON input file.</p>
+<p>Supported well shapes and required parameter keys:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'gaussian'</span></code>: <code class="docutils literal notranslate"><span class="pre">epsilon,</span> <span class="pre">sigma,</span> <span class="pre">a,</span> <span class="pre">b,</span> <span class="pre">b1,</span> <span class="pre">b2,</span> <span class="pre">sub_basis</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'tanh'</span></code>:     <code class="docutils literal notranslate"><span class="pre">epsilon,</span> <span class="pre">wd</span></code> (alias <code class="docutils literal notranslate"><span class="pre">ww</span></code>)``, a, b, b1, b2, sub_basis``</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'sin'</span></code>:      <code class="docutils literal notranslate"><span class="pre">epsilon,</span> <span class="pre">ks,</span> <span class="pre">sub_basis</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'flat'</span></code>:     no keys required</p></li>
+</ul>
+<p>For <code class="docutils literal notranslate"><span class="pre">'gaussian'</span></code> and <code class="docutils literal notranslate"><span class="pre">'tanh'</span></code>, <code class="docutils literal notranslate"><span class="pre">b1</span></code> and <code class="docutils literal notranslate"><span class="pre">b2</span></code> are the primitive
+lattice vectors used to build the metric matrices (via
+<code class="docutils literal notranslate"><span class="pre">calc_matrices_bvect</span></code>).</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">'sin'</span></code>, <code class="docutils literal notranslate"><span class="pre">ks</span></code> should be a pre-computed <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">2)</span></code> array (e.g.
+from <code class="docutils literal notranslate"><span class="pre">get_ks</span></code>).  No metric matrices are needed.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">'flat'</span></code>, the substrate is identically zero — useful for testing
+the integrator against analytic predictions (FDT, diffusion coefficient)
+without substrate interference.</p>
+<p>All array parameters (basis, u, u_inv, ks) are converted to float64 ONCE
+here and captured in the returned closures.  Callers pass en_inputs=[]
+and call en_func(pos, pos_cm) – the closure holds everything else.
+This eliminates per-step np.array conversions in run_md.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>params: dict with at least ‘well_shape’ and shape-specific keys</dt><dd><p>listed above.  ‘epsilon’ and ‘sub_basis’ are not required
+for ‘flat’.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>pen_func:  particle-level closure (pos, pos_cm) -&gt;</dt><dd><p>(en, F, tau) arrays (per particle).</p>
+</dd>
+<dt>en_func:   total-energy closure  (pos, pos_cm) -&gt;</dt><dd><p>(float, (2,) float64, float).</p>
+</dd>
+</dl>
+<p>en_inputs: always [] – all parameters live in the closures.</p>
+</dd>
+<dt>Raises:</dt><dd><p>NotImplementedError: if well_shape is not recognised.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -252,7 +399,7 @@ Substrate energy is modelled as sum of three plane waves.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="modules.html" class="btn btn-neutral float-left" title="Modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="tool_create_cluster.html" class="btn btn-neutral float-right" title="Cluster" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tool_create_cluster.html" class="btn btn-neutral float-right" title="Cluster (flake.cluster)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

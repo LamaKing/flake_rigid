@@ -1,11 +1,8 @@
 Modules
 ========
 
-.. note::
-   The functions in ``snips/`` are snippets that might be useful to some but are not documented here as they address minor or technical aspects not relevant for the whole package.
-
 Tools
---------
+------
 .. toctree::
    :maxdepth: 2
 
@@ -14,8 +11,8 @@ Tools
    string_method
    misc
 
-Static
---------
+Static maps
+-----------
 .. toctree::
    :maxdepth: 2
 

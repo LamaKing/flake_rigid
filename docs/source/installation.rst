@@ -1,32 +1,49 @@
 Installation
 =============
 
-SLIDES is written in python3. The following packages are required:
+FLAKE is written in Python 3 (>=3.10). Required dependencies (installed automatically):
 
-- nbsphinx==0.9.2
-- sphinx-rtd-theme==1.2.1
-- matplotlib==3.7.1
-- numpy==1.24.3
-- scipy==1.10.1
-- shapely==2.0.1
-- ase==3.22.1
+- numpy
+- scipy
+- numba
 
-From PIP
----------
+Optional dependencies (for examples and documentation):
 
-The easiest way to install SLIDES is via `pip <https://pypi.org/project/pip/>`_, see the project page `here <https://test.pypi.org/project/SLIDES/>`_.
-To install type the following in your command line
+- matplotlib
+- shapely
+- ase (for POSCAR import)
+- h5py (for HDF5 map/trajectory files)
+- joblib (for parallel sweeps)
+- pyyaml (for CLI YAML input)
+
+From source (recommended)
+--------------------------
+
+Clone the repository and install in editable mode:
 
 .. code-block:: console
 
-   pip install -i https://test.pypi.org/simple/ SLIDES
+   git clone https://github.com/LamaKing/slides_rigid.git
+   cd slides_rigid
+   pip install -e ".[dev]"
 
-This will put the sources in your python path so that all the functions of this package will be accessible from any python script.
+This registers the ``flake`` command-line entry point and installs pytest for running the test suite.
 
-From source
-------------
+Verify the installation:
 
-You can get the source code by cloning our `git repository <https://github.com/LamaKing/slide_rigid/tree/main>`_.
-SLIDES is fully written in python, so no compiling is needed.
+.. code-block:: console
 
-In the examples folder you will find the notebook underlying the examples shown in the documentation here. These notebooks are editable, so you can play around with different substrate, geometries and driver, ultimately tailoring the design to your system of interest!
+   flake --help
+   python -m pytest tests/ -q
+
+Numba will JIT-compile the hot loops on the first run; subsequent runs are fast.
+
+Examples
+--------
+
+The ``examples/`` folder contains Jupyter notebooks covering all major features.
+Open them with:
+
+.. code-block:: console
+
+   jupyter notebook examples/

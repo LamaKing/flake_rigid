@@ -1,32 +1,69 @@
 #!/usr/bin/env python3
-"""
+r"""
 Substrate potential functions for rigid-cluster simulations.
 
 Each substrate type exposes two public functions:
-    particle_en_<type>  --  per-particle energy, force, torque contribution
-    calc_en_<type>      --  total (summed) energy, force, torque on CM
 
-Both return (energy, force, torque).  The particle-level functions are useful
-for diagnostics and testing; production code typically calls calc_en_<type>
-through the substrate_from_params factory.
+- ``particle_en_<type>`` — per-particle energy, force, and torque contribution
+- ``calc_en_<type>``     — total (summed) energy, force, and torque on the CM
+
+Both return ``(energy, force, torque)``.  The particle-level functions are
+useful for diagnostics; production code calls ``calc_en_<type>`` through the
+``substrate_from_params`` factory.
 
 Coordinate convention
 ---------------------
-All positions are 2-D Cartesian (x, y).  The cluster CM is at pos_cm; the
-rigid-body orientation is handled externally.  Torque is computed about
-pos_torque (normally the CM).
+All positions are 2-D Cartesian :math:`(x, y)`.  The cluster CM is at
+``pos_cm``; the rigid-body orientation is handled externally.  Torque is
+computed about ``pos_torque`` (normally the CM):
 
-Units: consistent with the calling code -- distances in micron, forces in fN,
-energies in zJ, angles in radians internally (degrees at the MD level).
+.. math::
+
+    \tau_i = (\mathbf{r}_i - \mathbf{r}_\mathrm{cm}) \times \mathbf{F}_i
+
+Units are consistent with the calling code (distances in μm, forces in fN,
+energies in zJ for colloidal systems; or Å/eV/nN for nanoscale).
+
+Substrate types
+---------------
+**Gaussian well** — smooth, localised well vanishing at cutoff :math:`b`:
+
+.. math::
+
+    V(r) = \begin{cases}
+        -\epsilon \, e^{-r^2/(2\sigma^2)}              & r \le a \\
+        -\epsilon \, e^{-r^2/(2\sigma^2)} \, f(\rho)   & a < r < b \\
+        0                                               & r \ge b
+    \end{cases}
+
+where :math:`\rho = (r-a)/(b-a)` and :math:`f` is the :math:`C^2` smoothstep
+:math:`f(\rho) = 1 - 10\rho^3 + 15\rho^4 - 6\rho^5`.
+
+**Tanh well** — flat bottom with steep walls (Cao, Phys. Rev. E 103, 2021):
+
+.. math::
+
+    V(r) = \begin{cases}
+        -\epsilon                                                    & r \le a \\
+        \tfrac{\epsilon}{2}\!\left(\tanh\!\frac{\rho - w}{\rho(1-\rho)} - 1\right) & a < r < b \\
+        0                                                            & r \ge b
+    \end{cases}
+
+**Sinusoidal (plane-wave)** — superposition of :math:`n` plane waves
+(Vanossi, Manini, Tosatti, PNAS 109, 2012):
+
+.. math::
+
+    V(\mathbf{r}) = -\frac{\epsilon}{n^2}
+        \left|\sum_{l=0}^{n-1} e^{i \mathbf{k}_l \cdot \mathbf{r}}\right|^2
+
+which ranges from :math:`-\epsilon` (well minimum) to :math:`0` (saddle).
 
 JIT notes
 ---------
-The inner loops are compiled with Numba @njit.  This means:
-  - No NumPy fancy indexing or boolean masks inside jitted functions.
-  - Explicit for-loops over particles -- Numba handles these efficiently.
-  - Functions passed to @njit callers must themselves be @njit.
-The non-jitted wrappers (calc_en_*) handle array allocation and call the
-jitted core.
+Inner loops use Numba ``@njit``: no NumPy fancy indexing or boolean masks
+inside jitted functions; explicit for-loops over particles.  Non-jitted
+wrappers handle array allocation and call the jitted core.
 """
 
 import numpy as np
@@ -54,7 +91,7 @@ def calc_matrices_triangle(R):
     """Metric matrices for a triangular lattice of spacing R.
 
     Nearest-neighbour direction is along x (consistent with the cluster
-    creation conventions in tool_create_cluster).
+    creation conventions in flake.cluster).
     """
     area = R * R * sqrt(3.) / 2.
     u     = np.array([[sqrt(3.) / 2., 0.5 ], [0.,  1.       ]]) * (R / area)
@@ -94,18 +131,21 @@ def gaussian(x, mu, sigma):
 def _particle_en_gaussian_core(pos, pos_torque, basis,
                                 a, b, sigma, epsilon,
                                 u, u_inv):
-    """JIT core for Gaussian-well substrate.
+    r"""JIT core for Gaussian-well substrate.
 
-    The well is:
-        V(r) = -epsilon * exp(-r^2 / (2*sigma^2))          for r <= a  (bulk)
-        V(r) = -epsilon * exp(-r^2 / (2*sigma^2)) * f(rho) for a < r < b  (tail)
-        V(r) = 0                                            for r >= b  (outside)
+    .. math::
 
-    where rho = (r-a)/(b-a) in [0,1] and f is the C^2 smoothstep:
-        f(rho) = 1 - 10*rho^3 + 15*rho^4 - 6*rho^5
+        V(r) = \begin{cases}
+            -\epsilon \, e^{-r^2/(2\sigma^2)}
+                & r \le a \\
+            -\epsilon \, e^{-r^2/(2\sigma^2)} \, f(\rho)
+                & a < r < b \\
+            0   & r \ge b
+        \end{cases}
 
-    The tail ensures the potential and its first two derivatives go to zero
-    smoothly at r=b, avoiding discontinuous forces.
+    where :math:`\rho = (r-a)/(b-a)` and
+    :math:`f(\rho) = 1 - 10\rho^3 + 15\rho^4 - 6\rho^5` (:math:`C^2` smoothstep).
+    The tail ensures :math:`V` and its first two derivatives vanish at :math:`r=b`.
 
     Args:
         pos:        (N, 2) particle positions.
@@ -269,15 +309,21 @@ def calc_en_gaussian(pos, pos_torque, basis, a, b, sigma, epsilon, u, u_inv):
 def _particle_en_tanh_core(pos, pos_torque, basis,
                             a, b, ww, epsilon,
                             u, u_inv):
-    """JIT core for tanh-shaped substrate wells.
+    r"""JIT core for tanh-shaped substrate wells.
 
-    The well profile (following Cao, Phys. Rev. E 103, 2021):
-        V = -epsilon                                      for r <= a  (flat bottom)
-        V = epsilon/2 * (tanh((rho-ww)/(rho*(1-rho))) - 1)  for a < r < b
-        V = 0                                             for r >= b
+    Following Cao, *Phys. Rev. E* 103, 012606 (2021):
 
-    where rho = (r-a)/(b-a) in (0,1).  The parameter ww controls the
-    steepness of the wall: smaller ww -> steeper outer wall.
+    .. math::
+
+        V(r) = \begin{cases}
+            -\epsilon  & r \le a \\
+            \dfrac{\epsilon}{2}\!\left(\tanh\dfrac{\rho - w}{\rho(1-\rho)} - 1\right)
+                       & a < r < b \\
+            0          & r \ge b
+        \end{cases}
+
+    where :math:`\rho = (r-a)/(b-a)`.
+    Smaller ``ww`` gives a steeper outer wall.
 
     Args:
         pos, pos_torque, basis: same as Gaussian core.
@@ -408,27 +454,40 @@ def calc_en_tanh(pos, pos_torque, basis, a, b, ww, epsilon, u, u_inv):
 # ============================================================
 
 def get_ks(R, n, c_n, alpha_n):
-    """Wave vectors for an n-fold symmetric sinusoidal substrate.
+    r"""Wave vectors for an *n*-fold symmetric sinusoidal substrate.
 
-    Constructs n plane waves whose interference gives a potential with the
-    desired lattice symmetry.  Coefficients from:
-        Vanossi, Manini, Tosatti, PNAS 109, 16429 (2012).
+    Constructs :math:`n` plane waves whose interference gives a potential with
+    the desired lattice symmetry.  Coefficients from Vanossi, Manini, Tosatti,
+    *PNAS* 109, 16429 (2012).  The :math:`l`-th wave vector is:
+
+    .. math::
+
+        \mathbf{k}_l = \frac{c_n \pi}{R}
+            \begin{pmatrix}
+                \cos\!\left(\tfrac{2\pi l}{n} + \alpha_n\right) \\
+                \sin\!\left(\tfrac{2\pi l}{n} + \alpha_n\right)
+            \end{pmatrix}, \quad l = 0, \ldots, n-1
 
     Preset recipes:
-        Lines        : n=2, c_n=1,            alpha_n=0
-        Triangular   : n=3, c_n=4/3,          alpha_n=0
-        Square       : n=4, c_n=sqrt(2),      alpha_n=pi/4
-        Quasicrystal5: n=5, c_n=2,            alpha_n=0
-        Quasicrystal6: n=6, c_n=4/sqrt(3),    alpha_n=-pi/6
+
+    ============== ===  ======================  ================
+    Symmetry        n   c_n                     alpha_n (deg)
+    ============== ===  ======================  ================
+    Lines           2   1                       0
+    Triangular      3   4/3                     0
+    Square          4   :math:`\sqrt{2}`        45
+    Quasicrystal 5  5   2                       0
+    Quasicrystal 6  6   :math:`4/\sqrt{3}`      −30
+    ============== ===  ======================  ================
 
     Args:
         R:       float -- lattice spacing.
-        n:       int   -- number of plane waves (fold symmetry).
-        c_n:     float -- amplitude pre-factor for |k|.
-        alpha_n: float -- overall rotation of the wave-vector star [radians].
+        n:       int   -- number of plane waves (controls symmetry).
+        c_n:     float -- amplitude pre-factor; sets :math:`|\mathbf{k}|`.
+        alpha_n: float -- global rotation of the wave-vector star **[radians]**.
 
     Returns:
-        ks: (n, 2) ndarray of wave vectors.
+        ks: (n, 2) float64 ndarray of wave vectors.
     """
     return np.array([
         c_n * pi / R * np.array([np.cos(2. * pi / n * l + alpha_n),
@@ -605,23 +664,23 @@ def substrate_from_params(params):
     This is the standard entry point for production use.  The dictionary
     is typically loaded from a JSON input file.
 
-    Supported well shapes and required keys:
+    Supported well shapes and required parameter keys:
 
-        'gaussian':  epsilon, sigma, a, b, b1, b2, sub_basis
-        'tanh':      epsilon, wd (=ww), a, b, b1, b2, sub_basis
-        'sin':       epsilon, ks, sub_basis
-        'flat':      no keys required (not even epsilon or sub_basis)
+    - ``'gaussian'``: ``epsilon, sigma, a, b, b1, b2, sub_basis``
+    - ``'tanh'``:     ``epsilon, wd`` (alias ``ww``)``, a, b, b1, b2, sub_basis``
+    - ``'sin'``:      ``epsilon, ks, sub_basis``
+    - ``'flat'``:     no keys required
 
-    For 'gaussian' and 'tanh', b1 and b2 are the primitive lattice vectors
-    used to build the metric matrices (via calc_matrices_bvect).
+    For ``'gaussian'`` and ``'tanh'``, ``b1`` and ``b2`` are the primitive
+    lattice vectors used to build the metric matrices (via
+    ``calc_matrices_bvect``).
 
-    For 'sin', ks should be a pre-computed (n, 2) array (e.g. from get_ks).
-    No metric matrices are needed because the plane-wave potential is
-    already periodic by construction.
+    For ``'sin'``, ``ks`` should be a pre-computed ``(n, 2)`` array (e.g.
+    from ``get_ks``).  No metric matrices are needed.
 
-    For 'flat', the substrate is identically zero everywhere -- useful for
-    testing the integrator against analytic predictions (drift velocity,
-    diffusion coefficient, FDT) without substrate interference.
+    For ``'flat'``, the substrate is identically zero — useful for testing
+    the integrator against analytic predictions (FDT, diffusion coefficient)
+    without substrate interference.
 
     All array parameters (basis, u, u_inv, ks) are converted to float64 ONCE
     here and captured in the returned closures.  Callers pass en_inputs=[]

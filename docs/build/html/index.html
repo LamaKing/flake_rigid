@@ -1,27 +1,27 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SuperLubric Interface DESigner &mdash; SLIDES 0.0.4 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>FLAKE — rigid cluster friction simulator &mdash; FLAKE 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -37,7 +37,7 @@
           
           
           <a href="#" class="icon icon-home">
-            SLIDES
+            FLAKE
               <img src="_static/logo_html.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -61,7 +61,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">SLIDES</a>
+          <a href="#">FLAKE</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -69,7 +69,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">SuperLubric Interface DESigner</li>
+      <li class="breadcrumb-item active">FLAKE — rigid cluster friction simulator</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -80,38 +80,37 @@
            <div itemprop="articleBody">
              
   <img alt="_images/logo.png" src="_images/logo.png" />
-<section id="superlubric-interface-designer">
-<h1>SuperLubric Interface DESigner<a class="headerlink" href="#superlubric-interface-designer" title="Permalink to this heading"></a></h1>
+<section id="flake-rigid-cluster-friction-simulator">
+<h1>FLAKE — rigid cluster friction simulator<a class="headerlink" href="#flake-rigid-cluster-friction-simulator" title="Link to this heading"></a></h1>
 <p>Compute the interlocking potential between a periodic substrate and a finite-size adsorbate, in the rigid approximation.
 The adsorbate is treated as a rigid body with a given orientation <span class="math notranslate nohighlight">\(\theta\)</span> and center of mass (CM) position <span class="math notranslate nohighlight">\(x_\mathrm{cm}, y_\mathrm{cm}\)</span>.
-This model mimicks the basic physics of 2D materials flakes sliding over a substrate in AFM experiments, e.g. graphene on graphite, nobel gases islands on metal surfaces, and colloidal particles under external drivers, like gravity.</p>
-<p>The rigid approximation allows for treatment of large clusters approaching sizes of AFM experiments. This is of course a major approximation, and yet a reasonable one to qualitatively describe the contact between stiff materials like graphite and hBN.
-The large-scale capabilities and qualitative description, make SLIDES the perfect tool to explore interafaces at little computational cost and derive scaling laws as a function of the system paramters, e.g. cluster size or substrate potential.
-To the best of our knowledge, no such tool is available today: LAMMPS can be used for common cases for which force fields are available (e.g. graphene/hBN) and homemade system-specific solutions are found in the literature.</p>
-<p>This package is a collection of functions implementing the above physical system and automating routines usually needed to study the static, dynamics and scaling laws of friction at nanoscale interfaces.
-SLIDES is not object oriented, but mainly based on function. This choice stems from the will to keep the software as simple as possible, easy to extend and allow single parts of the code to be easily integrated in other projects.
-The two main components of this package are <code class="docutils literal notranslate"><span class="pre">tool_create_substrate.py</span></code> and <code class="docutils literal notranslate"><span class="pre">tool_create_cluster.py</span></code>.
-The first module allows to create a set of rigid substrates of different symmetry and Fourier complexity.
-The second module provides a set of function to create finite clusters of different shapes.
-The <code class="docutils literal notranslate"><span class="pre">static_[...].py</span></code>  modules combine substrate and cluster to compute static energy landscapes, providing a convenient and automated interface for systematic explorations. The command line interface provides a simple parallelisation over clusters of different sizes, ideal to compute scaling laws.
-The <code class="docutils literal notranslate"><span class="pre">MD_rigid_rototrasl.py</span></code> module performes Euler intergration of the overdamped Langeving equation.</p>
-<p>This software was developed at SISSA, Trieste, Italy in the group of Prof.
-Erio Tosatti and Andrea Vanossi and based on the experiments by Xin Cao and Clemens Bechinger at Univeristy of Konstanz, Germany.
-For any question/support contanct <a class="reference external" href="mailto:ansilva&#37;&#52;&#48;sissa&#46;it">Andrea Silva</a>.</p>
+This model mimics the basic physics of 2D material flakes sliding over a substrate in AFM experiments (e.g. graphene on graphite, noble gas islands on metal surfaces) and colloidal particles under external drivers.</p>
+<p>The rigid approximation allows treatment of large clusters approaching sizes of AFM experiments — a reasonable approximation for stiff materials like graphite and hBN.
+The large-scale capabilities and qualitative description make FLAKE the perfect tool to explore interfaces at little computational cost and derive scaling laws as a function of system parameters (cluster size, substrate potential, orientation).</p>
+<p>FLAKE is not object oriented but mainly function-based, keeping the software simple, easy to extend, and allowing individual components to be integrated in other projects.</p>
+<p>The two main modules are <code class="docutils literal notranslate"><span class="pre">flake.substrate</span></code> and <code class="docutils literal notranslate"><span class="pre">flake.cluster</span></code>.
+<code class="docutils literal notranslate"><span class="pre">flake.substrate</span></code> creates rigid substrates of different symmetry and Fourier complexity.
+<code class="docutils literal notranslate"><span class="pre">flake.cluster</span></code> provides functions to create finite clusters of different shapes.
+<code class="docutils literal notranslate"><span class="pre">flake.maps</span></code> combines substrate and cluster to compute static energy landscapes.
+<code class="docutils literal notranslate"><span class="pre">flake.dynamics</span></code> and <code class="docutils literal notranslate"><span class="pre">flake.sweep</span></code> run and parallelise overdamped Langevin MD.
+<code class="docutils literal notranslate"><span class="pre">flake.string_method</span></code> finds minimum energy paths and energy barriers.</p>
+<p>This software was developed at SISSA, Trieste, Italy in the group of Prof. Erio Tosatti and Andrea Vanossi,
+based on experiments by Xin Cao and Clemens Bechinger at the University of Konstanz, Germany.
+For questions or support contact <a class="reference external" href="mailto:ansilva&#37;&#52;&#48;sissa&#46;it">Andrea Silva</a>.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Intro</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#substrate">Substrate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#cluster">Cluster</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#static-maps">Static Maps</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#static-maps">Static maps</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="intro.html#translations">Translations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="intro.html#rotations">Rotations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="intro.html#roto-translations">Roto-translations</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#dynamics-maps">Dynamics Maps</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="intro.html#barrier-finding">Barrier finding</a></li>
-<li class="toctree-l3"><a class="reference internal" href="intro.html#molecular-dynamics">Molecular dynamics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#barrier-finding">Barrier finding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#molecular-dynamics">Molecular dynamics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="intro.html#equations-of-motion">Equations of motion</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#units">Units</a><ul>
@@ -123,69 +122,80 @@ For any question/support contanct <a class="reference external" href="mailto:ans
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#from-pip">From PIP</a></li>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#from-source">From source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#from-source-recommended">From source (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#examples">Examples</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="0-Substrate_types.html">Substrates</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="0-Substrate_types.html#Benchmark-substrate-potentials:-different-wells-and-symmetries">Benchmark substrate potentials: different wells and symmetries</a></li>
 <li class="toctree-l3"><a class="reference internal" href="0-Substrate_types.html#Lattice-substrate">Lattice substrate</a></li>
-<li class="toctree-l3"><a class="reference internal" href="0-Substrate_types.html#Plane-wave-substrate">Plane wave substrate</a></li>
-<li class="toctree-l3"><a class="reference internal" href="0-Substrate_types.html#Plot">Plot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="0-Substrate_types.html#Visualising-the-substrate">Visualising the substrate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="0-Substrate_types.html#Substrate-from-parameter-dictionary">Substrate from parameter dictionary</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="1-Cluster_creation.html">Cluster creation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="1-Cluster_creation.html#Set-up-lattice-and-size">Set up lattice and size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="1-Cluster_creation.html#Lattice-and-size">Lattice and size</a></li>
 <li class="toctree-l3"><a class="reference internal" href="1-Cluster_creation.html#Single-shape">Single shape</a></li>
-<li class="toctree-l3"><a class="reference internal" href="1-Cluster_creation.html#Do-all-shapes">Do all shapes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="1-Cluster_creation.html#Test-loading-from-params">Test loading from params</a></li>
+<li class="toctree-l3"><a class="reference internal" href="1-Cluster_creation.html#All-shapes">All shapes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="1-Cluster_creation.html#Cluster-from-parameter-dictionary">Cluster from parameter dictionary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="1-Cluster_creation.html#Load-from-POSCAR">Load from POSCAR</a></li>
-<li class="toctree-l3"><a class="reference internal" href="1-Cluster_creation.html#Cluster-from-Polygon-shape">Cluster from Polygon shape</a></li>
+<li class="toctree-l3"><a class="reference internal" href="1-Cluster_creation.html#Cluster-from-polygon-shape">Cluster from polygon shape</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="2-Cluster_on_substrate.html">Put a cluster on a substrate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="2-Cluster_on_substrate.html#Define-the-system">Define the system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2-Cluster_on_substrate.html">Cluster on a substrate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="2-Cluster_on_substrate.html#System-definition">System definition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="2-Cluster_on_substrate.html#Cluster">Cluster</a></li>
-<li class="toctree-l3"><a class="reference internal" href="2-Cluster_on_substrate.html#Snapshots">Snapshots</a></li>
-<li class="toctree-l3"><a class="reference internal" href="2-Cluster_on_substrate.html#Translational-landscape-driver">Translational landscape driver</a></li>
-<li class="toctree-l3"><a class="reference internal" href="2-Cluster_on_substrate.html#Rotational-landscape-driver">Rotational landscape driver</a></li>
-<li class="toctree-l3"><a class="reference internal" href="2-Cluster_on_substrate.html#Roto-trasl-map">Roto-trasl map</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2-Cluster_on_substrate.html#Snapshots-at-fixed-(theta,-pos_cm)">Snapshots at fixed (theta, pos_cm)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2-Cluster_on_substrate.html#Translational-energy-landscape">Translational energy landscape</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2-Cluster_on_substrate.html#Rotational-energy-landscape">Rotational energy landscape</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2-Cluster_on_substrate.html#Roto-translational-landscape">Roto-translational landscape</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="3-Barrier_from_stirng.html">Barrier</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="3-Barrier_from_stirng.html#Substrate">Substrate</a></li>
-<li class="toctree-l3"><a class="reference internal" href="3-Barrier_from_stirng.html#Cluster">Cluster</a></li>
-<li class="toctree-l3"><a class="reference internal" href="3-Barrier_from_stirng.html#Translation-landscape">Translation landscape</a></li>
-<li class="toctree-l3"><a class="reference internal" href="3-Barrier_from_stirng.html#id1">Barrier</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3-Barrier_from_string.html">Energy barrier and minimum energy path</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="3-Barrier_from_string.html#System-definition">System definition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="3-Barrier_from_string.html#Cluster">Cluster</a></li>
+<li class="toctree-l3"><a class="reference internal" href="3-Barrier_from_string.html#Translational-energy-landscape">Translational energy landscape</a></li>
+<li class="toctree-l3"><a class="reference internal" href="3-Barrier_from_string.html#2D-translational-MEP">2D translational MEP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="3-Barrier_from_string.html#3D-roto-translational-MEP">3D roto-translational MEP</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="4-Dynamics.html">Molecular dynamics: depinning under applied force and torque</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="4-Dynamics.html#System-definition">System definition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="4-Dynamics.html#Single-trajectory:-below-and-above-depinning">Single trajectory: below and above depinning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="4-Dynamics.html#Force-sweep:-translational-depinning">Force sweep: translational depinning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="4-Dynamics.html#Torque-sweep:-rotational-depinning">Torque sweep: rotational depinning</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="5-Scaling_laws.html">Scaling laws of translational static friction</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="5-Scaling_laws.html#Commensurate">Commensurate</a></li>
-<li class="toctree-l3"><a class="reference internal" href="5-Scaling_laws.html#Misaligned">Misaligned</a></li>
-<li class="toctree-l3"><a class="reference internal" href="5-Scaling_laws.html#Plot-the-different-scalings">Plot the different scalings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="5-Scaling_laws.html#Physics">Physics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="5-Scaling_laws.html#Method">Method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="5-Scaling_laws.html#System-setup">System setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="5-Scaling_laws.html#Grid-for-translational-map">Grid for translational map</a></li>
+<li class="toctree-l3"><a class="reference internal" href="5-Scaling_laws.html#Sweep-over-cluster-sizes:-circle-and-hexagon">Sweep over cluster sizes: circle and hexagon</a></li>
+<li class="toctree-l3"><a class="reference internal" href="5-Scaling_laws.html#Single-particle-reference">Single-particle reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="5-Scaling_laws.html#Scaling-plot:-all-shapes-together">Scaling plot: all shapes together</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="MD_depinning.html">MD of a depinning transition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MD_depinning.html">Depinning dynamics</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="modules.html#tools">Tools</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tool_create_substrate.html">Substrate</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tool_create_cluster.html">Cluster</a></li>
-<li class="toctree-l3"><a class="reference internal" href="string_method.html">String method</a></li>
-<li class="toctree-l3"><a class="reference internal" href="misc.html">Miscellanous</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tool_create_substrate.html">Substrate (flake.substrate)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tool_create_cluster.html">Cluster (flake.cluster)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="string_method.html">String method (flake.string_method)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="misc.html">I/O (flake.io)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="misc.html#module-flake.plot">Plotting (flake.plot)</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#static">Static</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="static_maps.html">Static Translation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="static_maps.html#module-static_roto_map">Static Rotation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="static_maps.html#module-static_rototrasl_map">Static Rotation and Translation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#static-maps">Static maps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="static_maps.html">Static maps (flake.maps)</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="modules.html#dynamics">Dynamics</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamic.html">Transition state barrier</a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamic.html#module-MD_rigid_rototrasl">Molecular Dynamics of rigid cluster</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamic.html">Dynamics (flake.dynamics)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamic.html#module-flake.sweep">Sweep infrastructure (flake.sweep)</a></li>
 </ul>
 </li>
 </ul>
@@ -194,7 +204,7 @@ For any question/support contanct <a class="reference external" href="mailto:ans
 </div>
 </section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>

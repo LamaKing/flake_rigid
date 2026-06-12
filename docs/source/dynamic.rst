@@ -1,15 +1,15 @@
-Transition state barrier
-=========================
+Dynamics (flake.dynamics)
+==========================
 
-.. automodule:: static_barrier_string
+.. automodule:: flake.dynamics
    :members:
    :undoc-members:
    :show-inheritance:
 
-Molecular Dynamics of rigid cluster
-=====================================
+Sweep infrastructure (flake.sweep)
+====================================
 
-.. automodule:: MD_rigid_rototrasl
+.. automodule:: flake.sweep
    :members:
    :undoc-members:
    :show-inheritance:

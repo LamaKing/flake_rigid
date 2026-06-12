@@ -73,8 +73,7 @@ def test_cm_at_origin(tri_lat, shape, n1, n2):
 def test_output_shape(tri_lat, shape, n1, n2):
     """make_cluster must return a 2-D array with shape (N, 2) for some N > 0."""
     a1, a2 = tri_lat
-    kwargs = {'rx': 2.5, 'ry': 1.5} if shape == 'ellipse' else {}
-    pos = make_cluster(a1, a2, n1, n2, shape=shape, **kwargs)
+    pos = make_cluster(a1, a2, n1, n2, shape=shape)
     assert pos.ndim == 2
     assert pos.shape[1] == 2
     assert pos.shape[0] > 0
@@ -155,11 +154,13 @@ def test_circle_radius(tri_lat):
 # ---------------------------------------------------------------------------
 
 def test_ellipse_bounds(tri_lat):
-    """All particles must satisfy (x/rx)^2 + (y/ry)^2 < 1."""
+    """All particles must satisfy (x/rx)^2 + (y/ry)^2 < 1, with rx=N1*|a1|, ry=N2*|a2|."""
     a1, a2 = tri_lat
-    rx, ry  = 2.5, 1.5
-    pos     = make_cluster(a1, a2, 6, 6, shape='ellipse', rx=rx, ry=ry)
-    xi      = (pos[:, 0] / rx)**2 + (pos[:, 1] / ry)**2
+    N1, N2 = 6, 4
+    pos    = make_cluster(a1, a2, N1, N2, shape='ellipse')
+    rx     = N1 * np.linalg.norm(a1)
+    ry     = N2 * np.linalg.norm(a2)
+    xi     = (pos[:, 0] / rx)**2 + (pos[:, 1] / ry)**2
     assert np.all(xi < 1.0 + 1e-9), (
         "Particle(s) outside ellipse: max xi=%.6f" % xi.max()
     )

@@ -1,30 +1,30 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Miscellanous &mdash; SLIDES 0.0.4 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>I/O (flake.io) &mdash; FLAKE 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Static Translation" href="static_maps.html" />
-    <link rel="prev" title="String method" href="string_method.html" /> 
+    <link rel="next" title="Static maps (flake.maps)" href="static_maps.html" />
+    <link rel="prev" title="String method (flake.string_method)" href="string_method.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,7 +36,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            SLIDES
+            FLAKE
               <img src="_static/logo_html.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -53,20 +53,31 @@
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="modules.html#tools">Tools</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="tool_create_substrate.html">Substrate</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tool_create_cluster.html">Cluster</a></li>
-<li class="toctree-l3"><a class="reference internal" href="string_method.html">String method</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Miscellanous</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#misc.get_brillouin_zone_2d"><code class="docutils literal notranslate"><span class="pre">get_brillouin_zone_2d()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#misc.handle_run"><code class="docutils literal notranslate"><span class="pre">handle_run()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#misc.plot_BZ2d"><code class="docutils literal notranslate"><span class="pre">plot_BZ2d()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#misc.plot_UC"><code class="docutils literal notranslate"><span class="pre">plot_UC()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#misc.plt_cosmetic"><code class="docutils literal notranslate"><span class="pre">plt_cosmetic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tool_create_substrate.html">Substrate (flake.substrate)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tool_create_cluster.html">Cluster (flake.cluster)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="string_method.html">String method (flake.string_method)</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">I/O (flake.io)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#flake.io.load_map"><code class="docutils literal notranslate"><span class="pre">load_map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.io.load_params"><code class="docutils literal notranslate"><span class="pre">load_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.io.load_trajectory"><code class="docutils literal notranslate"><span class="pre">load_trajectory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.io.make_sin_params"><code class="docutils literal notranslate"><span class="pre">make_sin_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.io.save_map"><code class="docutils literal notranslate"><span class="pre">save_map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.io.save_params"><code class="docutils literal notranslate"><span class="pre">save_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.io.save_trajectory"><code class="docutils literal notranslate"><span class="pre">save_trajectory()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-flake.plot">Plotting (flake.plot)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#public-api">Public API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.plot.get_brillouin_zone_2d"><code class="docutils literal notranslate"><span class="pre">get_brillouin_zone_2d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.plot.plot_BZ2d"><code class="docutils literal notranslate"><span class="pre">plot_BZ2d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.plot.plot_UC"><code class="docutils literal notranslate"><span class="pre">plot_UC()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.plot.plot_lattice_vectors"><code class="docutils literal notranslate"><span class="pre">plot_lattice_vectors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flake.plot.plt_cosmetic"><code class="docutils literal notranslate"><span class="pre">plt_cosmetic()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#static">Static</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#static-maps">Static maps</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modules.html#dynamics">Dynamics</a></li>
 </ul>
 </li>
@@ -78,7 +89,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">SLIDES</a>
+          <a href="index.html">FLAKE</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -87,7 +98,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">Modules</a></li>
-      <li class="breadcrumb-item active">Miscellanous</li>
+      <li class="breadcrumb-item active">I/O (flake.io)</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/misc.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -97,51 +108,186 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-misc">
-<span id="miscellanous"></span><h1>Miscellanous<a class="headerlink" href="#module-misc" title="Permalink to this heading"></a></h1>
+  <section id="module-flake.io">
+<span id="i-o-flake-io"></span><h1>I/O (flake.io)<a class="headerlink" href="#module-flake.io" title="Link to this heading"></a></h1>
+<p>File I/O for rigid-cluster simulations.</p>
+<p>HDF5 format (via h5py) is used for all numerical results.  Each dataset
+name in the file matches the dict key returned by the map functions.
+Metadata (scalar parameters, substrate/cluster settings) is stored as
+HDF5 attributes; numpy arrays and nested structures in params are
+serialised as JSON strings to avoid HDF5 group complexity.</p>
+<p>YAML format (via PyYAML) is used for human-editable parameter files.</p>
+<p>Neither h5py nor yaml is imported at module level – both are guarded
+so the module can be imported even if the optional dependency is absent;
+only the relevant function call raises ImportError.</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="misc.get_brillouin_zone_2d">
-<span class="sig-prename descclassname"><span class="pre">misc.</span></span><span class="sig-name descname"><span class="pre">get_brillouin_zone_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#misc.get_brillouin_zone_2d" title="Permalink to this definition"></a></dt>
-<dd><p>Generate the Brillouin Zone of a given 2D cell. The BZ is the Wigner-Seitz cell
-of the reciprocal lattice, which can be constructed by Voronoi decomposition
-to the reciprocal lattice.  A Voronoi diagram is a subdivision of the space
-into the nearest neighborhoods of a given set of points.</p>
-<p>See:
-<a class="reference external" href="https://en.wikipedia.org/wiki/Wigner%E2%80%93Seitz_cell">https://en.wikipedia.org/wiki/Wigner%E2%80%93Seitz_cell</a>
-<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/tutorial/spatial.html#voronoi-diagrams">https://docs.scipy.org/doc/scipy/reference/tutorial/spatial.html#voronoi-diagrams</a>
-<a class="reference external" href="http://staff.ustc.edu.cn/~zqj/posts/howto-plot-brillouin-zone/">http://staff.ustc.edu.cn/~zqj/posts/howto-plot-brillouin-zone/</a></p>
-<p>Returns list of vertices of the cell.</p>
+<dt class="sig sig-object py" id="flake.io.load_map">
+<span class="sig-prename descclassname"><span class="pre">flake.io.</span></span><span class="sig-name descname"><span class="pre">load_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.io.load_map" title="Link to this definition"></a></dt>
+<dd><p>Load HDF5 map file.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>(result_dict, params_dict)  –  both plain Python dicts.
+result_dict values are numpy arrays; params_dict values are
+Python scalars, strings, or dicts (JSON-decoded where applicable).</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="misc.handle_run">
-<span class="sig-prename descclassname"><span class="pre">misc.</span></span><span class="sig-name descname"><span class="pre">handle_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">driver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">move_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out.dat'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#misc.handle_run" title="Permalink to this definition"></a></dt>
-<dd><p>Change param file according to given key and value.
-Run the driver.
-Create a folder “key_value” according to key and value.
-Move parameter and output files in the folder.
-Return name of the folder.</p>
+<dt class="sig sig-object py" id="flake.io.load_params">
+<span class="sig-prename descclassname"><span class="pre">flake.io.</span></span><span class="sig-name descname"><span class="pre">load_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.io.load_params" title="Link to this definition"></a></dt>
+<dd><p>Load a YAML (or JSON) parameter file.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>filename: str – path to .yaml or .json file.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="misc.plot_BZ2d">
-<span class="sig-prename descclassname"><span class="pre">misc.</span></span><span class="sig-name descname"><span class="pre">plot_BZ2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ws_verts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'color':</span> <span class="pre">'tab:gray',</span> <span class="pre">'fill':</span> <span class="pre">False,</span> <span class="pre">'ls':</span> <span class="pre">'--',</span> <span class="pre">'lw':</span> <span class="pre">1}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#misc.plot_BZ2d" title="Permalink to this definition"></a></dt>
-<dd><p>Create a patch of the Brillouin Zone and add to MPL axis.</p>
-<p>Inputs are a matplolib axis to plot (e.g. plt.gca()) and list of vertices (e.g. computed by get_brillouin_zone_2d).
-Optionally dictionary with plotting parameters.</p>
-<p>Returns the axis and cell Polygon object</p>
+<dt class="sig sig-object py" id="flake.io.load_trajectory">
+<span class="sig-prename descclassname"><span class="pre">flake.io.</span></span><span class="sig-name descname"><span class="pre">load_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.io.load_trajectory" title="Link to this definition"></a></dt>
+<dd><p>Load HDF5 trajectory file.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>(traj_dict, params_dict)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="misc.plot_UC">
-<span class="sig-prename descclassname"><span class="pre">misc.</span></span><span class="sig-name descname"><span class="pre">plot_UC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'color':</span> <span class="pre">'tab:gray',</span> <span class="pre">'ls':</span> <span class="pre">':',</span> <span class="pre">'lw':</span> <span class="pre">1}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#misc.plot_UC" title="Permalink to this definition"></a></dt>
-<dd><p>Shortcut to plot the unit cell of the lattice</p>
+<dt class="sig sig-object py" id="flake.io.make_sin_params">
+<span class="sig-prename descclassname"><span class="pre">flake.io.</span></span><span class="sig-name descname"><span class="pre">make_sin_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_symmetry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spacing</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.io.make_sin_params" title="Link to this definition"></a></dt>
+<dd><p>Build substrate parameter dict for an n-fold sinusoidal potential.</p>
+<p>Equivalent to running create_PW_sub.py from the old snips/ directory.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>n_symmetry: int   – fold symmetry (2, 3, 4, 5, or 6).
+spacing:    float – lattice spacing (same units as cluster positions).</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict with keys ‘well_shape’ and ‘ks’ ready to merge into a full
+params dict.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: if n_symmetry is not in {2, 3, 4, 5, 6}.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="misc.plt_cosmetic">
-<span class="sig-prename descclassname"><span class="pre">misc.</span></span><span class="sig-name descname"><span class="pre">plt_cosmetic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'y'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#misc.plt_cosmetic" title="Permalink to this definition"></a></dt>
-<dd><p>Adjust ax for plotting: lines at x=0 y=0, set xylabels and aspect as equal</p>
+<dt class="sig sig-object py" id="flake.io.save_map">
+<span class="sig-prename descclassname"><span class="pre">flake.io.</span></span><span class="sig-name descname"><span class="pre">save_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.io.save_map" title="Link to this definition"></a></dt>
+<dd><p>Save a map result dict to HDF5.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>result_dict: dict of numpy arrays (output of translational_map etc.).
+filename:    str – output path (should end in .h5 or .hdf5).
+params:      optional dict of scalar/string/array metadata.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="flake.io.save_params">
+<span class="sig-prename descclassname"><span class="pre">flake.io.</span></span><span class="sig-name descname"><span class="pre">save_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.io.save_params" title="Link to this definition"></a></dt>
+<dd><p>Save a parameter dict to YAML.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>params:   dict – parameters to write.
+filename: str  – output path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="flake.io.save_trajectory">
+<span class="sig-prename descclassname"><span class="pre">flake.io.</span></span><span class="sig-name descname"><span class="pre">save_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.io.save_trajectory" title="Link to this definition"></a></dt>
+<dd><p>Save an MD trajectory dict to HDF5.</p>
+<p>Expected keys: ‘t’, ‘energy’, ‘pos_cm’, ‘vel_cm’, ‘theta’,
+‘omega’, ‘force’, ‘torque’.  Any subset is accepted.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>traj_dict: dict of numpy arrays.
+filename:  str – output path.
+params:    optional dict of metadata.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-flake.plot">
+<span id="plotting-flake-plot"></span><h1>Plotting (flake.plot)<a class="headerlink" href="#module-flake.plot" title="Link to this heading"></a></h1>
+<p>Plotting utilities for FLAKE.</p>
+<section id="public-api">
+<h2>Public API<a class="headerlink" href="#public-api" title="Link to this heading"></a></h2>
+<blockquote>
+<div><p>plot_UC              – draw the real-space unit cell on a matplotlib axis.
+get_brillouin_zone_2d – compute BZ vertices via Voronoi decomposition.
+plot_BZ2d            – add BZ polygon patch to a matplotlib axis.
+plt_cosmetic         – set axis labels, zero lines, and equal aspect.
+plot_lattice_vectors – draw primitive lattice vectors as arrows.</p>
+</div></blockquote>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="flake.plot.get_brillouin_zone_2d">
+<span class="sig-prename descclassname"><span class="pre">flake.plot.</span></span><span class="sig-name descname"><span class="pre">get_brillouin_zone_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.plot.get_brillouin_zone_2d" title="Link to this definition"></a></dt>
+<dd><p>Compute the vertices of the 2D Brillouin Zone (Wigner-Seitz cell of reciprocal lattice).</p>
+<p>Uses Voronoi decomposition of the reciprocal lattice.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>cell: (2, 2) array-like – rows are the two reciprocal lattice vectors.</p>
+</dd>
+<dt>Returns:</dt><dd><p>(M, 2) float64 ndarray – vertices of the BZ polygon.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="flake.plot.plot_BZ2d">
+<span class="sig-prename descclassname"><span class="pre">flake.plot.</span></span><span class="sig-name descname"><span class="pre">plot_BZ2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ws_verts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.plot.plot_BZ2d" title="Link to this definition"></a></dt>
+<dd><p>Add the Brillouin Zone polygon to a matplotlib axis.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>ax:       matplotlib Axes.
+ws_verts: (M, 2) array-like – BZ vertices (e.g. from get_brillouin_zone_2d).
+params:   dict – Polygon kwargs (ls, color, lw, fill, …).</p>
+</dd>
+<dt>Returns:</dt><dd><p>(ax, ws_cell) – axis and the Polygon patch.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="flake.plot.plot_UC">
+<span class="sig-prename descclassname"><span class="pre">flake.plot.</span></span><span class="sig-name descname"><span class="pre">plot_UC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.plot.plot_UC" title="Link to this definition"></a></dt>
+<dd><p>Draw the real-space unit cell spanned by u[0], u[1] on ax.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>ax:     matplotlib Axes.
+u:      (2, 2) array-like – two primitive lattice vectors.
+params: dict – line style kwargs forwarded to ax.plot.</p>
+</dd>
+<dt>Returns:</dt><dd><p>ax</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="flake.plot.plot_lattice_vectors">
+<span class="sig-prename descclassname"><span class="pre">flake.plot.</span></span><span class="sig-name descname"><span class="pre">plot_lattice_vectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('tab:red',</span> <span class="pre">'tab:orange')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('b1',</span> <span class="pre">'b2')</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.plot.plot_lattice_vectors" title="Link to this definition"></a></dt>
+<dd><p>Draw the two primitive lattice vectors as arrows from the origin.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>ax:     matplotlib Axes.
+S:      (2, 2) array-like – rows are the two lattice vectors.
+colors: tuple of str – arrow colours.
+labels: tuple of str – legend labels.</p>
+</dd>
+<dt>Returns:</dt><dd><p>ax</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="flake.plot.plt_cosmetic">
+<span class="sig-prename descclassname"><span class="pre">flake.plot.</span></span><span class="sig-name descname"><span class="pre">plt_cosmetic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'y'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#flake.plot.plt_cosmetic" title="Link to this definition"></a></dt>
+<dd><p>Add zero lines, axis labels and equal aspect to ax.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>ax:     matplotlib Axes.
+xlabel: str – x-axis label.
+ylabel: str – y-axis label.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -150,8 +296,8 @@ Optionally dictionary with plotting parameters.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="string_method.html" class="btn btn-neutral float-left" title="String method" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="static_maps.html" class="btn btn-neutral float-right" title="Static Translation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="string_method.html" class="btn btn-neutral float-left" title="String method (flake.string_method)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="static_maps.html" class="btn btn-neutral float-right" title="Static maps (flake.maps)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

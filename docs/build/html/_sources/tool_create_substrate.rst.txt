@@ -1,7 +1,7 @@
-Substrate
-===================
+Substrate (flake.substrate)
+===========================
 
-.. automodule:: tool_create_substrate
+.. automodule:: flake.substrate
    :members:
    :undoc-members:
    :show-inheritance:

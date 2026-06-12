@@ -282,10 +282,9 @@ def make_cluster(a1, a2, N1, N2, shape='circle'):
 
     Args:
         a1, a2: array-like (2,) -- primitive lattice vectors.
-        N1, N2: int             -- grid repetitions (shape-dependent meaning,
-                                   see module docstring for per-shape semantics).
-        shape:  str             -- one of 'circle', 'hexagon', 'rectangle',
-                                   'triangle', 'parallelogram', 'ellipse'.
+        N1, N2: int -- grid repetitions; meaning depends on shape (see module docstring).
+        shape: str -- one of 'circle', 'hexagon', 'rectangle', 'triangle',
+            'parallelogram', 'ellipse'.
 
     Returns:
         (N, 2) float64 ndarray -- particle positions with CM at origin.
@@ -548,8 +547,9 @@ def params_from_poscar(filename, cut_z=0, tol=0.9):
         tol:      float -- fractional tolerance on cut_z (default 0.9).
 
     Returns:
-        dict with keys: 'a1', 'a2', 'cl_basis'
-        pos_z: (M,) array of z coordinates of discarded atoms (for inspection).
+        Tuple ``(params_dict, pos_z)`` where ``params_dict`` has keys
+        ``'a1', 'a2', 'cl_basis'`` and ``pos_z`` is a ``(M,)`` array of
+        z coordinates of atoms excluded by the z filter.
 
     Raises:
         ImportError:  if ASE is not installed.
