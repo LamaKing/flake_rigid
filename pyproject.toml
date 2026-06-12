@@ -15,7 +15,6 @@ dependencies = [
     "numpy",
     "scipy",
     "numba",
-    "monty",
 ]
 keywords = ["simulation", "physics", "friction", "nanoscale-molecular-dynamics"]
 classifiers = [
@@ -32,6 +31,18 @@ dev = [
     "pytest",
     "pytest-cov",
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["flake*"]
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (run with: pytest -m slow)",
+]
+
+[project.scripts]
+drift = "flake.cli:main"
 
 [project.urls]
 "Homepage" = "https://slides-rigid.readthedocs.io/en/latest/"
