@@ -1,0 +1,27 @@
+# Translational depinning sweep: vary Fx from 0 to 300.
+# Analytical prediction for commensurate cluster N=85 on triangular sin substrate:
+#   F1s = max|Fx| single particle ~ 2.793 (at y=0, computed analytically)
+#   Fc  = N * F1s = 85 * 2.793 ~ 237.4
+# The sweep range [150, 300] brackets Fc with margin.
+#
+# post_fn=drift_velocity: returns (vx, vy) = (x_f - x_0)/(t_f - t_0).
+# Pinned: vx ~ 0. Sliding: vx > 0, grows linearly above Fc.
+#
+# kBT=1e-8: thermally negligible at epsilon=1, regularises saddle-point
+# crossings in the Euler-Maruyama integrator.
+sweep_type: grid
+grid:
+  Fx: [0, 30, 60, 100, 110, 120, 130, 140, 150.0, 160.0, 170.0, 180.0, 190.0, 200.0, 210.0, 215.0, 220.0, 225.0,
+       230.0, 232.0, 234.0, 236.0, 238.0, 240.0, 242.0, 244.0, 246.0, 248.0,
+       250.0, 255.0, 260.0, 265.0, 270.0, 280.0, 290.0, 300.0, 400, 500, 600]
+base_md_kwargs:
+  eta: 1.0
+  kBT: 1.0e-8
+  dt: 1.0e-3
+  n_steps: 200000
+  print_every: 500
+post_fn: drift_velocity
+save_traj: true
+n_jobs: 4
+backend: loky
+outdir: sweep_Fx_out

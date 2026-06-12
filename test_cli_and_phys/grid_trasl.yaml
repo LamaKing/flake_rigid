@@ -1,0 +1,11 @@
+# Translational energy map: E(x_cm, y_cm) at theta=0.
+# well_shape=sin has no unit cell, so Cartesian x_range/y_range are required.
+# For the triangular substrate with spacing=1: period = 2*pi/|k| = 1.5.
+# Covering [-1.5, 1.5] = 2 full periods in each direction gives a clear
+# view of the hexagonal pattern without redundancy.
+map_type: translational
+x_range: [-1.5, 1.5]
+y_range: [-1.5, 1.5]
+n_x: 150
+n_y: 150
+n_jobs: 4

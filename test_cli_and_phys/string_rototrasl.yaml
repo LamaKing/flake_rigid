@@ -1,0 +1,18 @@
+# 3D roto-translational MEP: one lattice step in x AND one angular period.
+# This path connects two equivalent commensurate minima that differ by
+# both a lattice translation (b1=[1,0]) and a rotation (60 deg).
+#
+# Physical meaning: the cluster crosses the barrier along the coupled
+# translation-rotation channel -- the typical depinning path in
+# moire friction experiments (cf. PRX 2022 paper).
+#
+# scale=[1,1,60]: same metric as string_roto.yaml.
+# The y coordinate is free to relax; if symmetry holds it stays ~0.
+p0: [0.0, 0.0,  0.0]
+p1: [1.0, 0.0, 60.0]
+scale: [1.0, 1.0, 60.0]
+n_points: 200
+n_iter: 5000
+step: 1.0e-4
+tol: 1.0e-3
+fix_ends: true

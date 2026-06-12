@@ -1,0 +1,7 @@
+# Rotational energy map: E(theta) at pos_cm=(0,0).
+# Two full periods (120 deg) to confirm the 60-deg periodicity
+# expected for triangular-on-triangular commensurate contact.
+map_type: rotational
+theta_range: [0.0, 120.0]
+n_theta: 600
+n_jobs: 4

@@ -1,0 +1,18 @@
+# 3D roto-translational MEP: pure rotation from theta=0 to theta=60 deg.
+# p0 and p1 have 3 components: [x_cm, y_cm, theta_deg].
+# pos is kept in reference frame (theta=0); string_method rotates internally.
+#
+# scale=[1,1,60]: arc-length metric weights.
+#   lx=ly=1 (substrate lattice spacing), ltheta=60 (angular period).
+#   This ensures x,y and theta contribute equally to the path metric.
+#
+# The barrier here is the pure rotational barrier: how much energy
+# costs to rotate the commensurate cluster by one angular period.
+p0: [0.0, 0.0,  0.0]
+p1: [0.0, 0.0, 60.0]
+scale: [1.0, 1.0, 60.0]
+n_points: 200
+n_iter: 5000
+step: 1.0e-4
+tol: 1.0e-3
+fix_ends: true

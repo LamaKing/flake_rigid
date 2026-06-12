@@ -1,0 +1,32 @@
+# Commensurate triangular cluster on sinusoidal triangular substrate.
+# rho=1: cluster and substrate have the same lattice spacing.
+# This is the maximum-barrier case for translational and rotational depinning.
+#
+# Wave vectors from get_ks(1, 3, 4/3, 0):
+#   n=3 plane waves, c_n=4/3, alpha=0.
+#   Precomputed values (run get_ks once and paste here).
+#   |k| = c_n * pi / R = 4/3 * pi ~ 4.189
+
+# --- substrate ---
+well_shape: sin
+epsilon: 1.0
+sub_basis:
+  - [0.0, 0.0]
+ks:
+  - [ 4.1887902 ,  0.        ] 
+  - [-2.0943951 ,  3.62759873] 
+  - [-2.0943951 , -3.62759873]  
+# --- cluster ---
+# Triangular lattice, same spacing as substrate (commensurate).
+cluster_shape: circle
+N1: 9
+N2: 9
+cl_basis:
+  - [0.0, 0.0]
+a1: [1.0, 0.0]
+a2: [0.5, -0.8660254037844386]
+
+# theta=0: reference frame (cluster_from_params output).
+# pos_cm is ignored at CLI level; initial conditions go in sweep/string configs.
+theta: 0.0
+pos_cm: [0.0, 0.0]

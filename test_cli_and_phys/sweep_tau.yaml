@@ -1,0 +1,24 @@
+# Rotational depinning sweep: vary external torque Tau from 0 to 2000.
+# Rough estimate: tau_c ~ Fc * (eta_r/eta_t) ~ 237 * 5 ~ 1200.
+# The sweep range [0, 2000] brackets the expected threshold.
+# Dense sampling near the expected threshold (800-1600).
+#
+# post_fn=drift_velocity returns (vx, vy); for pure rotation vx~0.
+# Use last_state to also track theta_final and omega.
+# We use drift_velocity here and compute omega manually in the analysis script.
+sweep_type: grid
+grid:
+  Tau: [0.0, 200.0, 400.0, 600.0, 700.0, 800.0, 850.0, 900.0, 950.0,
+        1000.0, 1050.0, 1100.0, 1150.0, 1200.0, 1250.0, 1300.0, 1350.0,
+        1400.0, 1500.0, 1600.0, 1800.0, 2000.0, 3000, 4000, 5000, 6000]
+base_md_kwargs:
+  eta: 1.0
+  kBT: 1.0e-8
+  dt: 1.0e-3
+  n_steps: 200000
+  print_every: 500
+post_fn: drift_omega 
+save_traj: true
+n_jobs: 4
+backend: loky
+outdir: sweep_tau_out
