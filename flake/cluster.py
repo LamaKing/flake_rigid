@@ -15,7 +15,7 @@ control the cluster size.  The precise meaning of N1, N2 depends on shape:
     rectangle    : N1 (N2) cells along the a1 (a2) direction
     triangle     : triangle spanned by N1*a1, N2*a2
     parallelogram: sqrt(N1*N2) x sqrt(N1*N2) lattice (sqrt must be odd int)
-    ellipse      : search grid; semi-axes rx, ry given in physical units
+    ellipse      : semi-axes rx = N1*|a1|, ry = N2*|a2|
 
 Units follow the calling code; no unit conversion is done here.
 
@@ -231,22 +231,21 @@ def _make_cluster_parallelogram(a1, a2, N1, N2):
     return pos
 
 
-def _make_cluster_ellipse(a1, a2, N1, N2, rx, ry):
-    """Build an elliptical cluster with semi-axes rx and ry.
+def _make_cluster_ellipse(a1, a2, N1, N2):
+    """Build an elliptical cluster with semi-axes rx = N1*|a1|, ry = N2*|a2|.
 
     Includes all lattice points satisfying (x/rx)^2 + (y/ry)^2 < 1.
-    N1, N2 control the grid search radius; increase them if the ellipse
-    extends beyond 2*(N1+N2) lattice spacings.
+    This is consistent with how N1, N2 scale the cluster for other shapes.
 
     Args:
         a1, a2: (2,) float64 -- primitive lattice vectors.
-        N1, N2: int          -- search grid half-size.
-        rx:     float        -- semi-axis along x (same units as a1, a2).
-        ry:     float        -- semi-axis along y.
+        N1, N2: int          -- semi-axes in units of |a1| and |a2|.
 
     Returns:
         (N, 2) float64 ndarray, CM at origin.
     """
+    rx  = N1 * np.sqrt(a1[0]*a1[0] + a1[1]*a1[1])
+    ry  = N2 * np.sqrt(a2[0]*a2[0] + a2[1]*a2[1])
     M   = 2 * (N1 + N2)
     rx2 = rx * rx
     ry2 = ry * ry
@@ -278,24 +277,22 @@ _SHAPE_FUNCS = {
 }
 
 
-def make_cluster(a1, a2, N1, N2, shape='circle', **shape_kwargs):
+def make_cluster(a1, a2, N1, N2, shape='circle'):
     """Build a finite-size 2D lattice cluster of the requested shape.
 
     Args:
-        a1, a2:       array-like (2,) -- primitive lattice vectors.
-        N1, N2:       int             -- grid repetitions (shape-dependent meaning).
-        shape:        str             -- one of 'circle', 'hexagon', 'rectangle',
-                                        'triangle', 'parallelogram', 'ellipse'.
-        **shape_kwargs:               -- extra arguments forwarded to the internal
-                                        builder.  Currently used only for 'ellipse'
-                                        (rx, ry: float semi-axes in physical units).
+        a1, a2: array-like (2,) -- primitive lattice vectors.
+        N1, N2: int             -- grid repetitions (shape-dependent meaning,
+                                   see module docstring for per-shape semantics).
+        shape:  str             -- one of 'circle', 'hexagon', 'rectangle',
+                                   'triangle', 'parallelogram', 'ellipse'.
 
     Returns:
         (N, 2) float64 ndarray -- particle positions with CM at origin.
 
     Raises:
-        ValueError:         if shape is not recognised, or if shape constraints
-                            are violated (e.g. parallelogram with even sqrt(N)).
+        ValueError: if shape is not recognised, or if shape constraints
+                    are violated (e.g. parallelogram with even sqrt(N)).
     """
     if shape not in _SHAPE_FUNCS:
         raise ValueError(
@@ -304,7 +301,7 @@ def make_cluster(a1, a2, N1, N2, shape='circle', **shape_kwargs):
         )
     a1 = np.asarray(a1, dtype=np.float64)
     a2 = np.asarray(a2, dtype=np.float64)
-    return _SHAPE_FUNCS[shape](a1, a2, int(N1), int(N2), **shape_kwargs)
+    return _SHAPE_FUNCS[shape](a1, a2, int(N1), int(N2))
 
 
 # ============================================================
@@ -418,7 +415,7 @@ def cluster_from_params(params):
         cl_poly:   vertex list for polygon masking (required if shape='polygon').
         direction: polygon masking direction -- 0 interior, 1 exterior.
         theta:     float, rotation in degrees applied after cluster creation.
-        rx, ry:    semi-axes for ellipse shape.
+        (ellipse semi-axes are N1*|a1| and N2*|a2|; no extra keys needed.)
 
     Returns:
         (N, 2) float64 ndarray, CM at origin.
@@ -434,11 +431,7 @@ def cluster_from_params(params):
         direction = params.get('direction', 0)
         return cluster_poly(poly, params, direction)
 
-    shape_kwargs = {}
-    if shape == 'ellipse':
-        shape_kwargs['rx'] = float(params['rx'])
-        shape_kwargs['ry'] = float(params['ry'])
-    pos = make_cluster(a1, a2, N1, N2, shape=shape, **shape_kwargs)
+    pos = make_cluster(a1, a2, N1, N2, shape=shape)
 
     basis = np.array(params.get('cl_basis', [[0.0, 0.0]]), dtype=np.float64)
     pos   = add_basis(pos, basis)
