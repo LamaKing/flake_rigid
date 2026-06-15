@@ -1,5 +1,5 @@
 
-![logo](docs/source/_static/logo_html.png)
+![logo](https://raw.githubusercontent.com/LamaKing/flake_rigid/main/docs/source/_static/logo_html.png)
 
 # FLAKE — Friction and Lattice Analysis of Kinetics and Energetics
 
