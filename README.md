@@ -1,5 +1,5 @@
 
-![logo](docs/source/_static/logo_acronym.png)
+![logo](docs/source/_static/logo_html.png)
 
 # FLAKE — Friction and Lattice Analysis of Kinetics and Energetics
 
