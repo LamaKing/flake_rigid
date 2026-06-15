@@ -6,15 +6,15 @@ FLAKE is written in Python 3 (>=3.10). Required dependencies (installed automati
 - numpy
 - scipy
 - numba
+- pyyaml (CLI YAML input)
+- h5py (HDF5 map/trajectory files)
+- joblib (parallel sweeps)
 
 Optional dependencies (for examples and documentation):
 
 - matplotlib
 - shapely
 - ase (for POSCAR import)
-- h5py (for HDF5 map/trajectory files)
-- joblib (for parallel sweeps)
-- pyyaml (for CLI YAML input)
 
 From PyPI
 ---------

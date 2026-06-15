@@ -201,7 +201,7 @@ sweeps.
 
 # Research Impact
 
-FLAKE v0.1.0 is the formalized, tested, and packaged release of a codebase
+FLAKE v0.1.2 is the formalized, tested, and packaged release of a codebase
 developed from 2022 onward at SISSA. The predecessor (v0.0.6, publicly
 available since November 2022 with ReadTheDocs documentation) was the
 primary simulation tool for the following published studies:
@@ -219,7 +219,7 @@ The colloidal experiments interpreted in @cao_orientational_2019 (Nature
 Physics) and @cao_pervasive_2021 (Physical Review E) motivated the
 roto-translational coupling design of the package.
 
-Version 0.1.0 adds a correct FDT noise implementation, a full-JIT MD inner
+Version 0.1.2 adds a correct FDT noise implementation, a full-JIT MD inner
 loop (10–50x faster than the v0.0.6 Python loop for long trajectories), the
 roto-translational string method, a flat substrate option for testing, and a
 complete test suite (125 unit and physics tests). The package is currently

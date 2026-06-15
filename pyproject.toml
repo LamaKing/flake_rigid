@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "flake-rigid"
-version = "0.1.1"
+version = "0.1.2"
 authors = [
   { name="Andrea Silva", email="ansilva@sissa.it" },
 ]
@@ -15,6 +15,9 @@ dependencies = [
     "numpy",
     "scipy",
     "numba",
+    "pyyaml",
+    "h5py",
+    "joblib",
 ]
 keywords = ["simulation", "physics", "friction", "nanoscale-molecular-dynamics"]
 classifiers = [
