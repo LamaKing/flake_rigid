@@ -1,8 +1,8 @@
 .. FLAKE documentation master file
 
-.. image:: _static/logo.png
+.. image:: _static/logo_acronym.png
 
-FLAKE — rigid cluster friction simulator
+FLAKE - rigid cluster friction simulator
 =========================================
 
 Compute the interlocking potential between a periodic substrate and a finite-size adsorbate, in the rigid approximation.

@@ -3,12 +3,12 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "slides-rigid"
+name = "flake-rigid"
 version = "0.1.0"
 authors = [
   { name="Andrea Silva", email="ansilva@sissa.it" },
 ]
-description = "SuperLubric Interface DESigner: statics and dynamics of 2D rigid cluster over a substrate."
+description = "Friction and Lattice Analysis of Kinetics and Energetics: statics and overdamped Langevin dynamics of a 2D rigid cluster over a substrate."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

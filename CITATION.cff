@@ -7,8 +7,8 @@ authors:
   - family-names: Silva
     given-names: Andrea
     email: ansilva@sissa.it
-    affiliation: "SISSA, Trieste, Italy"
-    orcid: "https://orcid.org/TODO"
+    affiliation: "SISSA and CNR-IOM, Trieste, Italy"
+    orcid: "https://orcid.org/0000-0001-6699-8115"
 repository-code: "https://github.com/LamaKing/slides_rigid"
 license: GPL-3.0
 keywords:
@@ -74,6 +74,51 @@ references:
     start: 021059
     year: 2022
     doi: "10.1103/PhysRevX.12.021059"
+  - type: article
+    title: >
+      Pervasive orientational and directional locking at geometrically
+      heterogeneous sliding interfaces
+    authors:
+      - family-names: Cao
+        given-names: Xin
+      - family-names: Panizon
+        given-names: Emanuele
+      - family-names: Vanossi
+        given-names: Andrea
+      - family-names: Manini
+        given-names: Nicola
+      - family-names: Tosatti
+        given-names: Erio
+      - family-names: Bechinger
+        given-names: Clemens
+    journal: "Physical Review E"
+    volume: 103
+    issue: 1
+    start: 012606
+    year: 2021
+    doi: "10.1103/PhysRevE.103.012606"
+  - type: article
+    title: >
+      Orientational and directional locking of colloidal clusters driven across
+      periodic surfaces
+    authors:
+      - family-names: Cao
+        given-names: Xin
+      - family-names: Panizon
+        given-names: Emanuele
+      - family-names: Vanossi
+        given-names: Andrea
+      - family-names: Manini
+        given-names: Nicola
+      - family-names: Bechinger
+        given-names: Clemens
+    journal: "Nature Physics"
+    volume: 15
+    issue: 8
+    start: 776
+    end: 780
+    year: 2019
+    doi: "10.1038/s41567-019-0515-7"
   - type: article
     title: >
       Twisting dynamics of large lattice-mismatch van der Waals heterostructures

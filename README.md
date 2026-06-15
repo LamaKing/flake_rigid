@@ -1,7 +1,7 @@
 
 ![logo](https://github.com/LamaKing/slides_rigid/assets/19472018/04d7b496-8ed0-4655-beed-f5092dface51)
 
-# FLAKE — rigid cluster friction simulator
+# FLAKE — Friction and Lattice Analysis of Kinetics and Energetics
 
 FLAKE computes the interlocking potential between a periodic substrate and a finite-size adsorbate, in the rigid approximation.
 The adsorbate is treated as a rigid body at a given orientation $\theta$ and center of mass (CM) position $x_\mathrm{cm}, y_\mathrm{cm}$.
@@ -70,19 +70,20 @@ See `examples/2-Cluster_on_substrate.ipynb` for details.
 ## Barrier finding
 
 The minimum energy path (MEP) between two configurations in $(x_\mathrm{cm}, y_\mathrm{cm})$ or $(x_\mathrm{cm}, y_\mathrm{cm}, \theta)$ space is found with the string method [6] implemented in `flake.string_method`.
-The maximum energy along the MEP is the static friction force Fs.
+The maximum energy along the MEP gives the static friction force $F_s = \max_s |\nabla E|$.
 
-See `examples/3-Barrier_from_stirng.ipynb` for details.
+See `examples/3-Barrier_from_string.ipynb` for details.
 
 ## Molecular dynamics
 
 `flake.dynamics.run_md` integrates the overdamped Langevin equation:
 
-$$\gamma_t \frac{d\mathbf{r}}{dt} = \mathbf{F}_\mathrm{ext} - \nabla U + \text{noise}$$
+$$\eta_t \frac{d\mathbf{r}_\mathrm{cm}}{dt} = \mathbf{F}_\mathrm{ext} + \mathbf{F}_\mathrm{sub} + \boldsymbol{\xi}_t$$
 
-$$\gamma_r \frac{d\theta}{dt} = \tau_\mathrm{ext} - \frac{dU}{d\theta} + \text{noise}$$
+$$\eta_r \frac{d\theta}{dt} = \tau_\mathrm{ext} + \tau_\mathrm{sub} + \xi_r$$
 
-The drag coefficients are $\gamma_t = N\gamma$ and $\gamma_r = \gamma \sum_i r_i^2$.
+The drag coefficients $\eta_t = N\eta$ and $\eta_r = \eta \sum_i r_i^2$ are computed from the cluster geometry by `calc_cluster_langevin`.
+Noise satisfies the fluctuation-dissipation theorem: $\langle \xi_i \xi_j \rangle = 2k_BT\eta_i\,\delta_{ij}\delta(t-t')$.
 Sweep infrastructure (`flake.sweep`) parallelises trajectories over a grid of external drives.
 
 See `examples/4-Dynamics.ipynb` for depinning sweeps.
