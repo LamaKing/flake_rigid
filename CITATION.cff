@@ -9,7 +9,7 @@ authors:
     email: ansilva@sissa.it
     affiliation: "SISSA and CNR-IOM, Trieste, Italy"
     orcid: "https://orcid.org/0000-0001-6699-8115"
-repository-code: "https://github.com/LamaKing/slides_rigid"
+repository-code: "https://github.com/LamaKing/flake_rigid"
 license: GPL-3.0
 keywords:
   - friction

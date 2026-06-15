@@ -9,19 +9,22 @@ The adsorbate is treated as a rigid body at a given orientation $\theta$ and cen
 This package implements the physical system and automates routines needed to study the statics, dynamics, and scaling laws of friction at nanoscale interfaces.
 It was developed at SISSA, Trieste, Italy in the group of Prof. Erio Tosatti and Andrea Vanossi, based on experiments by Xin Cao and Clemens Bechinger at the University of Konstanz, Germany.
 
-See the [documentation](https://slides-rigid.readthedocs.io/en/latest/) for more details.
+See the [documentation](https://flake-rigid.readthedocs.io/en/latest/) for more details.
 
 ## Installation
 
-Clone the repository and install in editable mode with the development extras:
+```console
+pip install flake-rigid
+```
+
+Or clone and install in editable mode (for development):
 
 ```console
-git clone https://github.com/LamaKing/slides_rigid.git
-cd slides_rigid
+git clone https://github.com/LamaKing/flake_rigid.git
+cd flake_rigid
 pip install -e ".[dev]"
 ```
 
-This registers the `flake` command-line entry point.
 Numba will JIT-compile the hot loops on first run; subsequent runs are fast.
 
 ## Quick start

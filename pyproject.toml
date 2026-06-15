@@ -45,5 +45,5 @@ markers = [
 flake = "flake.cli:main"
 
 [project.urls]
-"Homepage" = "https://slides-rigid.readthedocs.io/en/latest/"
-"Source" = "https://github.com/LamaKing/slides_rigid"
+"Homepage" = "https://flake-rigid.readthedocs.io/en/latest/"
+"Source" = "https://github.com/LamaKing/flake_rigid"
