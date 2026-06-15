@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it and the reference papers below."
 title: "FLAKE: Friction and Lattice Analysis of Kinetics and Energetics"
-version: "0.1.0"
+version: "0.1.1"
 date-released: "2025"
 authors:
   - family-names: Silva
