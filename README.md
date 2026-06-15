@@ -1,5 +1,5 @@
 
-![logo](https://github.com/LamaKing/slides_rigid/assets/19472018/04d7b496-8ed0-4655-beed-f5092dface51)
+![logo](docs/source/_static/logo_acronym.png)
 
 # FLAKE — Friction and Lattice Analysis of Kinetics and Energetics
 
