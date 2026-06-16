@@ -28,6 +28,8 @@ This installs the ``flake`` command-line entry point and all required dependenci
 From source
 -----------
 
+Source code is hosted at `https://github.com/LamaKing/flake_rigid <https://github.com/LamaKing/flake_rigid>`_.
+
 Clone the repository and install in editable mode (recommended for development):
 
 .. code-block:: console

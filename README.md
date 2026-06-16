@@ -9,7 +9,7 @@ The adsorbate is treated as a rigid body at a given orientation $\theta$ and cen
 This package implements the physical system and automates routines needed to study the statics, dynamics, and scaling laws of friction at nanoscale interfaces.
 It was developed at SISSA, Trieste, Italy in the group of Prof. Erio Tosatti and Andrea Vanossi, based on experiments by Xin Cao and Clemens Bechinger at the University of Konstanz, Germany.
 
-See the [documentation](https://flake-rigid.readthedocs.io/en/latest/) for more details.
+See the [documentation](https://flake-rigid.readthedocs.io/en/latest/) or the [source on GitHub](https://github.com/LamaKing/flake_rigid) for more details.
 
 ## Installation
 

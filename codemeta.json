@@ -1,0 +1,23 @@
+{
+  "@context": "https://raw.githubusercontent.com/codemeta/codemeta/master/codemeta.jsonld",
+  "@type": "Code",
+  "author": [
+    {
+      "@id": "0000-0001-6699-8115",
+      "@type": "Person",
+      "email": "ansilva@sissa.it",
+      "name": "Andrea Silva",
+      "affiliation": "SISSA, CNR-IOM, Trieste, Italy"
+    }
+  ],
+  "identifier": "",
+  "codeRepository": "https://github.com/LamaKing/flake_rigid",
+  "datePublished": "2026-06-16",
+  "dateModified": "2026-06-16",
+  "dateCreated": "2026-06-16",
+  "description": "FLAKE: statics and dynamics of 2D rigid cluster over a substrate.",
+  "keywords": "friction, nanoscale mechanics, colloidal system, nanotribology, moire-pattern",
+  "license": "GNU-GPL v3.0",
+  "title": "FLAKE",
+  "version": "v0.1.0"
+}
