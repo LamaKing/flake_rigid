@@ -1,11 +1,13 @@
 ---
 title: 'FLAKE: Friction and Lattice Analysis of Kinetics and Energetics of rigid 2D clusters on crystalline substrates'
 tags:
-  - Python
+  - python
+  - condensed matter physics
   - friction
   - superlubricity
   - nanotribology
   - Langevin dynamics
+  - moire pattern
 authors:
   - name: Andrea Silva
     orcid: 0000-0001-6699-8115
@@ -13,10 +15,10 @@ authors:
 affiliations:
   - index: 1
     name: SISSA – Scuola Internazionale Superiore di Studi Avanzati, Trieste, Italy
-    ror: 02k6dtp35
+    ror: 004fze387
   - index: 2
     name: CNR-IOM, Trieste, Italy
-    ror: 01460ce75
+    ror: 00yfw2296 
 date: 13 June 2026
 bibliography: paper.bib
 ---
@@ -27,131 +29,93 @@ When a small solid island slides across a crystalline surface, the outcome —
 smooth flow or stick-slip jerking, free rotation or angular locking — is
 controlled almost entirely by the geometric relationship between the island
 and the surface: their relative orientation, size, and lattice symmetry.
-These phenomena, collectively studied under the banner of *structural
-superlubricity* [@hirano_superlubricity_1990; @dienwiebel_superlubricity_2004],
-are central to nanoscale friction and to the interpretation of colloidal
-monolayer experiments [@cao_orientational_2019; @cao_pervasive_2021].
+These phenomena are central to nanoscale friction and to the interpretation of colloidal
+monolayer experiments [@cao_orientational_2019; @cao_pervasive_2021] and are
+the premises for the study of *structural superlubricity* in real interfaces
+[@hirano_superlubricity_1990; @dienwiebel_superlubricity_2004; @ying_scalingup_2025].
 
 FLAKE (Friction and Lattice Analysis of Kinetics and Energetics) is a
-Python package for simulating the statics and overdamped Langevin dynamics
-of a rigid 2D cluster of particles sliding over a periodic or quasiperiodic
-substrate potential. It provides: energy landscape maps over translational
-and rotational degrees of freedom; minimum-energy path (MEP) search via the
-string method in both 2D (translational) and 3D (translational + rotational)
-configuration space; and parameter-sweep molecular dynamics for depinning
-thresholds and velocity–force scaling laws. All substrate types — sinusoidal,
-Gaussian well, and tanh well — as well as cluster geometries (circle,
-hexagon, triangle, rectangle, ellipse) are fully configurable through a
-YAML parameter file and a command-line interface.
+Python package for simulating the statics and Langevin dynamics of a rigid
+2D cluster sliding over a periodic or quasiperiodic substrate potential.
+It is designed for researchers in nanotribology and 2D-materials physics who
+need fast, systematic exploration of how cluster geometry, orientation, and
+substrate symmetry control friction — studies that are prohibitively expensive
+with fully atomistic simulations. FLAKE has been the primary simulation tool
+for three published studies on structural superlubricity and colloidal friction
+[@silva_frictionless_2023; @cao_moire_2022; @liao_twisting_2023].
 
 # Statement of Need
 
 Nanotribology experiments with colloidal clusters
-[@cao_orientational_2019; @cao_pervasive_2021] and van der Waals
-heterostructures [@cao_moire_2022; @liao_twisting_2023] produce rich
+[@cao_orientational_2019; @cao_pervasive_2021; @cao_moire_2022] and van der Waals
+heterostructures [@liao_twisting_2023; @yao_superlubricity_2025] produce rich
 phenomenology — orientational locking, rotational depinning, coupled
 roto-translational motion — that is difficult to interpret without a
 corresponding simulation tool. The standard computational approach in this
 field is all-atom molecular dynamics with realistic interatomic potentials,
 typically using LAMMPS [@thompson_lammps_2022]. While indispensable for
 elastic effects and chemical specificity, all-atom simulations are
-prohibitively expensive for the systematic parameter sweeps (cluster size,
-orientation, substrate symmetry, applied force) needed to extract scaling
-laws or build phase diagrams. They also entangle rigidity-breaking elastic
-deformation with the purely geometric commensurability effects that dominate
-in stiff 2D materials.
+prohibitively expensive for the systematic parameter sweeps needed to extract
+scaling laws and build phase diagrams. They also entangle elastic deformation
+with the purely geometric commensurability effects that dominate in stiff 2D
+materials. General-purpose MD packages such as ASE [@larsen_ase_2017] support
+overdamped integrators but are built around per-atom force fields and do not
+expose the collective rigid-body geometry needed here.
 
-FLAKE occupies the complementary rigid-body niche. Treating the cluster as
-perfectly rigid reduces the many-body problem to three collective degrees of
-freedom — two translational and one rotational — and makes it possible to
-run thousands of trajectories in seconds on a laptop. This is the regime
-relevant to stiff flakes (graphene, hBN, MoS$_2$) on flat substrates at
-moderate loads, and to colloidal clusters in optical traps or on patterned
-surfaces, where interparticle distances are effectively fixed. FLAKE is
-designed to be a fast, Python-native foundation for experiment interpretation
-and as a rigid-body baseline for LAMMPS elastic-contact studies, not a
-replacement for them.
-
-General-purpose MD packages such as ASE [@larsen_ase_2017] or OpenMM
-support overdamped integrators but are designed around per-atom force fields
-and do not expose the collective rigid-body geometry needed here. Implementing
-roto-translational Langevin dynamics, substrate closure factories, and MEP
-search for orientation-dependent energy barriers on top of those frameworks
-would require more custom code than the package itself.
-
-The need for a dedicated rigid-body tribology tool has become increasingly
-acute. Recent years have seen a wave of independent computational studies
-addressing exactly the phenomena FLAKE targets — rotational energy landscapes
-and scaling laws for twisted bilayers
+Recent years have seen a wave of independent computational studies addressing
+exactly the phenomena FLAKE targets — rotational energy landscapes and scaling
+laws for twisted bilayers
 [@zhang_universal_2025; @zhang_frictionless_prl_2025; @zhang_directional_2026],
 shape-dependent friction scaling [@yan_shape_2024; @gao_frictional_2025],
 orientational control via strain [@zhou_orientational_2025], and experimental
-evidence for directional superlubricity and anomalous diffusion in van der
-Waals heterostructures [@lester_directional_2024]. These studies use a
-variety of tools and conventions, often relying on LAMMPS with
-material-specific force fields that constrain the accessible geometries and
-substrate symmetries. Reviews of the scaling-up challenge
-[@ying_scalingup_2025] highlight that systematic parameter exploration
-remains a bottleneck. FLAKE aims to provide the missing common ground: a
-single, geometry-agnostic, Python-native package that makes such systematic
-studies straightforward.
+evidence for directional superlubricity in van der Waals heterostructures
+[@lester_directional_2024]. These studies use a variety of tools and
+conventions, often relying on LAMMPS with material-specific force fields that
+constrain the accessible geometries and substrate symmetries. Reviews of the
+scaling-up challenge [@ying_scalingup_2025] highlight that systematic parameter
+exploration remains a bottleneck. FLAKE provides the missing common ground: a
+single, geometry-agnostic, Python-native rigid-body package designed for fast,
+systematic friction studies, and a clean baseline for LAMMPS elastic-contact
+studies.
 
 # State of the Field
 
 Structural superlubricity in 2D materials is an active research front
-[@muser_structural_2023; @ying_scalingup_2025]. The field has reached a point
-where the geometric, rigid-body mechanism is well-established in principle,
-but quantitative predictions — scaling of the static friction force with
-cluster size and shape, the role of orientation, the nature of
-roto-translational coupling — still require systematic numerical exploration
-that is expensive with fully elastic, force-field-based MD. FLAKE goes beyond
-existing approaches by:
-
-- supporting arbitrary cluster shapes and sizes with numerically exact energy
-  and force evaluation via Numba-JIT substrate potentials [@lam_numba_2015];
-- coupling translational and rotational degrees of freedom in a single
-  Euler–Maruyama integrator with fluctuation-dissipation-theorem-correct
-  noise [@risken_fokker_planck_1989];
-- providing a roto-translational string method [@weinan_string_2002] to find
-  minimum-energy paths in the joint (x, y, $\theta$) space — an operation
-  that has no equivalent in existing open software to the author's knowledge;
-- wrapping everything in a sweep infrastructure (via joblib [@joblib_2024])
-  that makes scaling-law studies a one-command operation.
+[@muser_structural_2023; @ying_scalingup_2025]. The geometric, rigid-body
+mechanism is now well-established in principle [@silva_frictionless_2023],
+but quantitative predictions — friction scaling with cluster size and shape,
+the role of orientation, roto-translational coupling — still require systematic
+numerical exploration. No existing open Python package targets this combination
+for the rigid-body tribology use case, making each research group implement
+its own bespoke simulation tools.
 
 **DFT-level PES tools** such as TribChem [@losi_tribchem_2023] and the
 high-throughput workflow of @wolloch_highthroughput_2022 operate at the
-opposite end of the length-scale spectrum: they compute interfacial adhesion
-and shear strength from first-principles electronic structure, also in the
-rigid approximation, but for unit-cell-sized systems with full chemical
-specificity. These tools are naturally complementary to FLAKE — their output
-(the corrugation amplitude $\epsilon$ and the shape of the well) can
-parametrise FLAKE's substrate potentials for specific material interfaces.
+opposite length-scale extreme: they compute interfacial adhesion and shear
+strength from first-principles electronic structure for unit-cell-sized systems.
+These tools are naturally complementary to FLAKE — their output (corrugation
+amplitude $\epsilon$ and well shape) can parametrise FLAKE's substrate
+potentials for specific material interfaces.
 
 **Geometric descriptors** such as the Registry Index
-[@hod_registry_2013; @cao_registry_tmd_2022] similarly characterise
-interfacial commensurability from atomic geometry alone, producing
-qualitative energy maps analogous to FLAKE's static maps. However, they
-carry no energy scale and cannot be used to drive dynamics: they describe
-*which* configurations are commensurate but cannot compute the barrier
-between them or the resulting friction force.
+[@hod_registry_2013; @cao_registry_tmd_2022] characterise interfacial
+commensurability from atomic geometry alone, producing qualitative energy maps.
+However, they carry no energy scale and cannot drive dynamics or compute energy
+barriers.
 
 In LAMMPS simulations of 2D-material interfaces, the interlayer interaction
-(the analogue of FLAKE's substrate potential) is typically described by the
-Interlayer Potential (ILP) of @leven_ilp_2016, which uses Gaussian-shaped
-atom-atom overlap terms for the registry-dependent repulsion. This form is
-qualitatively captured by FLAKE's Gaussian-well substrate — providing a
-physical justification for the substrate model when the code is used to
-interpret LAMMPS-parametrised systems.
-
-No existing Python package targets this combination of features for the
-rigid-body tribology use case.
+is typically described by the Interlayer Potential (ILP) of @leven_ilp_2016,
+which uses Gaussian-shaped atom-atom overlap terms for registry-dependent
+repulsion — qualitatively captured by FLAKE's Gaussian-well substrate,
+providing a physical link between the two approaches.
 
 # Software Design
 
-## Overdamped Langevin dynamics
-
-The equation of motion for the cluster center-of-mass position $\mathbf{r}$
-and orientation angle $\theta$ is:
+The central design choice in FLAKE is the rigid-body reduction.
+A cluster of $N$ particles on a substrate in principle requires $2N$ or $3N$
+equations of motion. Treating the cluster as a rigid body collapses this to
+three collective degrees of freedom — center-of-mass position
+$\mathbf{r} = (x, y)$ and orientation angle $\theta$ — governed by:
 
 $$\eta_t \dot{\mathbf{r}} = \mathbf{F}_\text{sub}(\mathbf{r}, \theta) + \mathbf{F}_\text{ext} + \boldsymbol{\xi}_t$$
 
@@ -159,93 +123,111 @@ $$\eta_r \dot{\theta} = \tau_\text{sub}(\mathbf{r}, \theta) + \tau_\text{ext} + 
 
 where $\eta_t$ and $\eta_r$ are translational and rotational drag coefficients
 computed from cluster geometry, $\mathbf{F}_\text{sub}$ and $\tau_\text{sub}$
-are the total substrate force and torque on the rigid cluster, and
+are the total substrate force and torque summed over all particles, and
 $\boldsymbol{\xi}_{t,r}$ are Gaussian white noise terms satisfying the
 fluctuation-dissipation theorem:
 $\langle \xi_i(t)\xi_j(t') \rangle = 2 k_B T \eta_i \delta_{ij}\delta(t-t')$.
+The overdamped (inertia-free) limit is the physically appropriate regime for
+colloidal clusters in viscous media [@cao_orientational_2019] and for 2D
+materials at low sliding speeds; extending the integrator to include inertia
+is straightforward.
+This reduction makes it possible to run thousands of trajectories in seconds
+on a laptop, enabling the systematic parameter sweeps — over cluster size,
+shape, orientation, substrate symmetry, and applied force — that are the
+primary target of FLAKE.
 
-The Euler–Maruyama discretisation with time step $\Delta t$ uses a
-noise amplitude $B_i = \sqrt{2k_BT/(\eta_i \Delta t)}$, giving variance
-$B_i^2 \Delta t = 2 k_B T / \eta_i$ per step — the correct FDT scaling.
-An earlier version of this code used $B_i = \sqrt{2 k_B T \eta_i}$ (a
-common but incorrect form), which produced noise variance proportional to
-$\Delta t^2$ instead of $\Delta t$; this bug has been corrected in v0.1.0.
+The rigidity assumption is justified by the physics: for stiff 2D materials
+(graphene, hBN, MoS$_2$) at moderate loads, and for colloidal clusters where
+interparticle distances are effectively fixed, the dominant friction mechanism
+is geometric commensurability, not elastic deformation [@silva_frictionless_2023].
+**Limitations.** The rigid-body approximation does not capture intralayer
+elasticity, which drives the Aubry-type commensurate–incommensurate
+transition [@muser_structural_2023]; moiré-induced out-of-plane buckling in
+freestanding bilayers [@wang_buckling_2024]; or elastic edge effects that
+give rise to chiral moiré dynamics at finite contacts [@silva_chirality_2024].
+These effects require fully elastic simulations and are explicitly beyond
+FLAKE's scope.
 
-## JIT substrate closures and performance
-
+The performance design follows directly from this reduction.
 All substrate energy and force kernels are implemented as Numba
-just-in-time compiled functions (`@njit`) [@lam_numba_2015]. The `substrate_from_params` factory
-pre-converts all parameters to float64 arrays once at construction time and
-returns closures, eliminating per-step Python overhead. When no Python
-callback is needed (no custom stop or output functions), `run_md` dispatches
-to a fully JIT-compiled inner loop `_md_loop_njit`, reducing the per-step
-cost to pure native code.
+just-in-time compiled (`@njit`) functions [@lam_numba_2015].
+The `substrate_from_params` factory pre-converts all parameters to float64
+arrays once at construction time and returns closures, eliminating per-step
+Python overhead. When no Python callback is needed, `run_md` dispatches to a
+fully JIT-compiled inner loop, reducing the per-step cost to pure native code
+(10–50$\times$ faster than a Python loop for long trajectories).
+The string method for minimum-energy paths [@weinan_string_2002] is extended
+to the joint $(x, y, \theta)$ space using independent length scales
+$(l_x, l_y, l_\theta)$ that put translational and angular displacements on
+equal footing — a non-trivial metric choice required to find physically
+meaningful roto-translational paths.
 
-## String method for minimum-energy paths
+**Features.** FLAKE provides:
 
-`find_mep` implements the zero-temperature string method
-[@weinan_string_2002] in 2D (translational MEP) and 3D
-(roto-translational MEP). The arc-length metric in 3D uses independent
-length scales $(l_x, l_y, l_\theta)$ to put translational and angular
-displacements on equal footing — critical for finding physically meaningful
-paths when rotation and translation are coupled.
-
-## CLI and sweep infrastructure
-
-A YAML-driven command-line interface (`flake map`, `flake sweep`,
-`flake string`) makes it possible to run energy maps, MD sweeps, and string
-calculations without writing Python. `sweep_md` parallelises over a
-parameter grid using joblib's loky backend [@joblib_2024], names output
-directories by the varying parameters, and supports resuming interrupted
-sweeps.
+- *Energy landscape maps* over translational and/or rotational degrees of
+  freedom (`flake map`), for static analysis of commensurability and
+  orientational locking.
+- *Minimum-energy path search* via the string method in 2D (translational)
+  and 3D (roto-translational) configuration space (`flake string`), giving
+  static friction forces and transition pathways.
+- *Parameter-sweep Langevin dynamics* (`flake sweep`) parallelised over a
+  parameter grid via joblib [@joblib_2024], for depinning thresholds and
+  velocity–force scaling laws.
+- *Substrate types*: sinusoidal (optical lattices), Gaussian well (ILP-like
+  registry dependence), tanh well (lithographic patterns), and flat (testing
+  baseline); new types require only a single `@njit` function.
+- *Cluster geometries*: circle, hexagon, triangle, rectangle, ellipse, and
+  arbitrary polygon via Shapely; multi-site bases supported.
+- A *YAML-driven CLI* and six end-to-end Jupyter notebooks in `examples/`
+  covering the full workflow from substrate construction to scaling-law
+  analysis, with no Python required for standard studies.
 
 # Research Impact
 
 FLAKE v0.1.2 is the formalized, tested, and packaged release of a codebase
 developed from 2022 onward at SISSA. The predecessor (v0.0.6, publicly
-available since November 2022 with ReadTheDocs documentation) was the
+available since November 2022) was the
 primary simulation tool for the following published studies:
 
-- @silva_frictionless_2023 (Nanoscale): translational and rotational
-  superlubricity of rigid clusters on sinusoidal substrates; scaling laws
-  $F_s \propto N$ (commensurate) and $F_s \propto \sqrt{N}$ (incommensurate).
-- @cao_moire_2022 (Physical Review X): coupled roto-translational depinning
-  and the role of Moiré pattern evolution in colloidal and van der Waals
-  systems.
-- @liao_twisting_2023 (ACS Applied Materials and Interfaces): twisting
-  dynamics of large lattice-mismatch van der Waals heterostructures.
+- @silva_frictionless_2023 (Nanoscale): geometric classification of arbitrary 2D interfaces and scaling laws of static friction force from finite commensurate and incommensurate contacts.
+- @cao_moire_2022 (Physical Review X): coupled roto-translational depinning and the role of moiré pattern evolution in colloidal and van der Waals experiments.
+- @liao_twisting_2023 (ACS Applied Materials and Interfaces): combined experiment and simulation of twisting dynamics in large lattice-mismatch van der Waals heterostructures.
 
-The colloidal experiments interpreted in @cao_orientational_2019 (Nature
-Physics) and @cao_pervasive_2021 (Physical Review E) motivated the
-roto-translational coupling design of the package.
+The colloidal experiments of @cao_orientational_2019 and @cao_pervasive_2021 provided the physics foundation and motivated the initial design of the package.
 
-Version 0.1.2 adds a correct FDT noise implementation, a full-JIT MD inner
-loop (10–50x faster than the v0.0.6 Python loop for long trajectories), the
-roto-translational string method, a flat substrate option for testing, and a
-complete test suite (125 unit and physics tests). The package is currently
-in active use for ongoing research projects on quasicrystalline substrates
-and angular depinning at SISSA.
+Version 0.1.2 adds a fully JIT-compiled MD inner loop, the roto-translational
+string method, a flat substrate option for testing, and a complete test suite
+(125 unit and physics tests). The package is currently in active use at SISSA for
+ongoing research on quasicrystalline substrates and roto-translational
+synchronisation effects, in collaboration with experimentalists in Germany
+and China.
 
 # AI Usage Disclosure
 
-Claude Code (Anthropic, `claude-sonnet-4-6`) was used during the development
-of v0.1.0 for: module restructuring and API cleanup (renaming `src/` to
-`flake/`, updating all import paths); documentation (module docstrings with
-`.. math::` RST blocks, README, Sphinx configuration); test scaffolding
-(generating test stubs for new functions); and paper drafting (initial text
-of this manuscript). The physical model, numerical algorithms, substrate
-potential implementations, string method, and overall software architecture
-were designed by the author and were present in the predecessor codebase
-prior to AI assistance. All AI-generated outputs were reviewed, edited, and
-validated by the author. The core physics correctness — including the FDT
-noise fix, the torque-arm convention, and the roto-translational arc-length
-metric — was identified, verified, and decided by the author.
+The physical model, all design decisions, and the research direction of FLAKE
+are entirely the work of the author.
+The central argument — that geometry dominates friction in stiff 2D contacts,
+making a rigid-body model both sufficient and necessary for systematic study —
+is grounded in the author's prior publications
+[@silva_frictionless_2023; @cao_moire_2022].
+The choice of substrate models, the roto-translational string method and its
+arc-length metric, and the scope of the package all predate any AI involvement:
+the core physical model and simulation algorithms were functional in the
+predecessor codebase (v0.0.6, November 2022) prior to any AI assistance.
+Claude Code (Anthropic, `claude-sonnet-4-6`) was subsequently used to improve
+the codebase in ways that do not affect the physics: making the code more
+readable (docstring writing, module restructuring and API cleanup), more
+efficient (Numba JIT refactoring of substrate closures and the MD inner loop),
+and adherent to modern open-source standards (test suite scaffolding and CI
+configuration).
+All AI-generated outputs were reviewed and edited by the author.
 
 # Acknowledgements
 
-The author thanks Emanuele Panizon, Erio Tosatti, Andrea Vanossi,
-Nicola Manini, and Clemens Bechinger for the physics discussions and
+The author thanks Emanuele Panizon, Jin Wang, Dong Han, Erio Tosatti, Andrea Vanossi,
+Nicola Manini, Xin Cao, and Clemens Bechinger for the physics discussions and
 experimental collaborations that motivated and shaped this work.
+The author thanks Andrea Trost for help with the logo design.
 
 This work was supported by the European Research Council (ERC) under the
 European Union's Horizon 2020 research and innovation programme, grant
