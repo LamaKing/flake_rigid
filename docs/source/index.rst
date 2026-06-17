@@ -32,6 +32,7 @@ For questions or support contact `Andrea Silva <ansilva@sissa.it>`_.
    installation
    examples
    modules
+   contributing
 
 
 Indices and tables
