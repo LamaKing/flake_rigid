@@ -32,7 +32,7 @@ and the surface: their relative orientation, size, and lattice symmetry.
 These phenomena are central to nanoscale friction and to the interpretation of colloidal
 monolayer experiments [@cao_orientational_2019; @cao_pervasive_2021] and are
 the premises for the study of *structural superlubricity* in real interfaces
-[@wang_colloquium_2024; @hirano_superlubricity_1990; @dienwiebel_superlubricity_2004; @ying_scalingup_2025; yao_superlubricity_2025].
+[@wang_colloquium_2024; @hirano_superlubricity_1990; @dienwiebel_superlubricity_2004; @ying_scalingup_2025; @yao_superlubricity_2025].
 
 FLAKE (Friction and Lattice Analysis of Kinetics and Energetics) is a
 Python package for simulating the statics and Langevin dynamics of a rigid
@@ -184,7 +184,7 @@ meaningful roto-translational paths.
 
 # Research Impact
 
-FLAKE v0.1.2 is the formalised, tested, and packaged release of a codebase
+FLAKE v0.1.3 is the formalised, tested, and packaged release of a codebase
 developed from 2022 onward at SISSA. The predecessor (v0.0.6, publicly
 available since November 2022) was the primary simulation tool for the
 following published studies:
@@ -195,7 +195,7 @@ following published studies:
 
 The colloidal experiments of @cao_orientational_2019 and @cao_pervasive_2021 provided the physics foundation and motivated the initial design of the package.
 
-Version 0.1.2 adds a fully JIT-compiled MD inner loop, the roto-translational
+Version 0.1.3 adds a fully JIT-compiled MD inner loop, the roto-translational
 string method, and a complete test suite. The package is currently in active use at SISSA for
 ongoing research on quasicrystalline substrates and roto-translational
 synchronisation effects, in collaboration with experimentalists in Germany
@@ -214,11 +214,11 @@ arc-length metric, and the scope of the package all predate any AI involvement:
 the core physical model and simulation algorithms were functional in the
 predecessor codebase (v0.0.6, November 2022) prior to any AI assistance.
 Claude Code (Anthropic, `claude-sonnet-4-6`) was subsequently used to improve
-the codebase in ways that do not affect the physics: making the code more
-readable (docstring writing, module restructuring and API cleanup), more
+the codebase: making the code more
+readable (docstring rewriting, module restructuring and API cleanup), more
 efficient (Numba JIT refactoring of substrate closures and the MD inner loop),
 and adherent to modern open-source standards (test suite scaffolding and CI
-configuration).
+configuration) and improving this manuscript.
 All AI-generated outputs were reviewed and edited by the author.
 
 # Acknowledgements
