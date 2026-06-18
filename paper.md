@@ -19,7 +19,7 @@ affiliations:
   - index: 2
     name: CNR-IOM, Trieste, Italy
     ror: 00yfw2296 
-date: 13 June 2026
+date: 18 June 2026
 bibliography: paper.bib
 ---
 
@@ -149,7 +149,7 @@ FLAKE's scope.
 
 The performance design follows directly from this reduction.
 All substrate energy and force kernels are Numba just-in-time compiled
-(`@njit`) [@lam_numba_2015]: the `substrate_from_params` factory pre-converts
+(`@njit`, Numba's JIT decorator [@lam_numba_2015]): the `substrate_from_params` factory pre-converts
 parameters to float64 arrays once and returns closures, eliminating per-step
 Python overhead, and `run_md` dispatches to a fully JIT-compiled inner loop
 when no Python callbacks are needed (10–50$\times$ faster than an interpreted
@@ -175,7 +175,7 @@ meaningful roto-translational paths.
   velocity–force scaling laws.
 - *Substrate types*: sinusoidal (optical lattices), Gaussian well (ILP-like
   registry dependence), tanh well (lithographic patterns), and flat (testing
-  baseline); new types require only a single `@njit` function.
+  baseline); new types require only a single Numba `@njit` function.
 - *Cluster geometries*: circle, hexagon, triangle, rectangle, ellipse, and
   arbitrary polygon via Shapely; multi-site bases supported.
 - A *YAML-driven CLI* and six end-to-end Jupyter notebooks in `examples/`
