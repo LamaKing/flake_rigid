@@ -22,7 +22,7 @@ reference frame; the method rotates internally::
 
 ``result['points']`` has shape ``(n_pt, 3)``; :math:`\theta` is in degrees.
 Typical scales: :math:`\lambda_x = \lambda_y =` substrate lattice spacing;
-:math:`\lambda_\theta = 60°` for 6-fold contact, :math:`30°` for 12-fold.
+:math:`\lambda_\theta = 60°` for 6-fold contact, :math:`90°` for 4-fold.
 
 Gradient and string step
 ------------------------
@@ -144,6 +144,8 @@ class StringPath:
 
         Args:
             gradients: (n_pt, dim) ndarray -- -dE/dp at each point.
+                Note: when fix_ends=True the endpoint rows of this array are
+                zeroed in-place before the step. The caller's array is mutated.
             dt:        float               -- step size.
         """
         gradients = np.asarray(gradients, dtype=np.float64)
@@ -254,8 +256,13 @@ def find_mep(pos, calc_en_f, en_params, p0, p1,
         max_steps: int             -- maximum gradient-descent iterations.
         dt:        float           -- step size.
         fix_ends:  bool            -- freeze endpoints (default True).
-        tol:       float           -- convergence: max pointwise displacement
-                                      between iterations < tol.
+        tol:       float           -- convergence: max pointwise Euclidean
+                                      displacement between iterations < tol,
+                                      measured in raw (unscaled) coordinates.
+                                      In 3D roto-translational mode the theta
+                                      component contributes in degrees, so tol
+                                      should be set relative to the translation
+                                      scale, not the arc-length metric.
         scale:     (dim,) array-like or None -- coordinate scales for the
                                       arc-length reparametrization.
                                       Default None (ones).

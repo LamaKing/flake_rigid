@@ -28,8 +28,7 @@ Euler-Maruyama step:
     \delta_i = \frac{F_i^\mathrm{total}}{\eta_i} \, dt
                + \sqrt{\frac{2 k_B T}{\eta_i \, dt}} \; \xi_i \, dt, \quad \xi_i \sim \mathcal{N}(0,1)
 
-The displacement variance is :math:`\langle \delta_i^2 \rangle = 2 k_B T / \eta_i \cdot dt = 2 D_i \, dt`
-(correct FDT).
+The displacement variance is :math:`\langle \delta_i^2 \rangle = 2 k_B T / \eta_i \cdot dt = 2 D_i \, dt`.
 
 At :math:`k_B T = 0` the noise term vanishes and this reduces to explicit Euler gradient descent.
 The step size ``dt`` is fixed; check convergence by halving it.
@@ -40,11 +39,23 @@ JIT path vs Python path
 -----------------------
 When ``stop_fn`` and ``output_fn`` are both ``None``, the inner EM loop runs entirely
 in Numba JIT via ``_md_loop_njit`` — no Python/JIT boundary per step.
-``calc_en_f`` must have been produced by ``substrate_from_params``, which attaches
-``_jit_core`` and ``_jit_params`` to the closure.
+This requires ``calc_en_f`` to expose ``_jit_core`` and ``_jit_params`` attributes,
+which ``substrate_from_params`` attaches automatically.  If those attributes are
+absent and no callbacks are provided, ``run_md`` raises ``NotImplementedError``.
 
 When ``stop_fn`` or ``output_fn`` is provided, the Python loop path is used instead.
-This is ~6–11× slower but supports arbitrary Python callbacks.
+This is ~6–11× slower but supports arbitrary Python callbacks, and ``calc_en_f``
+does not need ``_jit_core``/``_jit_params``.
+
+RNG and reproducibility
+-----------------------
+The two paths use different RNG backends.  The JIT path calls
+``np.random.seed(seed)`` before the loop, which seeds Numba's internal xorshift
+generator; ``np.random.normal`` inside ``@njit`` draws from that generator.
+The Python path uses ``np.random.default_rng(seed)`` (PCG64), which is a
+completely separate RNG.  **The same integer ``seed`` will produce different
+trajectories on the JIT and Python paths.** Do not compare results across paths
+expecting identical noise sequences.
 
 Public API
 ----------
@@ -288,9 +299,13 @@ def run_md(pos, calc_en_f, en_params,
 
     Args:
         pos: (N, 2) ndarray -- cluster positions in the cluster frame (CM at origin).
-        calc_en_f: callable -- substrate energy function from ``substrate_from_params``.
-            Must expose ``_jit_core`` and ``_jit_params`` attributes.
-        en_params: list -- extra arguments for ``calc_en_f`` (usually ``[]``).
+        calc_en_f: callable -- substrate energy function. Must expose
+            ``_jit_core`` and ``_jit_params`` attributes when no callbacks are
+            provided (JIT path); not required when stop_fn or output_fn is set.
+            Use ``substrate_from_params`` to build a compliant function.
+        en_params: list -- extra arguments for ``calc_en_f``. Always ``[]``
+            for functions produced by ``substrate_from_params`` (closures capture
+            all parameters internally).
         eta: float -- single-particle drag coefficient.
         Fx: float -- constant external force along x (default 0).
         Fy: float -- constant external force along y (default 0).
@@ -305,7 +320,10 @@ def run_md(pos, calc_en_f, en_params,
             forces Python loop path.
         output_fn: callable or None -- ``output_fn(step, t, state_dict) -> None``;
             forces Python loop; ``run_md`` returns ``None``.
-        seed: int -- RNG seed.
+        seed: int -- RNG seed. Note: the JIT path (no callbacks) seeds Numba's
+            internal xorshift via ``np.random.seed``; the Python path (callbacks
+            present) uses ``np.random.default_rng``. The same seed gives
+            different trajectories on the two paths.
 
     Returns:
         ``None`` if ``output_fn`` is provided. Otherwise a dict with keys
@@ -316,6 +334,11 @@ def run_md(pos, calc_en_f, en_params,
         ValueError: if ``eta_r == 0`` and (``Tau != 0`` or ``kBT > 0``).
         NotImplementedError: if ``calc_en_f`` lacks ``_jit_core``/``_jit_params``
             and no callbacks are provided.
+
+    Warns:
+        UserWarning: if ``eta_r == 0`` even at T=0 (safe but theta will not evolve).
+        UserWarning: if ``kBT == 0`` (deterministic integrator at saddle points).
+        UserWarning: if ``|theta0| > 720`` (likely radians passed by mistake).
     """
     pos = np.asarray(pos, dtype=np.float64)
     if pos_cm0 is None:

@@ -23,8 +23,12 @@ Public API
 I/O convention
 --------------
 Each run writes two files:
-    outdir/run_NNNN/traj.h5    -- trajectory arrays (HDF5 via h5py)
-    outdir/run_NNNN/params.yaml -- run parameters (YAML via PyYAML)
+    outdir/run_NNNN[-key_val...]/traj.h5     -- trajectory arrays (HDF5 via h5py)
+    outdir/run_NNNN[-key_val...]/params.yaml -- run parameters (YAML via PyYAML)
+
+The directory name is run_NNNN when only one parameter varies, or
+run_NNNN-key1_val1-key2_val2 when multiple parameters vary.
+load_sweep and load_sweep_points match on the run_NNNN prefix.
 
 Neither h5py nor yaml is imported at module level; both are guarded
 inside the functions that use them.
@@ -139,7 +143,7 @@ def _load_run(run_dir):
     """Load one run from run_dir.
 
     Args:
-        run_dir: str -- path to a run_NNNN directory.
+        run_dir: str -- path to a run_NNNN[-key_val...] directory.
 
     Returns:
         (traj_dict, run_params) -- trajectory arrays and parameter dict.
@@ -168,17 +172,17 @@ def _load_run(run_dir):
 def load_sweep(outdir):
     """Load all runs from a sweep output directory.
 
-    Scans for run_NNNN/ subdirectories in numeric order.  Every directory
-    that matches the pattern produces one entry in the returned list -- runs
-    are never silently dropped.  Missing or incomplete runs produce an entry
-    with result=None and a WARNING; the caller is responsible for filtering
-    (see filter_sweep).
+    Scans for run_NNNN[-key_val...]/ subdirectories in numeric order.  Every
+    directory whose name starts with run_NNNN produces one entry in the
+    returned list -- runs are never silently dropped.  Missing or incomplete
+    runs produce an entry with result=None and a WARNING; the caller is
+    responsible for filtering (see filter_sweep).
 
     Args:
         outdir: str -- directory written by sweep_md with save=True.
 
     Returns:
-        list of dict, one per ``run_NNNN`` directory found.
+        list of dict, one per ``run_NNNN[...]`` directory found.
         Each dict has keys ``'params'`` (run parameters or ``None``),
         ``'result'`` (full traj dict or ``None``), and ``'run_dir'``.
 
@@ -279,7 +283,7 @@ def load_sweep_points(outdir, grid_points, rtol=1e-5, atol=0.0):
             'params':  dict of run parameters from params.yaml.
             'result':  full traj dict, or None if traj.h5 absent.
             'run_dir': absolute path to the run directory.
-        Returned in disk order (sorted by run_NNNN index).
+        Returned in disk order (sorted by run_NNNN prefix).
 
     Raises:
         ValueError: if grid_points is empty.
@@ -672,8 +676,8 @@ def sweep_md(pos, calc_en_f, en_params, sweep_spec,
         outdir:         str  -- directory for per-run output.  Created if absent.
         save:           bool -- if True, write per-run output to outdir.
                                Each run writes:
-                                 outdir/run_NNNN/traj.h5  (if save_traj=True)
-                                 outdir/run_NNNN/params.yaml
+                                 outdir/run_NNNN[-key_val...]/traj.h5  (if save_traj=True)
+                                 outdir/run_NNNN[-key_val...]/params.yaml
         save_traj:      bool -- if True (default), write the full trajectory
                                to traj.h5 for each run.  Set False when
                                post_fn already extracts all needed information,

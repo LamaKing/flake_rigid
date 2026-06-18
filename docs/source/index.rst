@@ -31,6 +31,7 @@ For questions or support contact `Andrea Silva <ansilva@sissa.it>`_.
    intro
    installation
    examples
+   cli_reference
    modules
    contributing
 

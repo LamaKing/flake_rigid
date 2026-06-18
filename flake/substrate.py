@@ -55,9 +55,8 @@ where :math:`\rho = (r-a)/(b-a)` and :math:`f` is the :math:`C^2` smoothstep
 .. math::
 
     V(\mathbf{r}) = -\frac{\epsilon}{n^2}
-        \left|\sum_{l=0}^{n-1} e^{i \mathbf{k}_l \cdot \mathbf{r}}\right|^2
+        \left|\sum_{l=0}^{n-1} e^{i \mathbf{k}_l \cdot \mathbf{r}}\right|^2.
 
-which ranges from :math:`-\epsilon` (well minimum) to :math:`0` (saddle).
 
 JIT notes
 ---------
@@ -121,7 +120,6 @@ def calc_matrices_bvect(b1, b2):
 def gaussian(x, mu, sigma):
     """Unnormalised Gaussian: exp(-(x-mu)^2 / (2*sigma^2)).
 
-    Kept public because tool_reciprocal_space.py uses it directly.
     Not normalised by design -- it represents a well *shape*, not a PDF.
     """
     return np.exp(-np.square(x - mu) / (2. * np.square(sigma)))
@@ -544,7 +542,10 @@ def _particle_en_sin_core(pos, pos_torque, basis, ks, epsilon):
             en[i] += -epsilon * inv_n2 * (sum_cos * sum_cos + sum_sin * sum_sin)
 
             # Force: F = -dV/dr
-            # dV/dx = -epsilon/n^2 * 2*(sum_cos * sum(k_x sin) - sum_sin * sum(k_x cos))
+            # F_x = -dV/dx = -epsilon/n^2 * 2*(sum_cos * sum(k_x sin) - sum_sin * sum(k_x cos))
+            # Derivation: V = -eps/n^2*(sum_cos^2 + sum_sin^2), d(sum_cos)/dx = -sum_kx_sin,
+            # d(sum_sin)/dx = sum_kx_cos => dV/dx = eps/n^2*2*(sum_cos*sum_kx_sin - sum_sin*sum_kx_cos)
+            # => F_x = -dV/dx has the sign below.
             sum_kx_sin = 0.
             sum_ky_sin = 0.
             sum_kx_cos = 0.
@@ -667,7 +668,7 @@ def substrate_from_params(params):
     Supported well shapes and required parameter keys:
 
     - ``'gaussian'``: ``epsilon, sigma, a, b, b1, b2, sub_basis``
-    - ``'tanh'``:     ``epsilon, wd`` (alias ``ww``)``, a, b, b1, b2, sub_basis``
+    - ``'tanh'``:     ``epsilon, wd, a, b, b1, b2, sub_basis``
     - ``'sin'``:      ``epsilon, ks, sub_basis``
     - ``'flat'``:     no keys required
 
@@ -794,7 +795,7 @@ def substrate_from_params(params):
 
     else:
         raise NotImplementedError(
-            "Unknown well shape '%s'.  Supported: 'gaussian', 'tanh', 'sin'."
+            "Unknown well shape '%s'.  Supported: 'gaussian', 'tanh', 'sin', 'flat'."
             % well_shape
         )
 

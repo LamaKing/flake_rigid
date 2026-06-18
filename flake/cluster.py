@@ -3,18 +3,22 @@
 Cluster creation utilities for rigid-cluster simulations.
 
 A cluster is always an (N, 2) float64 ndarray of (x, y) positions with the
-center of mass at the origin.  Nothing else -- no (N,6) legacy format, no
-hidden state, no file intermediaries in the shape functions.
+center of mass at the origin.
 
 The cluster is built from a Bravais lattice defined by two primitive vectors
 a1, a2 (each shape (2,)).  N1, N2 count unit cells along each direction and
 control the cluster size.  The precise meaning of N1, N2 depends on shape:
 
     circle       : encloses N1*N2 particles at correct areal density
-    hexagon      : N1 particles per edge of the hexagon
+
+    hexagon      : N1 particles per edge; N2 controls the lower-half row count. Set N1 == N2 for a regular hexagon.
+
     rectangle    : N1 (N2) cells along the a1 (a2) direction
+
     triangle     : triangle spanned by N1*a1, N2*a2
+
     parallelogram: sqrt(N1*N2) x sqrt(N1*N2) lattice (sqrt must be odd int)
+
     ellipse      : semi-axes rx = N1*|a1|, ry = N2*|a2|
 
 Units follow the calling code; no unit conversion is done here.
@@ -98,9 +102,16 @@ def _make_cluster_hexagon(a1, a2, N1, N2):
     a1 direction.  Works for any lattice but is most naturally a regular
     hexagon for the triangular lattice.
 
+    N1 and N2 play different roles:
+    - Lower half (including equator): N2 rows, row i has N1+i particles.
+    - Upper half: N1-1 rows, each losing one particle.
+    A regular hexagon requires N1 == N2.  When N1 != N2 the shape is an
+    elongated or compressed hexagon (more rows in one direction).
+
     Args:
         a1, a2: (2,) float64 -- primitive lattice vectors.
-        N1, N2: int          -- N1 controls the hexagon side length.
+        N1, N2: int          -- N1 controls edge length; use N1==N2 for a
+                                regular hexagon.
 
     Returns:
         (N, 2) float64 ndarray, CM at origin.
@@ -129,7 +140,8 @@ def _make_cluster_rectangle(a1, a2, N1, N2):
 
     Args:
         a1, a2: (2,) float64 -- primitive lattice vectors.
-        N1, N2: int          -- half-widths in units of |a1|, |a2|.
+        N1, N2: int          -- total widths; the rectangle spans
+                                ±N1/2*|a1| along x and ±N2/2*|a2| along y.
 
     Returns:
         (N, 2) float64 ndarray, CM at origin.
@@ -317,20 +329,21 @@ def save_cluster(pos, filename):
     np.save(filename, np.asarray(pos, dtype=np.float64))
 
 
-def load_cluster(filename, angle_deg=0):
-    """Load cluster from .npy file, optionally rotate, then re-centre CM.
+def load_cluster(filename, angle_deg=0, recenter=False):
+    """Load cluster from .npy file, optionally rotate, then oprionally re-centre CM.
 
     Args:
         filename:  str   -- path to .npy file (with or without '.npy').
         angle_deg: float -- ACW rotation applied before recentring (degrees).
+        recenter: bool -- recenter after rotation
 
     Returns:
-        (N, 2) float64 ndarray, CM at origin.
+        (N, 2) float64 ndarray. CM is at origin only if recenter=True.
     """
     pos = np.load(filename).astype(np.float64)
     if angle_deg != 0.0:
         pos = rotate(pos, angle_deg)
-    pos -= np.mean(pos, axis=0)
+    if recenter: pos -= np.mean(pos, axis=0)
     return pos
 
 
@@ -413,7 +426,6 @@ def cluster_from_params(params):
                    (default [[0,0]] -- single-site Bravais lattice).
         cl_poly:   vertex list for polygon masking (required if shape='polygon').
         direction: polygon masking direction -- 0 interior, 1 exterior.
-        theta:     float, rotation in degrees applied after cluster creation.
         (ellipse semi-axes are N1*|a1| and N2*|a2|; no extra keys needed.)
 
     Returns:
@@ -543,7 +555,8 @@ def params_from_poscar(filename, cut_z=0, tol=0.9):
     Args:
         filename: str   -- path to POSCAR file.
         cut_z:    float -- keep only atoms with z < cut_z. If 0 (default),
-                          uses one standard deviation of z as threshold.
+                          threshold is set to mean(z) - std(z), which selects
+                          the lowest layer of a 2-layer slab.
         tol:      float -- fractional tolerance on cut_z (default 0.9).
 
     Returns:

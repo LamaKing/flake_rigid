@@ -13,11 +13,21 @@ See the [documentation](https://flake-rigid.readthedocs.io/en/latest/) or the [s
 
 ## Installation
 
+**With pip** (recommended):
+
 ```console
 pip install flake-rigid
 ```
 
-Or clone and install in editable mode (for development):
+**With conda** (creates a dedicated environment):
+
+```console
+conda create -n flake python=3.11
+conda activate flake
+pip install flake-rigid
+```
+
+**From source** (for development):
 
 ```console
 git clone https://github.com/LamaKing/flake_rigid.git
@@ -26,6 +36,18 @@ pip install -e ".[dev]"
 ```
 
 Numba will JIT-compile the hot loops on first run; subsequent runs are fast.
+
+### Jupyter notebook kernel
+
+To use FLAKE inside Jupyter notebooks from a conda environment:
+
+```console
+conda activate flake
+pip install ipykernel
+python -m ipykernel install --user --name flake --display-name "Python (flake)"
+```
+
+Then select the **Python (flake)** kernel when opening the notebooks in `examples/`.
 
 ## Quick start
 
@@ -44,12 +66,12 @@ See `test_cli_and_phys/` for working YAML examples of all three subcommands.
 
 ## Substrate
 
-The substrate is defined as a periodic function, either a superposition of plane waves or a potential well repeated on a Bravais lattice.
+The substrate is defined as a periodic function, either a superposition of plane waves or a potential well repeated on a lattice.
 The relevant module is `flake.substrate`.
 
 For a plane-wave (sinusoidal) substrate, the substrate is defined by a set of wave vectors: the number of vectors controls the symmetry and the length sets the spacing [1].
 For a lattice of wells, the substrate is defined by the well shape parameters and the lattice vectors [2–5].
-The substrate can be decorated with a multi-site basis.
+These substrate can be decorated with a multi-site basis.
 
 See `examples/0-Substrate_types.ipynb` for details.
 
@@ -104,7 +126,7 @@ No internal units conversion is performed; the user chooses a coherent set.
 
 **Colloidal experiments** [2, 3]:
 - energy: zJ = $10^{-21}$ J
-- length: $\mu$m
+- length: $\mu$ m
 - mass: fg = $10^{-15}$ g
 - force: fN, torque: fN·$\mu$m, time: ms
 
