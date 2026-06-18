@@ -175,22 +175,23 @@ def test_make_sweep_default_output_name(tmp_path, monkeypatch):
 # 2. _build_physics
 # ============================================================
 
-def test_build_physics_en_inputs_empty(params_yaml):
-    """substrate_from_params closure returns en_inputs=[]."""
+def test_build_physics_en_inputs_nonempty(params_yaml):
+    """substrate_from_params returns non-empty en_inputs for non-flat substrates."""
+    from flake.substrate import substrate_from_params as _sfp
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        pos, en_func, en_inputs, params = _build_physics(params_yaml)
-    assert en_inputs == [], "en_inputs must be [] (closure captures all params)"
-    assert pos.shape[1] == 2
+        params = _load_yaml(params_yaml)
+        _, _, en_inputs = _sfp(params)
+    assert len(en_inputs) > 0, "en_inputs should be non-empty for sin substrate"
 
 
 def test_build_physics_en_func_callable(params_yaml):
     """en_func closure returns (float, (2,) array, float) at origin."""
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        pos, en_func, en_inputs, _ = _build_physics(params_yaml)
+        pos, en_func, _ = _build_physics(params_yaml)
     pos_cm = np.zeros(2)
-    E, F, tau = en_func(pos, pos_cm, *en_inputs)
+    E, F, tau = en_func(pos, pos_cm)
     assert isinstance(float(E), float)
     assert np.asarray(F).shape == (2,)
     assert isinstance(float(tau), float)
@@ -216,8 +217,8 @@ def test_build_physics_theta_not_applied(tmp_path):
 
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        pos30, _, _, params30 = _build_physics(path)
-        pos0,  _, _, params0  = _build_physics(path0)
+        pos30, _, params30 = _build_physics(path)
+        pos0,  _, params0  = _build_physics(path0)
 
     # pos is the reference frame in both cases: same positions.
     assert np.allclose(pos30, pos0), \
@@ -694,10 +695,10 @@ def test_sweep_no_resume_when_save_traj_false(params_yaml, tmp_path):
         # (result should be non-None, not None from a skipped run).
         results2 = None
         from flake.cli import _build_physics
-        pos, calc_en_f, en_params, p = _build_physics(params_yaml)
+        pos, calc_en_f, p = _build_physics(params_yaml)
         from flake.sweep import sweep_md, grid_sweep
         spec = grid_sweep({'Fx': [0.0]})
-        results2 = sweep_md(pos, calc_en_f, en_params, spec,
+        results2 = sweep_md(pos, calc_en_f, spec,
                             base_md_kwargs={'eta': 1.0, 'kBT': 1e-8,
                                             'dt': 5e-4, 'n_steps': 50,
                                             'print_every': 25},

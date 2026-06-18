@@ -60,7 +60,7 @@ def _analytical_F1s():
     return float(np.max(np.abs(Fx)))
 
 
-def _depinning_Fc(pos, en_func, en_params, F_low, F_high, n_pts=12):
+def _depinning_Fc(pos, en_func, F_low, F_high, n_pts=12):
     """Coarse force sweep; returns (Fc_lo, Fc_hi) bracket of transition.
 
     Uses kBT=0 so the result is deterministic.  Asserts a clear pinned/sliding
@@ -70,7 +70,7 @@ def _depinning_Fc(pos, en_func, en_params, F_low, F_high, n_pts=12):
     spec   = [{'Fx': float(f)} for f in F_vals]
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        results = sweep_md(pos, en_func, en_params, spec,
+        results = sweep_md(pos, en_func, spec,
                            base_md_kwargs=_MD_BASE,
                            post_fn=drift_velocity(),
                            n_jobs=1, save=False, verbose=False)
@@ -86,8 +86,8 @@ def _depinning_Fc(pos, en_func, en_params, F_low, F_high, n_pts=12):
 
 @pytest.fixture(scope='module')
 def substrate():
-    _, en_func, en_params = substrate_from_params(_SIN_PARAMS)
-    return en_func, en_params
+    _, en_func, _ = substrate_from_params(_SIN_PARAMS)
+    return en_func
 
 
 # ---------------------------------------------------------------------------
@@ -96,11 +96,11 @@ def substrate():
 
 def test_F1s_analytic(substrate):
     """Single-particle Fc agrees with analytic F1s to 10%."""
-    en_func, en_params = substrate
+    en_func = substrate
     pos    = np.array([[0.0, 0.0]])   # single particle; kBT=0 so eta_r=0 is safe
     F1s    = _analytical_F1s()
 
-    Fc_lo, Fc_hi = _depinning_Fc(pos, en_func, en_params,
+    Fc_lo, Fc_hi = _depinning_Fc(pos, en_func,
                                   F_low=0.7 * F1s, F_high=1.3 * F1s)
     Fc_num = 0.5 * (Fc_lo + Fc_hi)
     rel_err = abs(Fc_num - F1s) / F1s
@@ -117,11 +117,11 @@ def test_F1s_analytic(substrate):
 
 def test_commensurate_linear_scaling(substrate):
     """Fc scales linearly with N for a commensurate cluster."""
-    en_func, en_params = substrate
+    en_func = substrate
     F1s = _analytical_F1s()
 
     pos1 = np.array([[0.0, 0.0]])
-    Fc1_lo, Fc1_hi = _depinning_Fc(pos1, en_func, en_params,
+    Fc1_lo, Fc1_hi = _depinning_Fc(pos1, en_func,
                                     F_low=0.7 * F1s, F_high=1.3 * F1s)
     Fc1 = 0.5 * (Fc1_lo + Fc1_hi)
 
@@ -129,7 +129,7 @@ def test_commensurate_linear_scaling(substrate):
     pos7 = np.array([
         [0., 0.], _A1, -_A1, _A2, -_A2, _A1 + _A2, -(_A1 + _A2)
     ], dtype=np.float64)
-    Fc7_lo, Fc7_hi = _depinning_Fc(pos7, en_func, en_params,
+    Fc7_lo, Fc7_hi = _depinning_Fc(pos7, en_func,
                                     F_low=4.0 * F1s, F_high=11.0 * F1s,
                                     n_pts=14)
     Fc7 = 0.5 * (Fc7_lo + Fc7_hi)
@@ -146,14 +146,14 @@ def test_commensurate_linear_scaling(substrate):
 
 def test_superlubricity(substrate):
     """Incommensurate cluster (theta=1.5 deg) slides at Fs < 0.5 * Fc_comm."""
-    en_func, en_params = substrate
+    en_func = substrate
     F1s = _analytical_F1s()
 
     # N=19 commensurate cluster (circle, 4 shells)
     pos_ref = make_cluster(_A1, _A2, 4, 4, shape='circle')
     N = len(pos_ref)
 
-    Fc_lo, Fc_hi = _depinning_Fc(pos_ref, en_func, en_params,
+    Fc_lo, Fc_hi = _depinning_Fc(pos_ref, en_func,
                                   F_low=0.5 * N * F1s,
                                   F_high=1.3 * N * F1s, n_pts=14)
     Fc_comm = 0.5 * (Fc_lo + Fc_hi)
@@ -167,7 +167,7 @@ def test_superlubricity(substrate):
     spec   = [{'Fx': float(f)} for f in F_vals]
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        results = sweep_md(pos_incomm, en_func, en_params, spec,
+        results = sweep_md(pos_incomm, en_func, spec,
                            base_md_kwargs=_MD_BASE,
                            post_fn=drift_velocity(),
                            n_jobs=1, save=False, verbose=False)

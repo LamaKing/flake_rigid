@@ -59,9 +59,9 @@ SINGLE = np.array([[0.0, 0.0]])
 
 @pytest.fixture(scope='module')
 def substrate():
-    """Return (calc_en_f, en_params) for the triangular sin substrate."""
-    _, calc_en_f, en_params = substrate_from_params(SIN_PARAMS)
-    return calc_en_f, en_params
+    """Return calc_en_f for the triangular sin substrate."""
+    _, calc_en_f, _ = substrate_from_params(SIN_PARAMS)
+    return calc_en_f
 
 
 @pytest.fixture(scope='module')
@@ -76,8 +76,8 @@ def sub_u_inv():
 # ---------------------------------------------------------------------------
 
 def test_single_particle_at_minimum(substrate):
-    calc_en_f, en_params = substrate
-    r = translational_map(SINGLE, calc_en_f, en_params, np.eye(2),
+    calc_en_f = substrate
+    r = translational_map(SINGLE, calc_en_f, np.eye(2),
                           n_x=1, n_y=1,
                           frac_x=(0., 0.), frac_y=(0., 0.))
     assert abs(r['energy'][0] - (-EPSILON)) < 1e-12
@@ -88,8 +88,8 @@ def test_single_particle_at_minimum(substrate):
 # ---------------------------------------------------------------------------
 
 def test_single_particle_trasl_map_shape(substrate):
-    calc_en_f, en_params = substrate
-    r = translational_map(SINGLE, calc_en_f, en_params, np.eye(2),
+    calc_en_f = substrate
+    r = translational_map(SINGLE, calc_en_f, np.eye(2),
                           n_x=5, n_y=5)
     assert r['pos_cm'].shape == (25, 2)
     assert r['energy'].shape == (25,)
@@ -102,9 +102,9 @@ def test_single_particle_trasl_map_shape(substrate):
 # ---------------------------------------------------------------------------
 
 def test_single_particle_force_from_map(substrate):
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
     # At origin: force must vanish.
-    r0 = translational_map(SINGLE, calc_en_f, en_params, np.eye(2),
+    r0 = translational_map(SINGLE, calc_en_f, np.eye(2),
                            n_x=1, n_y=1,
                            frac_x=(0., 0.), frac_y=(0., 0.))
     assert abs(r0['force'][0, 0]) < 1e-12
@@ -112,7 +112,7 @@ def test_single_particle_force_from_map(substrate):
 
     # At (0.1, 0): force must point toward origin (-x direction).
     dx = 0.1
-    r1 = translational_map(SINGLE, calc_en_f, en_params, np.eye(2),
+    r1 = translational_map(SINGLE, calc_en_f, np.eye(2),
                            n_x=1, n_y=1,
                            frac_x=(dx, dx), frac_y=(0., 0.))
     assert r1['force'][0, 0] < 0.0, (
@@ -126,10 +126,10 @@ def test_single_particle_force_from_map(substrate):
 
 def test_translational_map_periodicity(substrate, sub_u_inv):
     """E(0,0) == E(a1) == E(a2) for the triangular substrate unit cell."""
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
 
     def energy_at_frac(f1, f2):
-        r = translational_map(SINGLE, calc_en_f, en_params, sub_u_inv,
+        r = translational_map(SINGLE, calc_en_f, sub_u_inv,
                               n_x=1, n_y=1,
                               frac_x=(f1, f1), frac_y=(f2, f2))
         return r['energy'][0]
@@ -148,8 +148,8 @@ def test_translational_map_periodicity(substrate, sub_u_inv):
 
 def test_commensurate_cluster_matches_single_particle_energy(substrate):
     """7 commensurate particles at pos_cm=0 must give E = 7 * (-epsilon)."""
-    calc_en_f, en_params = substrate
-    r = translational_map(_COMM_POS, calc_en_f, en_params, np.eye(2),
+    calc_en_f = substrate
+    r = translational_map(_COMM_POS, calc_en_f, np.eye(2),
                           n_x=1, n_y=1,
                           frac_x=(0., 0.), frac_y=(0., 0.))
     expected = 7 * (-EPSILON)
@@ -164,12 +164,12 @@ def test_commensurate_cluster_matches_single_particle_energy(substrate):
 
 def test_commensurate_cluster_barrier_vs_incommensurate(substrate):
     """Incommensurate cluster barrier must be strictly less than commensurate."""
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
     common_kwargs = dict(n_x=12, n_y=12,
                          frac_x=(0., 1.), frac_y=(0., 1.))
 
-    r_c = translational_map(_COMM_POS,   calc_en_f, en_params, np.eye(2), **common_kwargs)
-    r_i = translational_map(_INCOMM_POS, calc_en_f, en_params, np.eye(2), **common_kwargs)
+    r_c = translational_map(_COMM_POS,   calc_en_f, np.eye(2), **common_kwargs)
+    r_i = translational_map(_INCOMM_POS, calc_en_f, np.eye(2), **common_kwargs)
 
     barrier_c = r_c['energy'].max() - r_c['energy'].min()
     barrier_i = r_i['energy'].max() - r_i['energy'].min()
@@ -186,14 +186,14 @@ def test_commensurate_cluster_barrier_vs_incommensurate(substrate):
 
 def test_commensurate_cluster_barrier_vs_rotated(substrate):
     """Cluster rotated by 15 degrees should have smaller translational barrier."""
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
     common_kwargs = dict(n_x=12, n_y=12,
                          frac_x=(0., 1.), frac_y=(0., 1.))
 
     pos_rot = rotate(_COMM_POS, 15.0)
 
-    r_aligned = translational_map(_COMM_POS, calc_en_f, en_params, np.eye(2), **common_kwargs)
-    r_rotated = translational_map(pos_rot,   calc_en_f, en_params, np.eye(2), **common_kwargs)
+    r_aligned = translational_map(_COMM_POS, calc_en_f, np.eye(2), **common_kwargs)
+    r_rotated = translational_map(pos_rot,   calc_en_f, np.eye(2), **common_kwargs)
 
     barrier_aligned = r_aligned['energy'].max() - r_aligned['energy'].min()
     barrier_rotated = r_rotated['energy'].max() - r_rotated['energy'].min()
@@ -209,9 +209,9 @@ def test_commensurate_cluster_barrier_vs_rotated(substrate):
 # ---------------------------------------------------------------------------
 
 def test_rotational_map_shape(substrate):
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
     n_theta = 7
-    r = rotational_map(SINGLE, calc_en_f, en_params,
+    r = rotational_map(SINGLE, calc_en_f,
                        np.linspace(0., 60., n_theta))
     assert r['theta'].shape  == (n_theta,)
     assert r['energy'].shape == (n_theta,)
@@ -225,10 +225,10 @@ def test_rotational_map_shape(substrate):
 
 def test_rotational_map_periodicity(substrate):
     """7-particle cluster: E(0 deg) == E(60 deg) from 6-fold symmetry."""
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
     # Include 0 and 60 as the first and last points.
     theta = np.linspace(0., 60., 13)
-    r = rotational_map(_COMM_POS, calc_en_f, en_params, theta)
+    r = rotational_map(_COMM_POS, calc_en_f, theta)
 
     e_0deg  = r['energy'][0]
     e_60deg = r['energy'][-1]
@@ -244,8 +244,8 @@ def test_rotational_map_periodicity(substrate):
 # ---------------------------------------------------------------------------
 
 def test_rototrasl_map_shape(substrate):
-    calc_en_f, en_params = substrate
-    r = rototrasl_map(SINGLE, calc_en_f, en_params, np.eye(2),
+    calc_en_f = substrate
+    r = rototrasl_map(SINGLE, calc_en_f, np.eye(2),
                       theta_deg=np.linspace(0., 30., 3),
                       n_x=4, n_y=4)
     assert r['energy'].shape == (3, 16)
@@ -260,10 +260,10 @@ def test_rototrasl_map_shape(substrate):
 
 def test_find_mep_barrier_positive(substrate):
     """MEP for single particle between two adjacent minima: barrier > 0."""
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
     p0 = np.array([0.0, 0.0])
     p1 = A1.copy()  # next minimum at [1, 0]
-    result = find_mep(SINGLE, calc_en_f, en_params, p0, p1,
+    result = find_mep(SINGLE, calc_en_f, p0, p1,
                       n_pt=30, max_steps=1000, dt=1e-4)
     assert result['barrier'] > 0.0
 
@@ -274,10 +274,10 @@ def test_find_mep_barrier_positive(substrate):
 
 def test_find_mep_converged(substrate):
     """With n_pt=50 and max_steps=5000 the MEP should converge."""
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
     p0 = np.array([0.0, 0.0])
     p1 = A1.copy()
-    result = find_mep(SINGLE, calc_en_f, en_params, p0, p1,
+    result = find_mep(SINGLE, calc_en_f, p0, p1,
                       n_pt=50, max_steps=5000, dt=1e-4)
     assert result['converged'], (
         "find_mep did not converge in %d steps" % result['n_steps']
@@ -290,13 +290,13 @@ def test_find_mep_converged(substrate):
 
 def test_find_mep_barrier_incommensurate_smaller(substrate):
     """7-particle incommensurate cluster (R=1.1) must have smaller MEP barrier."""
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
     p0 = np.array([0.0, 0.0])
     p1 = A1.copy()
 
-    mep_c = find_mep(_COMM_POS,   calc_en_f, en_params, p0, p1,
+    mep_c = find_mep(_COMM_POS,   calc_en_f, p0, p1,
                      n_pt=30, max_steps=1000, dt=1e-4)
-    mep_i = find_mep(_INCOMM_POS, calc_en_f, en_params, p0, p1,
+    mep_i = find_mep(_INCOMM_POS, calc_en_f, p0, p1,
                      n_pt=30, max_steps=1000, dt=1e-4)
 
     assert mep_i['barrier'] < mep_c['barrier'], (

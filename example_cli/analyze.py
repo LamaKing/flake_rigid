@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Analysis script for FLAKE CLI test runs.
+Analysis script for FLAKE CLI examples.
 
-Loads HDF5 outputs produced by:
-    flake map    -i params.yaml --grid grid_trasl.yaml  -o map_trasl.h5
-    flake map    -i params.yaml --grid grid_roto.yaml   -o map_roto.h5
-    flake string -i params.yaml --cfg  string_roto.yaml     -o mep_roto.h5
+Loads HDF5 outputs produced by run_tests.sh (or manually):
+    flake map    -i params.yaml --grid grid_trasl.yaml       -o map_trasl.h5
+    flake map    -i params.yaml --grid grid_roto.yaml        -o map_roto.h5
+    flake string -i params.yaml --cfg  string_roto.yaml      -o mep_roto.h5
     flake string -i params.yaml --cfg  string_rototrasl.yaml -o mep_rototrasl.h5
     flake sweep  -i params.yaml --spec sweep_Fx.yaml
     flake sweep  -i params.yaml --spec sweep_tau.yaml
@@ -320,15 +320,36 @@ def plot_depinning_tau(outdir='sweep_tau_out'):
     data = _load_sweep_dir(outdir)
     if not data:
         print('ERROR: no complete runs in %s' % outdir); return
-    tau_vals    = np.array([d['params']['Tau'] for d in data])
-    # load_sweep returns full traj dicts; extract final theta and omega
-    theta_final = np.array([d['result']['theta'][-1]  for d in data])
-    omega_final = np.array([d['result']['omega'][-1]  for d in data])
+    tau_vals = np.array([d['params']['Tau'] for d in data])
 
-    # Rotated if theta increased by more than one angular period (60 deg)
-    # Use omega as the sliding indicator: omega > threshold means rotating
+    # sweep_tau.yaml uses post_fn: drift_omega, so result is the mean angular
+    # drift (theta_f - theta_0)/(t_f - t_0) in deg/time -- a float per run.
+    # Fall back to computing from the raw trajectory if result is a dict
+    # (sweep run without post_fn, or save_traj=true without post_fn).
+    def _get_omega_drift(d):
+        res = d['result']
+        if isinstance(res, (int, float, np.floating)):
+            return float(res)
+        # raw trajectory dict: compute mean drift explicitly
+        theta  = res['theta']
+        t      = res['t']
+        dt_tot = float(t[-1] - t[0])
+        if dt_tot == 0.:
+            return 0.
+        return float(theta[-1] - theta[0]) / dt_tot
+
+    def _get_theta_final(d):
+        res = d['result']
+        if isinstance(res, dict):
+            return float(res['theta'][-1])
+        return None
+
+    omega_drift = np.array([_get_omega_drift(d) for d in data])
+    theta_finals = [_get_theta_final(d) for d in data]
+    has_theta = theta_finals[0] is not None
+
     thresh = 0.5   # deg/time; above this = depinned
-    pinned  = np.abs(omega_final) < thresh
+    pinned  = np.abs(omega_drift) < thresh
     sliding = ~pinned
 
     if pinned.any() and sliding.any():
@@ -339,28 +360,33 @@ def plot_depinning_tau(outdir='sweep_tau_out'):
         tc_lo = tc_hi = None
         print('Depinning Tau: no clear transition -- adjust Tau range')
 
-    fig, (axO, axTh) = plt.subplots(1, 2, dpi=150, figsize=(9, 3.5))
+    fig, axes = plt.subplots(1, 2 if has_theta else 1, dpi=150,
+                             figsize=(9 if has_theta else 5, 3.5))
+    axO = axes[0] if has_theta else axes
 
-    axO.scatter(tau_vals[pinned],  omega_final[pinned],
+    axO.scatter(tau_vals[pinned],  omega_drift[pinned],
                 color='tab:blue', label='pinned', zorder=3)
-    axO.scatter(tau_vals[sliding], omega_final[sliding],
+    axO.scatter(tau_vals[sliding], omega_drift[sliding],
                 color='tab:red', marker='^', label='rotating', zorder=3)
     if tc_lo is not None:
         axO.axvspan(tc_lo, tc_hi, alpha=0.15, color='orange',
                     label=r'$\tau_c \in [%.0f, %.0f]$' % (tc_lo, tc_hi))
     axO.set_xlabel(r'$\tau_\mathrm{ext}$')
-    axO.set_ylabel(r'$\omega_\mathrm{final}$ (deg/time)')
+    axO.set_ylabel(r'$\langle\omega\rangle$ (deg/time)')
     axO.legend(fontsize=7)
     axO.set_title('Rotational depinning', fontsize=9)
 
-    axTh.scatter(tau_vals[pinned],  theta_final[pinned],
-                 color='tab:blue', label='pinned', zorder=3)
-    axTh.scatter(tau_vals[sliding], theta_final[sliding],
-                 color='tab:red', marker='^', label='rotating', zorder=3)
-    axTh.axhline(60, ls='--', color='gray', lw=0.8, label='60 deg period')
-    axTh.set_xlabel(r'$\tau_\mathrm{ext}$')
-    axTh.set_ylabel(r'$\theta_\mathrm{final}$ (deg)')
-    axTh.legend(fontsize=7)
+    if has_theta:
+        axTh = axes[1]
+        theta_arr = np.array(theta_finals)
+        axTh.scatter(tau_vals[pinned],  theta_arr[pinned],
+                     color='tab:blue', label='pinned', zorder=3)
+        axTh.scatter(tau_vals[sliding], theta_arr[sliding],
+                     color='tab:red', marker='^', label='rotating', zorder=3)
+        axTh.axhline(60, ls='--', color='gray', lw=0.8, label='60 deg period')
+        axTh.set_xlabel(r'$\tau_\mathrm{ext}$')
+        axTh.set_ylabel(r'$\theta_\mathrm{final}$ (deg)')
+        axTh.legend(fontsize=7)
 
     plt.tight_layout()
     plt.savefig('plot_depinning_tau.png', dpi=150)

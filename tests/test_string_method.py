@@ -48,9 +48,9 @@ SINGLE = np.array([[0., 0.]])
 
 @pytest.fixture(scope='module')
 def substrate():
-    """Return (calc_en_f, en_params) for the triangular sin substrate."""
-    _, calc_en_f, en_params = substrate_from_params(SIN_PARAMS)
-    return calc_en_f, en_params
+    """Return calc_en_f for the triangular sin substrate."""
+    _, calc_en_f, _ = substrate_from_params(SIN_PARAMS)
+    return calc_en_f
 
 
 # ---------------------------------------------------------------------------
@@ -59,8 +59,8 @@ def substrate():
 
 def test_2d_barrier_positive(substrate):
     """Single particle, 2D MEP: barrier must be positive."""
-    calc_en_f, en_params = substrate
-    r = find_mep(SINGLE, calc_en_f, en_params,
+    calc_en_f = substrate
+    r = find_mep(SINGLE, calc_en_f,
                  p0=[0., 0.], p1=A1.tolist(),
                  n_pt=30, max_steps=1000, dt=1e-4)
     assert r['barrier'] > 0.0
@@ -68,8 +68,8 @@ def test_2d_barrier_positive(substrate):
 
 def test_2d_converges(substrate):
     """Single particle, 2D MEP: must converge with generous settings."""
-    calc_en_f, en_params = substrate
-    r = find_mep(SINGLE, calc_en_f, en_params,
+    calc_en_f = substrate
+    r = find_mep(SINGLE, calc_en_f,
                  p0=[0., 0.], p1=A1.tolist(),
                  n_pt=50, max_steps=5000, dt=1e-4)
     assert r['converged'], "find_mep did not converge in %d steps" % r['n_steps']
@@ -77,8 +77,8 @@ def test_2d_converges(substrate):
 
 def test_2d_output_keys(substrate):
     """Return dict has all required keys and dim=2."""
-    calc_en_f, en_params = substrate
-    r = find_mep(SINGLE, calc_en_f, en_params,
+    calc_en_f = substrate
+    r = find_mep(SINGLE, calc_en_f,
                  p0=[0., 0.], p1=A1.tolist(),
                  n_pt=20, max_steps=100)
     expected = {'points', 'energy', 'gradient', 'converged', 'n_steps',
@@ -89,9 +89,9 @@ def test_2d_output_keys(substrate):
 
 def test_2d_output_shapes(substrate):
     """Output arrays have shapes consistent with n_pt and dim=2."""
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
     n_pt = 17
-    r = find_mep(SINGLE, calc_en_f, en_params,
+    r = find_mep(SINGLE, calc_en_f,
                  p0=[0., 0.], p1=A1.tolist(),
                  n_pt=n_pt, max_steps=100)
     assert r['points'].shape   == (n_pt, 2)
@@ -101,11 +101,11 @@ def test_2d_output_shapes(substrate):
 
 def test_2d_barrier_incommensurate_smaller(substrate):
     """Incommensurate cluster (x1.1) has smaller barrier than commensurate."""
-    calc_en_f, en_params = substrate
-    r_c = find_mep(_COMM_POS, calc_en_f, en_params,
+    calc_en_f = substrate
+    r_c = find_mep(_COMM_POS, calc_en_f,
                    p0=[0., 0.], p1=A1.tolist(),
                    n_pt=30, max_steps=1000, dt=1e-4)
-    r_i = find_mep(_COMM_POS * 1.1, calc_en_f, en_params,
+    r_i = find_mep(_COMM_POS * 1.1, calc_en_f,
                    p0=[0., 0.], p1=A1.tolist(),
                    n_pt=30, max_steps=1000, dt=1e-4)
     assert r_i['barrier'] < r_c['barrier'], (
@@ -146,12 +146,12 @@ def test_2d_string_path_reparametrize_equal_spacing():
 
 def test_scaling_affects_path_not_barrier(substrate):
     """barrier with scale=[2.,2.] equals barrier with scale=None within 1e-4."""
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
     common = dict(n_pt=30, max_steps=1000, dt=1e-4,
                   p0=[0., 0.], p1=A1.tolist())
 
-    r_no_scale = find_mep(SINGLE, calc_en_f, en_params, scale=None,   **common)
-    r_scaled   = find_mep(SINGLE, calc_en_f, en_params, scale=[2., 2.], **common)
+    r_no_scale = find_mep(SINGLE, calc_en_f, scale=None,   **common)
+    r_scaled   = find_mep(SINGLE, calc_en_f, scale=[2., 2.], **common)
 
     assert abs(r_no_scale['barrier'] - r_scaled['barrier']) < 1e-4, (
         "barrier without scale=%.6f, with scale=[2,2]=%.6f"
@@ -180,9 +180,9 @@ def test_string_path_collapse_raises():
 
 def test_find_mep_3d_correct_shape(substrate):
     """3D find_mep: points.shape=(n_pt,3), dim=3, gradient.shape=(n_pt,3)."""
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
     n_pt = 15
-    r = find_mep(SINGLE, calc_en_f, en_params,
+    r = find_mep(SINGLE, calc_en_f,
                  p0=[0., 0., 0.], p1=[1., 0., 0.],
                  n_pt=n_pt, max_steps=100, dt=1e-4,
                  scale=[1., 1., 60.])
@@ -204,13 +204,13 @@ def test_find_mep_3d_barrier_leq_2d(substrate):
     in 3D).  For the triangular lattice the torque is zero by symmetry along
     y=0 at theta=0, so the path stays at theta=0 and the barriers are equal.
     """
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
     common = dict(n_pt=30, max_steps=500, dt=1e-4)
 
-    r_2d = find_mep(_COMM_POS, calc_en_f, en_params,
+    r_2d = find_mep(_COMM_POS, calc_en_f,
                     p0=[0., 0.],       p1=[1., 0.], **common)
 
-    r_3d = find_mep(_COMM_POS, calc_en_f, en_params,
+    r_3d = find_mep(_COMM_POS, calc_en_f,
                     p0=[0., 0., 0.],   p1=[1., 0., 0.],
                     scale=[1., 1., 60.], **common)
 
@@ -226,12 +226,12 @@ def test_find_mep_3d_barrier_leq_2d(substrate):
 
 def test_fix_ends_respected_after_steps(substrate):
     """After 10 manual string steps, p0 and p1 remain unchanged."""
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
     p0 = np.array([0., 0.])
     p1 = A1.copy()
 
     path      = StringPath(p0, p1, n_pt=20, fix_ends=True)
-    potential = StringPotential(SINGLE, calc_en_f, en_params)
+    potential = StringPotential(SINGLE, calc_en_f)
 
     for _ in range(10):
         _, gradients = potential.evaluate(path.points)

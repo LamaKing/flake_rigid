@@ -27,7 +27,7 @@ params = {
     'a1': [1.0, 0.0], 'a2': [0.5, -sqrt(3.)/2.],
     'cl_basis': [[0, 0]], 'cluster_shape': 'circle', 'N1': 20, 'N2': 20,
 }
-_, en_func, en_inputs = substrate_from_params(params)
+_, en_func, _ = substrate_from_params(params)
 pos = cluster_from_params(params)
 N = pos.shape[0]
 print('N = %d' % N)
@@ -37,14 +37,14 @@ theta  = 0.0
 pos_rot = rotate(pos, theta)
 
 # Warm up JIT
-en_func(pos_rot + pos_cm, pos_cm, *en_inputs)
+en_func(pos_rot + pos_cm, pos_cm)
 rotate(pos, 1.0)
 
 # ---- Benchmark calc_en_f ----
 n_calls = 20000
 t0 = time.perf_counter()
 for _ in range(n_calls):
-    e, f, tau = en_func(pos_rot + pos_cm, pos_cm, *en_inputs)
+    e, f, tau = en_func(pos_rot + pos_cm, pos_cm)
 t_en = (time.perf_counter() - t0) / n_calls * 1e6
 print('calc_en_f:  %.2f us/call' % t_en)
 
@@ -83,7 +83,7 @@ for _ in range(n_calls):
     pos_cm_   = x[:2]
     theta_deg = np.rad2deg(x[2])
     pos_rot_  = rotate(pos, theta_deg)
-    e0, f0, tau0 = en_func(pos_rot_ + pos_cm_, pos_cm_, *en_inputs)
+    e0, f0, tau0 = en_func(pos_rot_ + pos_cm_, pos_cm_)
     # drift
     vx = (f0[0]) / eta_t
     vy = (f0[1]) / eta_t

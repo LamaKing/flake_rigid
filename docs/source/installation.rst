@@ -29,11 +29,26 @@ With conda
 ----------
 
 If you use conda (or mamba), the recommended approach is to create a dedicated
-environment so that Numba and its dependencies do not conflict with other projects:
+environment so that Numba and its dependencies do not conflict with other projects.
+
+**Linux and Intel Mac (x86_64)**
 
 .. code-block:: console
 
    conda create -n flake python=3.11
+   conda activate flake
+   pip install flake-rigid
+
+**Apple Silicon Mac (M1/M2/M3, arm64)**
+
+On Apple Silicon, pip cannot install a pre-built ``llvmlite`` wheel and will
+attempt to compile it from source, which requires LLVM development headers that
+are not normally present.  Install ``numba`` via conda-forge first — it ships
+a pre-built binary — then let pip handle the rest:
+
+.. code-block:: console
+
+   conda create -n flake -c conda-forge python=3.11 numba
    conda activate flake
    pip install flake-rigid
 

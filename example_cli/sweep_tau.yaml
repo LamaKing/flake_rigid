@@ -6,17 +6,32 @@
 # post_fn=drift_velocity returns (vx, vy); for pure rotation vx~0.
 # Use last_state to also track theta_final and omega.
 # We use drift_velocity here and compute omega manually in the analysis script.
-sweep_type: grid
-grid:
-  Tau: [0.0, 200.0, 400.0, 600.0, 700.0, 800.0, 850.0, 900.0, 950.0,
-        1000.0, 1050.0, 1100.0, 1150.0, 1200.0, 1250.0, 1300.0, 1350.0,
-        1400.0, 1500.0, 1600.0, 1800.0, 2000.0, 3000, 4000, 5000, 6000]
+sweep_type: line
+line:
+  Tau: [0.0,
+ 367.3469387755102,
+ 734.6938775510204,
+ 1102.0408163265306,
+ 1469.3877551020407,
+ 1836.734693877551,
+ 2204.081632653061,
+ 2571.4285714285716,
+ 2938.7755102040815,
+ 3306.122448979592,
+ 3673.469387755102,
+ 4040.816326530612,
+ 4408.163265306122,
+ 4775.510204081633,
+ 5142.857142857143,
+ 5510.204081632653,
+ 5877.551020408163]
+
 base_md_kwargs:
-  eta: 1.0
-  kBT: 1.0e-8
-  dt: 1.0e-3
-  n_steps: 200000
-  print_every: 500
+ eta:         1.0
+ kBT:         0.0000001
+ dt:          0.001
+ n_steps:     50000
+ print_every: 10
 post_fn: drift_omega 
 save_traj: true
 overwrite: true    

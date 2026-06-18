@@ -684,9 +684,15 @@ def substrate_from_params(params):
     without substrate interference.
 
     All array parameters (basis, u, u_inv, ks) are converted to float64 ONCE
-    here and captured in the returned closures.  Callers pass en_inputs=[]
-    and call en_func(pos, pos_cm) -- the closure holds everything else.
+    here and captured in the returned closures.  The closures are called as
+    en_func(pos, pos_cm) -- they hold everything else internally.
     This eliminates per-step np.array conversions in run_md.
+
+    en_inputs is also returned as a list of the substrate parameters in the
+    same order as the explicit calc_en_<type> / particle_en_<type> public
+    functions, so callers can call those functions directly for debugging:
+        calc_en_gaussian(pos, pos_cm, *en_inputs)
+    The closures do NOT accept en_inputs as arguments; they are self-contained.
 
     Args:
         params: dict with at least 'well_shape' and shape-specific keys
@@ -698,7 +704,9 @@ def substrate_from_params(params):
                    (en, F, tau) arrays (per particle).
         en_func:   total-energy closure  (pos, pos_cm) ->
                    (float, (2,) float64, float).
-        en_inputs: always [] -- all parameters live in the closures.
+        en_inputs: list of pre-converted float64 parameters matching the
+                   explicit calc_en_<type> signature after (pos, pos_torque).
+                   Empty list for 'flat' (no explicit function to match).
 
     Raises:
         NotImplementedError: if well_shape is not recognised.
@@ -747,7 +755,7 @@ def substrate_from_params(params):
 
         en_func._jit_core   = _calc_en_gaussian_core
         en_func._jit_params = (_basis, _a, _b, _sigma, _epsilon, _u, _u_inv)
-        en_inputs = []
+        en_inputs = [_basis, _a, _b, _sigma, _epsilon, _u, _u_inv]
 
     elif well_shape == 'tanh':
         ww   = params['wd']   # 'wd' is the historical key; ww in the code
@@ -773,7 +781,7 @@ def substrate_from_params(params):
 
         en_func._jit_core   = _calc_en_tanh_core
         en_func._jit_params = (_basis, _a, _b, _ww, _epsilon, _u, _u_inv)
-        en_inputs = []
+        en_inputs = [_basis, _a, _b, _ww, _epsilon, _u, _u_inv]
 
     elif well_shape == 'sin':
         _ks      = np.asarray(params['ks'], dtype=np.float64)
@@ -791,7 +799,7 @@ def substrate_from_params(params):
 
         en_func._jit_core   = _calc_en_sin_core
         en_func._jit_params = (_basis, _ks, _epsilon)
-        en_inputs = []
+        en_inputs = [_basis, _ks, _epsilon]
 
     else:
         raise NotImplementedError(

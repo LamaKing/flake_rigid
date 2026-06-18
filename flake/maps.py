@@ -38,8 +38,8 @@ from flake.cluster import rotate
 
 def _eval_point(args):
     """Single grid-point evaluation.  Unpacked by joblib workers."""
-    pos_rot, pos_cm, calc_en_f, en_params = args
-    e, f, tau = calc_en_f(pos_rot + pos_cm, pos_cm, *en_params)
+    pos_rot, pos_cm, calc_en_f = args
+    e, f, tau = calc_en_f(pos_rot + pos_cm, pos_cm)
     return e, f[0], f[1], tau
 
 
@@ -47,7 +47,7 @@ def _eval_point(args):
 # Translational map
 # ============================================================
 
-def translational_map(pos, calc_en_f, en_params, u_inv,
+def translational_map(pos, calc_en_f, u_inv,
                       n_x, n_y,
                       frac_x=(0., 1.), frac_y=(0., 1.),
                       pos_cm_grid=None,
@@ -59,8 +59,7 @@ def translational_map(pos, calc_en_f, en_params, u_inv,
 
     Args:
         pos:          (N, 2) ndarray       -- cluster positions in cluster frame.
-        calc_en_f:    callable             -- total energy function from substrate_from_params.
-        en_params:    list                 -- extra arguments for calc_en_f.
+        calc_en_f:    callable             -- total energy closure from substrate_from_params.
         u_inv:        (2, 2) ndarray or None
                                            -- metric matrix used to map fractional
                                               coordinates to Cartesian.  Ignored
@@ -110,7 +109,7 @@ def translational_map(pos, calc_en_f, en_params, u_inv,
             for da2 in da2_vals
         ])
 
-    tasks = [(pos, cm, calc_en_f, en_params) for cm in grid_pos_cm]
+    tasks = [(pos, cm, calc_en_f) for cm in grid_pos_cm]
     results = _run_tasks(tasks, n_jobs)
 
     energy = np.array([r[0] for r in results])
@@ -125,15 +124,14 @@ def translational_map(pos, calc_en_f, en_params, u_inv,
 # Rotational map
 # ============================================================
 
-def rotational_map(pos, calc_en_f, en_params,
+def rotational_map(pos, calc_en_f,
                    theta_deg, pos_cm=(0., 0.),
                    n_jobs=1):
     """Energy as a function of cluster orientation at fixed CM position.
 
     Args:
         pos:       (N, 2) ndarray       -- cluster positions at theta=0.
-        calc_en_f: callable             -- total energy function.
-        en_params: list                 -- extra arguments for calc_en_f.
+        calc_en_f: callable             -- total energy closure from substrate_from_params.
         theta_deg: (n_theta,) array     -- angles in degrees.
         pos_cm:    (2,) array-like      -- fixed CM position (default origin).
         n_jobs:    int                  -- parallel workers.
@@ -151,7 +149,7 @@ def rotational_map(pos, calc_en_f, en_params,
 
     # Pre-rotate cluster for every angle before launching tasks.
     rotated = [rotate(pos, th) for th in theta_deg]
-    tasks   = [(r, pos_cm, calc_en_f, en_params) for r in rotated]
+    tasks   = [(r, pos_cm, calc_en_f) for r in rotated]
     results = _run_tasks(tasks, n_jobs)
 
     energy = np.array([r[0] for r in results])
@@ -166,7 +164,7 @@ def rotational_map(pos, calc_en_f, en_params,
 # Roto-translational map
 # ============================================================
 
-def rototrasl_map(pos, calc_en_f, en_params, u_inv,
+def rototrasl_map(pos, calc_en_f, u_inv,
                   theta_deg, n_x, n_y,
                   frac_x=(0., 1.), frac_y=(0., 1.),
                   pos_cm_grid=None,
@@ -178,8 +176,7 @@ def rototrasl_map(pos, calc_en_f, en_params, u_inv,
 
     Args:
         pos:         (N, 2) ndarray       -- cluster positions at theta=0.
-        calc_en_f:   callable             -- total energy function.
-        en_params:   list                 -- extra arguments for calc_en_f.
+        calc_en_f:   callable             -- total energy closure from substrate_from_params.
         u_inv:       (2, 2) ndarray or None -- metric matrix; ignored when
                                               pos_cm_grid is supplied.
         theta_deg:   (n_theta,) array     -- angles in degrees.
@@ -233,7 +230,7 @@ def rototrasl_map(pos, calc_en_f, en_params, u_inv,
     for th in theta_deg:
         pos_rot = rotate(pos, th)
         for cm in grid_pos_cm:
-            tasks.append((pos_rot, cm, calc_en_f, en_params))
+            tasks.append((pos_rot, cm, calc_en_f))
 
     results = _run_tasks(tasks, n_jobs)
 

@@ -45,7 +45,7 @@ from flake.dynamics import run_md
 _log = logging.getLogger(__name__)
 _log.addHandler(logging.NullHandler())
 
-# Valid override keys for run_md (everything after en_params in its signature).
+# Valid override keys for run_md (everything after calc_en_f in its signature).
 _VALID_MD_KWARGS = frozenset({
     'eta', 'Fx', 'Fy', 'Tau', 'kBT', 'dt', 'n_steps',
     'theta0', 'pos_cm0', 'print_every', 'stop_fn', 'output_fn', 'seed',
@@ -629,7 +629,7 @@ def drift_omega():
 # Main sweep driver
 # ============================================================
 
-def sweep_md(pos, calc_en_f, en_params, sweep_spec,
+def sweep_md(pos, calc_en_f, sweep_spec,
              base_md_kwargs=None, post_fn=None,
              n_jobs=1, backend='loky', outdir='.', save=True, save_traj=True,
              overwrite=False,
@@ -647,16 +647,14 @@ def sweep_md(pos, calc_en_f, en_params, sweep_spec,
 
     Args:
         pos:            (N, 2) ndarray -- cluster positions (reference frame).
-        calc_en_f:      callable       -- substrate energy function.
-        en_params:      list           -- extra arguments for calc_en_f.
+        calc_en_f:      callable       -- substrate energy closure from substrate_from_params.
         sweep_spec:     list of dict   -- one dict per run point.  Each dict
                                          overrides base_md_kwargs for that run.
                                          Duplicate points (same dict content)
                                          are silently removed after a warning.
         base_md_kwargs: dict or None   -- default keyword arguments for run_md.
                                          If None, run_md defaults are used.
-                                         Do NOT include pos, calc_en_f,
-                                         en_params here.
+                                         Do NOT include pos or calc_en_f here.
         post_fn:        callable or None
                         -- post_fn(traj_dict, run_params) -> dict or scalar.
                            Called after each run.  If None, the full trajectory
@@ -704,7 +702,7 @@ def sweep_md(pos, calc_en_f, en_params, sweep_spec,
 
     Example:
         spec = grid_sweep({'Fx': np.linspace(0, 0.5, 10), 'kBT': [1e-8]})
-        results = sweep_md(pos, calc_en_f, en_params, spec,
+        results = sweep_md(pos, calc_en_f, spec,
                            base_md_kwargs={'eta': 1.0, 'n_steps': 50000},
                            post_fn=drift_velocity(),
                            n_jobs=4, backend='threading',
@@ -776,7 +774,7 @@ def sweep_md(pos, calc_en_f, en_params, sweep_spec,
                 return {'params': kwargs, 'result': result, 'run_dir': run_dir}
 
         _log.info("sweep_md: starting run %04d / %04d", i, n_runs - 1)
-        traj   = run_md(pos, calc_en_f, en_params, **kwargs)
+        traj   = run_md(pos, calc_en_f, **kwargs)
         result = post_fn(traj, kwargs) if post_fn is not None else traj
         if run_dir is not None:
             _save_run(run_dir, traj, kwargs, save_traj=save_traj)

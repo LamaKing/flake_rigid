@@ -1,8 +1,8 @@
 """
 Superlubricity demo: commensurate vs incommensurate depinning.
 
-Run from src/ or test_cli_and_phys/:
-    python test_cli_and_phys/superlubricity.py
+Run from example_cli/:
+    python superlubricity.py
 
 Tune parameters below to explore.
 """
@@ -26,7 +26,7 @@ EPSILON     = 1.0           # substrate corrugation
 N_F         = 20            # number of force values in sweep
 N_STEPS     = 200_000       # steps per run (200 time units at dt=1e-3)
 KBT         = 0.0           # 0 = deterministic; try 1e-3 for thermal noise
-N_JOBS      = 4             # parallel workers
+N_JOBS      = -1             # parallel workers
 # ────────────────────────────────────────────────────────────────────────────
 
 A1 = np.array([1.0, 0.0])
@@ -38,7 +38,7 @@ sub_params = {
     'sub_basis':  [[0., 0.]],
     'ks':         get_ks(1.0, 3, 4.0 / 3.0, 0.0).tolist(),
 }
-_, en_func, en_params = substrate_from_params(sub_params)
+_, en_func, _ = substrate_from_params(sub_params)
 
 pos_comm  = make_cluster(A1, A2, N1, N2, shape=SHAPE)
 pos_incomm = rotate(pos_comm, THETA_INC)
@@ -61,13 +61,13 @@ F_comm   = np.linspace(0.0, 1.2 * Fc_comm_est, N_F)
 F_incomm = np.linspace(0.0, 0.5 * Fc_comm_est, N_F)
 
 print("Running commensurate sweep ...")
-res_comm = sweep_md(pos_comm, en_func, en_params,
+res_comm = sweep_md(pos_comm, en_func,
                     [{'Fx': float(f)} for f in F_comm],
                     base_md_kwargs=md_kwargs, post_fn=post_fn,
                     n_jobs=N_JOBS, save=False, verbose=False)
 
 print("Running incommensurate sweep ...")
-res_incomm = sweep_md(pos_incomm, en_func, en_params,
+res_incomm = sweep_md(pos_incomm, en_func,
                       [{'Fx': float(f)} for f in F_incomm],
                       base_md_kwargs=md_kwargs, post_fn=post_fn,
                       n_jobs=N_JOBS, save=False, verbose=False)

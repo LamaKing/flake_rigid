@@ -54,7 +54,7 @@ Run explicitly with:
 from time import time
 from flake.dynamics import run_md as _run_md
 
-_, en_func, en_inputs = substrate_from_params(_PARAMS)
+_, en_func, _ = substrate_from_params(_PARAMS)
 eta      = 1.0
 kBT      = 1e-5
 dt       = 5e-4
@@ -67,7 +67,7 @@ t0 = time()
 results_loop = []
 for Fx in F_values:
     traj = _run_md(
-        cluster, en_func, en_inputs,
+        cluster, en_func,
         eta=eta, Fx=Fx, kBT=kBT,
         dt=dt, n_steps=n_steps,
         theta0=0.0, pos_cm0=pos_cm0.copy(),
@@ -91,7 +91,7 @@ base = {'eta': eta, 'kBT': kBT, 'dt': dt,
         'n_steps': n_steps, 'print_every': 500,
         'pos_cm0': pos_cm0.copy()}
 t0     = time()
-r_loky = sweep_md(cluster, en_func, en_inputs, spec,
+r_loky = sweep_md(cluster, en_func, spec,
                       base_md_kwargs=base,
                       post_fn=drift_velocity(),
                       n_jobs=4, backend='loky',

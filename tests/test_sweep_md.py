@@ -52,8 +52,8 @@ _PARAMS = {
 
 @pytest.fixture(scope='module')
 def substrate():
-    _, en_func, en_inputs = substrate_from_params(_PARAMS)
-    return en_func, en_inputs
+    _, en_func, _ = substrate_from_params(_PARAMS)
+    return en_func
 
 
 @pytest.fixture(scope='module')
@@ -100,7 +100,7 @@ def test_concat_sweeps_dedup():
 def test_invalid_key_raises():
     with pytest.raises(ValueError, match='bad_key'):
         sweep_md(np.array([[0., 0.]]),
-                 lambda *a: (0., np.zeros(2), 0.), [],
+                 lambda *a: (0., np.zeros(2), 0.),
                  [{'bad_key': 1.0}],
                  base_md_kwargs={'eta': 1.0})
 
@@ -149,13 +149,13 @@ def test_drift_velocity_value():
 # ---------------------------------------------------------------------------
 
 def test_sweep_md_serial_returns_correct_structure(substrate, cluster):
-    en_func, en_inputs = substrate
+    en_func = substrate
     spec = grid_sweep({'Fx': [0.0, 0.1]})
     base = {'eta': 1.0, 'kBT': 1e-8, 'dt': 5e-4,
             'n_steps': 200, 'print_every': 50}
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        results = sweep_md(cluster, en_func, en_inputs, spec,
+        results = sweep_md(cluster, en_func, spec,
                            base_md_kwargs=base, save=False, verbose=False)
     assert len(results) == 2
     assert results[0]['run_dir'] is None
@@ -169,14 +169,14 @@ def test_sweep_md_serial_returns_correct_structure(substrate, cluster):
 # ---------------------------------------------------------------------------
 
 def test_save_load_roundtrip(substrate, cluster):
-    en_func, en_inputs = substrate
+    en_func = substrate
     spec = grid_sweep({'Fx': [0.0, 0.1]})
     base = {'eta': 1.0, 'kBT': 1e-8, 'dt': 5e-4,
             'n_steps': 200, 'print_every': 100}
     with tempfile.TemporaryDirectory() as tmp:
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
-            sweep_md(cluster, en_func, en_inputs, spec,
+            sweep_md(cluster, en_func, spec,
                      base_md_kwargs=base, save=True, outdir=tmp, verbose=False)
 
         dirs = sorted(os.listdir(tmp))
@@ -213,7 +213,7 @@ def test_loky_faster_than_explicit_loop(substrate):
     from flake.dynamics import run_md as _run_md
     from flake.cluster import make_cluster
 
-    en_func, en_inputs = substrate
+    en_func = substrate
 
     A1  = np.array([1.0, 0.0])
     A2  = np.array([0.5, -sqrt(3.0) / 2.0])
@@ -230,7 +230,7 @@ def test_loky_faster_than_explicit_loop(substrate):
     # warmup: compile JIT for this cluster size
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        _run_md(pos, en_func, en_inputs, eta=eta, kBT=kBT, dt=dt,
+        _run_md(pos, en_func, eta=eta, kBT=kBT, dt=dt,
                 n_steps=10, print_every=10, seed=0)
 
     # serial baseline: plain run_md loop (JIT path)
@@ -238,7 +238,7 @@ def test_loky_faster_than_explicit_loop(substrate):
         warnings.simplefilter('ignore')
         t0 = time()
         for Fx in F_values:
-            _run_md(pos, en_func, en_inputs,
+            _run_md(pos, en_func,
                     eta=eta, Fx=Fx, kBT=kBT, dt=dt, n_steps=n_steps,
                     theta0=0.0, pos_cm0=pos_cm0.copy(), print_every=n_steps)
         t_loop = time() - t0
@@ -250,7 +250,7 @@ def test_loky_faster_than_explicit_loop(substrate):
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         t0 = time()
-        sweep_md(pos, en_func, en_inputs, spec,
+        sweep_md(pos, en_func, spec,
                  base_md_kwargs=base, post_fn=drift_velocity(),
                  n_jobs=4, backend='loky', save=False, verbose=False)
         t_loky = time() - t0

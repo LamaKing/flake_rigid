@@ -64,7 +64,7 @@ def _dump_yaml(obj, path):
 
 
 def _build_physics(params_path):
-    """Load params.yaml and return (pos, calc_en_f, en_params, params_dict).
+    """Load params.yaml and return (pos, calc_en_f, params_dict).
 
     pos is always the cluster in the REFERENCE FRAME (theta=0).  Callers are
     responsible for applying the 'theta' value from params_dict appropriately:
@@ -84,10 +84,10 @@ def _build_physics(params_path):
 
     params = _load_yaml(params_path)
 
-    _, calc_en_f, en_params = substrate_from_params(params)
+    _, calc_en_f, _ = substrate_from_params(params)
     pos = cluster_from_params(params)
 
-    return pos, calc_en_f, en_params, params
+    return pos, calc_en_f, params
 
 
 # ============================================================
@@ -139,7 +139,7 @@ def _cmd_map(args):
     from flake.maps import translational_map, rotational_map, rototrasl_map
     from flake.io import save_map
 
-    pos, calc_en_f, en_params, params = _build_physics(args.input)
+    pos, calc_en_f, params = _build_physics(args.input)
 
     grid = _load_yaml(args.grid) if args.grid else {}
 
@@ -234,24 +234,24 @@ def _cmd_map(args):
 
     if map_type == 'translational':
         if well_shape == 'sin':
-            result = translational_map(pos, calc_en_f, en_params, None,
+            result = translational_map(pos, calc_en_f, None,
                                        n_x, n_y,
                                        pos_cm_grid=pos_cm_grid,
                                        n_jobs=n_jobs)
         else:
-            result = translational_map(pos, calc_en_f, en_params, u_inv,
+            result = translational_map(pos, calc_en_f, u_inv,
                                        n_x, n_y,
                                        frac_x=frac_x, frac_y=frac_y,
                                        n_jobs=n_jobs)
     elif map_type == 'rotational':
         theta_deg = np.linspace(theta_range[0], theta_range[1],
                                 n_theta, endpoint=False)
-        result = rotational_map(pos, calc_en_f, en_params,
+        result = rotational_map(pos, calc_en_f,
                                 theta_deg, n_jobs=n_jobs)
     else:  # rototrasl (gaussian/tanh only; sin raises above)
         theta_deg = np.linspace(theta_range[0], theta_range[1],
                                 n_theta, endpoint=False)
-        result = rototrasl_map(pos, calc_en_f, en_params, u_inv,
+        result = rototrasl_map(pos, calc_en_f, u_inv,
                                theta_deg, n_x, n_y,
                                frac_x=frac_x, frac_y=frac_y,
                                n_jobs=n_jobs)
@@ -320,7 +320,7 @@ def _cmd_sweep(args):
     """
     from flake.sweep import sweep_md, grid_sweep, line_sweep, force_sweep
 
-    pos, calc_en_f, en_params, params = _build_physics(args.input)
+    pos, calc_en_f, params = _build_physics(args.input)
 
     spec_dict = _load_yaml(args.spec)
 
@@ -370,7 +370,7 @@ def _cmd_sweep(args):
     print("flake sweep: %d points  outdir=%s" % (len(sweep_spec), outdir),
           flush=True)
 
-    results = sweep_md(pos, calc_en_f, en_params, sweep_spec,
+    results = sweep_md(pos, calc_en_f, sweep_spec,
                        base_md_kwargs=base_md_kwargs,
                        post_fn=post_fn,
                        save=True, verbose=True,
@@ -405,7 +405,7 @@ def _cmd_string(args):
     from flake.string_method import find_mep
     from flake.io import save_map
 
-    pos, calc_en_f, en_params, params = _build_physics(args.input)
+    pos, calc_en_f, params = _build_physics(args.input)
 
     cfg = _load_yaml(args.cfg)
 
@@ -443,7 +443,7 @@ def _cmd_string(args):
     print("flake string: dim=%d  n_points=%d  n_iter=%d"
           % (dim, n_points, n_iter), flush=True)
 
-    result = find_mep(pos, calc_en_f, en_params,
+    result = find_mep(pos, calc_en_f,
                       p0, p1,
                       n_pt=n_points, max_steps=n_iter,
                       dt=step, tol=tol,

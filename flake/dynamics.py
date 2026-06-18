@@ -184,7 +184,7 @@ def _md_loop_njit(pos, calc_en_core, substrate_params,
 # Python-loop path (used when callbacks are present)
 # ============================================================
 
-def _run_python_loop(pos, calc_en_f, en_params,
+def _run_python_loop(pos, calc_en_f,
                      eta_t, eta_r, Fx, Fy, Tau, kBT, dt,
                      x0, n_steps, print_every,
                      stop_fn, output_fn, seed):
@@ -205,7 +205,7 @@ def _run_python_loop(pos, calc_en_f, en_params,
     theta_deg = np.rad2deg(x[2])
     pos_rot   = rotate(pos, theta_deg)
 
-    e0, f0, tau0 = calc_en_f(pos_rot + pos_cm, pos_cm, *en_params)
+    e0, f0, tau0 = calc_en_f(pos_rot + pos_cm, pos_cm)
 
     records = [] if output_fn is None else None
 
@@ -227,7 +227,7 @@ def _run_python_loop(pos, calc_en_f, en_params,
         pos_cm    = x[:2].copy()
         theta_deg = np.rad2deg(x[2])
         pos_rot   = rotate(pos, theta_deg)
-        e0, f0, tau0 = calc_en_f(pos_rot + pos_cm, pos_cm, *en_params)
+        e0, f0, tau0 = calc_en_f(pos_rot + pos_cm, pos_cm)
 
         if i_step % print_every == 0:
             state = {
@@ -271,7 +271,7 @@ def _run_python_loop(pos, calc_en_f, en_params,
 # MD driver
 # ============================================================
 
-def run_md(pos, calc_en_f, en_params,
+def run_md(pos, calc_en_f,
            eta, Fx=0., Fy=0., Tau=0., kBT=0.,
            dt=1e-4, n_steps=10000,
            theta0=0., pos_cm0=None,
@@ -299,13 +299,11 @@ def run_md(pos, calc_en_f, en_params,
 
     Args:
         pos: (N, 2) ndarray -- cluster positions in the cluster frame (CM at origin).
-        calc_en_f: callable -- substrate energy function. Must expose
+        calc_en_f: callable -- substrate energy function returned by
+            ``substrate_from_params``.  Called as ``calc_en_f(pos, pos_cm)``;
+            all substrate parameters are captured in the closure.  Must expose
             ``_jit_core`` and ``_jit_params`` attributes when no callbacks are
             provided (JIT path); not required when stop_fn or output_fn is set.
-            Use ``substrate_from_params`` to build a compliant function.
-        en_params: list -- extra arguments for ``calc_en_f``. Always ``[]``
-            for functions produced by ``substrate_from_params`` (closures capture
-            all parameters internally).
         eta: float -- single-particle drag coefficient.
         Fx: float -- constant external force along x (default 0).
         Fy: float -- constant external force along y (default 0).
@@ -385,7 +383,7 @@ def run_md(pos, calc_en_f, en_params,
     # Python loop path: required when callbacks are present.
     if stop_fn is not None or output_fn is not None:
         return _run_python_loop(
-            pos, calc_en_f, en_params,
+            pos, calc_en_f,
             eta_t, eta_r, Fx, Fy, Tau, kBT, dt,
             x0, n_steps, print_every,
             stop_fn, output_fn, seed

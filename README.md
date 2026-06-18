@@ -62,7 +62,7 @@ flake string -i my_params.yaml --cfg string_roto.yaml -o mep.h5
 flake sweep -i my_params.yaml --spec sweep_Fx.yaml
 ```
 
-See `test_cli_and_phys/` for working YAML examples of all three subcommands.
+See `example_cli/` for working YAML examples of all three subcommands.
 
 ## Substrate
 

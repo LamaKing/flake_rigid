@@ -19,8 +19,8 @@ ks:
 # --- cluster ---
 # Triangular lattice, same spacing as substrate (commensurate).
 cluster_shape: circle
-N1: 9
-N2: 9
+N1: 15
+N2: 15
 cl_basis:
   - [0.0, 0.0]
 a1: [1.0, 0.0]

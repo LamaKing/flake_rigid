@@ -91,27 +91,27 @@ def _flat_sub(abs_pos, pos_cm):
 
 @pytest.fixture(scope='module')
 def substrate():
-    """Return (calc_en_f, en_params) for the triangular sin substrate."""
-    _, calc_en_f, en_params = substrate_from_params(SIN_PARAMS)
-    return calc_en_f, en_params
+    """Return calc_en_f for the triangular sin substrate."""
+    _, calc_en_f, _ = substrate_from_params(SIN_PARAMS)
+    return calc_en_f
 
 
 @pytest.fixture(scope='module')
 def gauss_substrate():
-    """Return (calc_en_f, en_params) for the square-lattice Gaussian substrate."""
-    _, calc_en_f, en_params = substrate_from_params(GAUSS_PARAMS)
-    return calc_en_f, en_params
+    """Return calc_en_f for the square-lattice Gaussian substrate."""
+    _, calc_en_f, _ = substrate_from_params(GAUSS_PARAMS)
+    return calc_en_f
 
 
 @pytest.fixture(scope='module')
 def flat_sub_jit():
-    """Return (calc_en_f, en_params) for the flat (zero) substrate.
+    """Return calc_en_f for the flat (zero) substrate.
 
     Energy and force are identically zero; _jit_core/_jit_params are present.
     Use in JIT-path tests that need a substrate-free integrator.
     """
-    _, calc_en_f, en_params = substrate_from_params(_FLAT_PARAMS)
-    return calc_en_f, en_params
+    _, calc_en_f, _ = substrate_from_params(_FLAT_PARAMS)
+    return calc_en_f
 
 
 # ---------------------------------------------------------------------------
@@ -120,7 +120,7 @@ def flat_sub_jit():
 
 def test_noise_amplitude_correct(flat_sub_jit):
     """var(delta_x) == 2*D_t*dt within 20% (TWO_PART cluster, kBT=1)."""
-    calc_en_f, en_params = flat_sub_jit
+    calc_en_f = flat_sub_jit
     eta   = 1.0
     kBT   = 1.0
     dt    = 1e-3
@@ -128,7 +128,7 @@ def test_noise_amplitude_correct(flat_sub_jit):
     eta_t, _ = calc_cluster_langevin(eta, TWO_PART)
     D_t = kBT / eta_t
 
-    result = run_md(TWO_PART, calc_en_f, en_params, eta=eta, kBT=kBT,
+    result = run_md(TWO_PART, calc_en_f, eta=eta, kBT=kBT,
                     dt=dt, n_steps=n, print_every=1, seed=42)
 
     dx      = np.diff(result['pos_cm'][:, 0])
@@ -147,8 +147,8 @@ def test_noise_amplitude_correct(flat_sub_jit):
 
 def test_zero_temperature_no_diffusion(flat_sub_jit):
     """kBT=0 and no external force: particle must not move at all."""
-    calc_en_f, en_params = flat_sub_jit
-    result = run_md(SINGLE, calc_en_f, en_params, eta=1.0, kBT=0.,
+    calc_en_f = flat_sub_jit
+    result = run_md(SINGLE, calc_en_f, eta=1.0, kBT=0.,
                     dt=1e-3, n_steps=1000, print_every=1, seed=0)
 
     pos = result['pos_cm']
@@ -163,14 +163,14 @@ def test_zero_temperature_no_diffusion(flat_sub_jit):
 
 def test_external_force_free_particle(flat_sub_jit):
     """kBT=0, flat substrate, Fx: pos_cm_x = Fx/eta_t * t up to 1e-8."""
-    calc_en_f, en_params = flat_sub_jit
+    calc_en_f = flat_sub_jit
     eta   = 1.0
     Fx    = 0.5
     dt    = 1e-3
     n     = 2000
     eta_t, _ = calc_cluster_langevin(eta, SINGLE)
 
-    result = run_md(SINGLE, calc_en_f, en_params, eta=eta, Fx=Fx, kBT=0.,
+    result = run_md(SINGLE, calc_en_f, eta=eta, Fx=Fx, kBT=0.,
                     dt=dt, n_steps=n, print_every=1, seed=0)
 
     t_arr  = result['t']
@@ -188,9 +188,9 @@ def test_external_force_free_particle(flat_sub_jit):
 
 def test_energy_decreases_to_minimum(substrate):
     """kBT=0, particle starts at (0.3,0): energy must decrease monotonically."""
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
 
-    result = run_md(SINGLE, calc_en_f, en_params, eta=1.0, kBT=0.,
+    result = run_md(SINGLE, calc_en_f, eta=1.0, kBT=0.,
                     dt=1e-4, n_steps=5000, print_every=1,
                     pos_cm0=np.array([0.3, 0.0]), seed=0)
 
@@ -214,7 +214,7 @@ def test_stop_fn():
     def my_stop(step, state_dict):
         return step >= trigger_step
 
-    result = run_md(SINGLE, _flat_sub, [], eta=1.0, kBT=0.,
+    result = run_md(SINGLE, _flat_sub, eta=1.0, kBT=0.,
                     dt=1e-3, n_steps=10000,
                     print_every=print_every,
                     stop_fn=my_stop, seed=0)
@@ -232,11 +232,11 @@ def test_stop_fn():
 
 def test_commensurate_cluster_pinned(substrate):
     """kBT=0, Fx=0.01*epsilon: 7-particle commensurate cluster must not slide."""
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
     epsilon = SIN_PARAMS['epsilon']
     Fx      = 0.01 * epsilon   # well below the translational barrier
 
-    result = run_md(_COMM_POS, calc_en_f, en_params, eta=1.0, Fx=Fx, kBT=0.,
+    result = run_md(_COMM_POS, calc_en_f, eta=1.0, Fx=Fx, kBT=0.,
                     dt=1e-4, n_steps=5000, print_every=100, seed=0)
 
     final_x = abs(float(result['pos_cm'][-1, 0]))
@@ -251,11 +251,11 @@ def test_commensurate_cluster_pinned(substrate):
 
 def test_output_dict_keys(flat_sub_jit):
     """All expected keys present and shapes consistent with n_rec."""
-    calc_en_f, en_params = flat_sub_jit
+    calc_en_f = flat_sub_jit
     n_steps     = 100
     print_every = 10
 
-    result = run_md(SINGLE, calc_en_f, en_params, eta=1.0, kBT=0.,
+    result = run_md(SINGLE, calc_en_f, eta=1.0, kBT=0.,
                     dt=1e-3, n_steps=n_steps,
                     print_every=print_every, seed=0)
 
@@ -286,7 +286,7 @@ def test_output_fn_no_return():
     def my_output(step, t, state_dict):
         collected.append({'step': step, 't': t, **state_dict})
 
-    result = run_md(SINGLE, _flat_sub, [], eta=1.0, kBT=0.,
+    result = run_md(SINGLE, _flat_sub, eta=1.0, kBT=0.,
                     dt=1e-3, n_steps=n_steps,
                     print_every=print_every,
                     output_fn=my_output, seed=0)
@@ -301,11 +301,11 @@ def test_output_fn_no_return():
 
 def test_gradient_descent_at_low_kBT(substrate):
     """kBT=1e-8 (near-zero): cluster starting at (0.3,0) relaxes toward minimum."""
-    calc_en_f, en_params = substrate
+    calc_en_f = substrate
     pos_cm0 = np.array([0.3, 0.0])
 
     # TWO_PART has eta_r > 0, required when kBT > 0.
-    r = run_md(TWO_PART, calc_en_f, en_params, eta=1.0, kBT=1e-8,
+    r = run_md(TWO_PART, calc_en_f, eta=1.0, kBT=1e-8,
                dt=1e-4, n_steps=5000, print_every=1,
                pos_cm0=pos_cm0.copy(), seed=0)
 
@@ -321,8 +321,8 @@ def test_gradient_descent_at_low_kBT(substrate):
 
 def test_jit_no_force_no_motion(flat_sub_jit):
     """JIT path: kBT=0, no external force -- CM stays at origin."""
-    calc_en_f, en_params = flat_sub_jit
-    result = run_md(TWO_PART, calc_en_f, en_params, eta=1.0, kBT=0.,
+    calc_en_f = flat_sub_jit
+    result = run_md(TWO_PART, calc_en_f, eta=1.0, kBT=0.,
                     dt=1e-3, n_steps=200, print_every=10, seed=42)
     assert np.allclose(result['pos_cm'], 0., atol=1e-14), (
         "max displacement = %.2e" % np.max(np.abs(result['pos_cm']))
@@ -335,7 +335,7 @@ def test_jit_no_force_no_motion(flat_sub_jit):
 
 def test_jit_noise_amplitude(flat_sub_jit):
     """JIT path: var(delta_x) == 2*D_t*dt within 20%."""
-    calc_en_f, en_params = flat_sub_jit
+    calc_en_f = flat_sub_jit
     eta = 1.0
     kBT = 1.0
     dt  = 1e-3
@@ -343,7 +343,7 @@ def test_jit_noise_amplitude(flat_sub_jit):
     eta_t, _ = calc_cluster_langevin(eta, TWO_PART)
     D_t = kBT / eta_t
 
-    result = run_md(TWO_PART, calc_en_f, en_params, eta=eta, kBT=kBT,
+    result = run_md(TWO_PART, calc_en_f, eta=eta, kBT=kBT,
                     dt=dt, n_steps=n, print_every=1, seed=42)
     dx  = np.diff(result['pos_cm'][:, 0])
     var = float(np.var(dx))
@@ -359,7 +359,7 @@ def test_jit_noise_amplitude(flat_sub_jit):
 def test_no_jit_core_raises():
     """run_md without callbacks raises NotImplementedError for a plain callable."""
     with pytest.raises(NotImplementedError, match="_jit_core"):
-        run_md(SINGLE, _flat_sub, [], eta=1.0, kBT=0.,
+        run_md(SINGLE, _flat_sub, eta=1.0, kBT=0.,
                dt=1e-3, n_steps=10, print_every=5, seed=0)
 
 
@@ -369,7 +369,7 @@ def test_no_jit_core_raises():
 
 def test_flat_drift_velocity(flat_sub_jit):
     """F/eta_t * t analytic prediction matches JIT trajectory to 1e-8."""
-    calc_en_f, en_params = flat_sub_jit
+    calc_en_f = flat_sub_jit
     eta = 1.0
     Fx  = 0.5
     dt  = 1e-3
@@ -379,7 +379,7 @@ def test_flat_drift_velocity(flat_sub_jit):
     import warnings
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        r = run_md(TWO_PART, calc_en_f, en_params, eta=eta, Fx=Fx, kBT=0.,
+        r = run_md(TWO_PART, calc_en_f, eta=eta, Fx=Fx, kBT=0.,
                    dt=dt, n_steps=n, print_every=1, seed=0)
 
     x_pred = Fx / eta_t * r['t']
@@ -388,7 +388,7 @@ def test_flat_drift_velocity(flat_sub_jit):
 
 def test_flat_diffusion(flat_sub_jit):
     """var(delta_x) == 2*D_t*dt to 5% on flat substrate (N=50000 steps)."""
-    calc_en_f, en_params = flat_sub_jit
+    calc_en_f = flat_sub_jit
     eta = 1.0
     kBT = 1.0
     dt  = 1e-3
@@ -399,7 +399,7 @@ def test_flat_diffusion(flat_sub_jit):
     import warnings
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        r = run_md(TWO_PART, calc_en_f, en_params, eta=eta, kBT=kBT,
+        r = run_md(TWO_PART, calc_en_f, eta=eta, kBT=kBT,
                    dt=dt, n_steps=n, print_every=1, seed=7)
 
     dx  = np.diff(r['pos_cm'][:, 0])
@@ -457,7 +457,7 @@ def test_jit_speedup_benchmark():
         'sub_basis': [[0., 0.]],
         'ks': get_ks(1.0, 3, 4.0 / 3.0, 0.0).tolist(),
     }
-    _, sin_en_f, sin_en_p = substrate_from_params(sin_params)
+    _, sin_en_f, _ = substrate_from_params(sin_params)
 
     n_steps = 500_000
     md_kw = dict(eta=1.0, kBT=1e-5, Fx=0.3, dt=5e-4,
@@ -471,17 +471,17 @@ def test_jit_speedup_benchmark():
 
         # warmup: compile JIT paths before timing
         wkw = dict(md_kw, n_steps=200, print_every=200)
-        run_md(pos, sin_en_f, sin_en_p, **wkw)
-        run_md(pos, sin_en_f, sin_en_p, stop_fn=_never_stop, **wkw)
+        run_md(pos, sin_en_f, **wkw)
+        run_md(pos, sin_en_f, stop_fn=_never_stop, **wkw)
 
         # Python-loop: stop_fn forces _run_python_loop
         t0 = perf_counter()
-        run_md(pos, sin_en_f, sin_en_p, stop_fn=_never_stop, **md_kw)
+        run_md(pos, sin_en_f, stop_fn=_never_stop, **md_kw)
         t_python = perf_counter() - t0
 
         # JIT-loop: no callbacks
         t0 = perf_counter()
-        run_md(pos, sin_en_f, sin_en_p, **md_kw)
+        run_md(pos, sin_en_f, **md_kw)
         t_jit = perf_counter() - t0
 
     speedup = t_python / t_jit
@@ -503,12 +503,12 @@ def test_jit_speedup_benchmark():
 
 def test_gauss_energy_decreases(gauss_substrate):
     """kBT=0, single particle starts off-minimum: energy must decrease monotonically."""
-    calc_en_f, en_params = gauss_substrate
+    calc_en_f = gauss_substrate
 
     import warnings
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        result = run_md(SINGLE, calc_en_f, en_params, eta=1.0, kBT=0.,
+        result = run_md(SINGLE, calc_en_f, eta=1.0, kBT=0.,
                         dt=1e-4, n_steps=5000, print_every=1,
                         pos_cm0=np.array([0.3, 0.0]), seed=0)
 
@@ -521,13 +521,13 @@ def test_gauss_energy_decreases(gauss_substrate):
 
 def test_gauss_commensurate_pinned(gauss_substrate):
     """kBT=0, Fx=0.01*epsilon: 5-particle commensurate cluster stays pinned."""
-    calc_en_f, en_params = gauss_substrate
+    calc_en_f = gauss_substrate
     Fx = 0.01 * GAUSS_PARAMS['epsilon']
 
     import warnings
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        result = run_md(_COMM_SQ, calc_en_f, en_params, eta=1.0, Fx=Fx, kBT=0.,
+        result = run_md(_COMM_SQ, calc_en_f, eta=1.0, Fx=Fx, kBT=0.,
                         dt=1e-4, n_steps=5000, print_every=100, seed=0)
 
     final_x = abs(float(result['pos_cm'][-1, 0]))
@@ -550,7 +550,7 @@ def test_gauss_jit_speedup_benchmark():
     pos = make_cluster(A1, A2, 9, 10, shape='circle')   # N=85
     N   = len(pos)
 
-    _, gauss_en_f, gauss_en_p = substrate_from_params(GAUSS_PARAMS)
+    _, gauss_en_f, _ = substrate_from_params(GAUSS_PARAMS)
 
     n_steps = 500_000
     md_kw = dict(eta=1.0, kBT=1e-5, Fx=0.3, dt=5e-4,
@@ -563,15 +563,15 @@ def test_gauss_jit_speedup_benchmark():
         warnings.simplefilter('ignore')
 
         wkw = dict(md_kw, n_steps=200, print_every=200)
-        run_md(pos, gauss_en_f, gauss_en_p, **wkw)
-        run_md(pos, gauss_en_f, gauss_en_p, stop_fn=_never_stop, **wkw)
+        run_md(pos, gauss_en_f, **wkw)
+        run_md(pos, gauss_en_f, stop_fn=_never_stop, **wkw)
 
         t0 = perf_counter()
-        run_md(pos, gauss_en_f, gauss_en_p, stop_fn=_never_stop, **md_kw)
+        run_md(pos, gauss_en_f, stop_fn=_never_stop, **md_kw)
         t_python = perf_counter() - t0
 
         t0 = perf_counter()
-        run_md(pos, gauss_en_f, gauss_en_p, **md_kw)
+        run_md(pos, gauss_en_f, **md_kw)
         t_jit = perf_counter() - t0
 
     speedup = t_python / t_jit

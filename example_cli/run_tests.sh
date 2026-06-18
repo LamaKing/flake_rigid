@@ -1,6 +1,6 @@
 #!/bin/bash
-# Run all FLAKE CLI tests for the commensurate triangular system.
-# Execute from the directory containing params.yaml and the yaml config files.
+# Run all FLAKE CLI examples for the commensurate triangular system.
+# Execute from the example_cli/ directory (where params.yaml lives).
 # Requires the package to be installed: pip install -e ".[dev]"
 #
 # NOTE: sweep_md skips runs whose run_NNNN/params.yaml already exists (resume).

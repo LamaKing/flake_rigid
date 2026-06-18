@@ -8,7 +8,7 @@ pre-rotate the cluster before calling::
 
     from flake.cluster import rotate
     pos_rot = rotate(pos, theta_deg)
-    result  = find_mep(pos_rot, calc_en_f, en_params,
+    result  = find_mep(pos_rot, calc_en_f,
                        p0=[x0, y0], p1=[x1, y1])
 
 ``result['points']`` has shape ``(n_pt, 2)``.
@@ -16,7 +16,7 @@ pre-rotate the cluster before calling::
 **3D roto-translational** :math:`(x_\mathrm{cm}, y_\mathrm{cm}, \theta)` — pos in
 reference frame; the method rotates internally::
 
-    result = find_mep(pos, calc_en_f, en_params,
+    result = find_mep(pos, calc_en_f,
                       p0=[x0, y0, th0], p1=[x1, y1, th1],
                       scale=[lx, ly, ltheta])
 
@@ -161,14 +161,12 @@ class StringPotential:
 
     Args:
         pos:       (N, 2) ndarray  -- cluster positions (reference frame, theta=0).
-        calc_en_f: callable        -- total energy function from substrate_from_params.
-        en_params: list            -- extra arguments for calc_en_f.
+        calc_en_f: callable        -- total energy closure from substrate_from_params.
     """
 
-    def __init__(self, pos, calc_en_f, en_params):
+    def __init__(self, pos, calc_en_f):
         self.pos       = np.asarray(pos, dtype=np.float64)
         self.calc_en_f = calc_en_f
-        self.en_params = en_params
 
     def evaluate(self, path_points, n_jobs=1):
         """Compute energy and gradient (-dE/dp) at every point along the path.
@@ -193,7 +191,7 @@ class StringPotential:
         if dim == 2:
             def _eval_point(cm):
                 e, f, tau = self.calc_en_f(
-                    self.pos + cm, cm, *self.en_params)
+                    self.pos + cm, cm)
                 return e, np.array([f[0], f[1]])
 
         elif dim == 3:
@@ -202,7 +200,7 @@ class StringPotential:
                 cm      = pt[:2]
                 pos_rot = rotate(self.pos, float(pt[2]))
                 e, f, tau = self.calc_en_f(
-                    pos_rot + cm, cm, *self.en_params)
+                    pos_rot + cm, cm)
                 return e, np.array([f[0], f[1], float(tau)])
 
         else:
@@ -235,7 +233,7 @@ class StringPotential:
 # MEP finder
 # ============================================================
 
-def find_mep(pos, calc_en_f, en_params, p0, p1,
+def find_mep(pos, calc_en_f, p0, p1,
              n_pt=100, max_steps=3000, dt=1e-4,
              fix_ends=True, tol=1e-8,
              scale=None, n_jobs=1):
@@ -248,8 +246,7 @@ def find_mep(pos, calc_en_f, en_params, p0, p1,
 
     Args:
         pos:       (N, 2) ndarray  -- cluster positions (reference frame).
-        calc_en_f: callable        -- total energy function.
-        en_params: list            -- extra arguments for calc_en_f.
+        calc_en_f: callable        -- total energy closure from substrate_from_params.
         p0:        (dim,) array-like -- start point.
         p1:        (dim,) array-like -- end point.
         n_pt:      int             -- number of points along path.
@@ -283,7 +280,7 @@ def find_mep(pos, calc_en_f, en_params, p0, p1,
     dim = p0.shape[0]
 
     path      = StringPath(p0, p1, n_pt, fix_ends=fix_ends, scale=scale)
-    potential = StringPotential(pos, calc_en_f, en_params)
+    potential = StringPotential(pos, calc_en_f)
 
     converged  = False
     step_count = 0

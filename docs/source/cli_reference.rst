@@ -49,7 +49,7 @@ A typical session proceeds in this order:
    # Step 4 — depinning sweep over a range of applied forces
    flake sweep -i params.yaml --spec sweep_Fx.yaml --outdir sweep_out/
 
-Working YAML examples for all subcommands are in ``test_cli_and_phys/``.
+Working YAML examples for all subcommands are in ``example_cli/``.
 
 
 Subcommand reference
@@ -340,6 +340,15 @@ Controls the parameter grid for ``flake sweep``. Generate a template with
    n_jobs: -1               # parallel workers (-1 = all cores)
    backend: loky            # joblib backend
    outdir: sweep_out        # output directory (overrides CLI --outdir)
+
+.. note::
+
+   ``overwrite: true`` only overwrites runs whose output directory name matches
+   the current parameter values exactly.  If you change a parameter value (e.g.
+   add a new ``Tau`` point or rename a sweep key), the old run directories are
+   **not** removed automatically — FLAKE never deletes data.  Before re-running a
+   modified sweep with different parameter values, remove the stale run
+   directories manually (or choose a different ``outdir``).
 
 The valid keys for ``grid`` / ``line`` entries and ``base_md_kwargs`` are the
 keyword arguments of :func:`flake.dynamics.run_md`:

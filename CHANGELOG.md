@@ -5,6 +5,58 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.1.3] -- 2026-06-18
+
+### Breaking API change
+
+`en_params` / `en_inputs` removed as a positional argument from all public
+functions.  Closures returned by `substrate_from_params` are self-contained;
+they do not accept extra energy-parameter arguments.
+
+Affected call sites (remove the `en_params` / `en_inputs` argument):
+
+- `run_md(pos, calc_en_f, eta=...)` — was `run_md(pos, calc_en_f, en_params, eta=...)`
+- `sweep_md(pos, calc_en_f, spec, ...)` — was `sweep_md(pos, en_func, en_params, spec, ...)`
+- `translational_map`, `rotational_map`, `rototrasl_map` — same pattern
+- `find_mep(pos, calc_en_f, p0, p1, ...)` — was `find_mep(..., en_params, ...)`
+- `StringPotential(pos, calc_en_f)` — was `StringPotential(pos, calc_en_f, en_params)`
+
+### Improvements
+
+- `substrate_from_params` now returns the real parameter list as `en_inputs`
+  (previously always `[]`).  Useful for calling explicit functions such as
+  `calc_en_sin(pos, pos_cm, *en_inputs)` directly in notebooks and debug
+  scripts without reconstructing the parameters manually.
+- `example_cli/` (renamed from `test_cli_and_phys/`): README updated, CLI
+  name corrected to `flake` throughout, `superlubricity.py` documented.
+- `docs/`: Apple Silicon installation section; note on stale sweep runs not
+  being purged by `overwrite: true`.
+- `analyze.py`: rotational depinning now uses mean angular drift
+  `(theta_f - theta_0) / (t_f - t_0)` instead of the noisy final-snapshot
+  `omega[-1]`.
+
+---
+
+## [0.1.2] -- 2026-06-15
+
+### Fixed
+
+- Added `pyyaml`, `h5py`, and `joblib` to the required dependencies in
+  `pyproject.toml`.  They were used by the package but not declared, so a
+  fresh `pip install flake-rigid` on a clean environment would fail at import
+  time.
+
+---
+
+## [0.1.1] -- 2026-06-15
+
+### Fixed
+
+- README image URL changed to the raw GitHub URL so the logo renders correctly
+  on the PyPI project page.
+
+---
+
 ## [0.1.0] -- 2026-06-12
 
 Complete rewrite from the research prototype (0.0.x).  API breaks with
@@ -15,7 +67,7 @@ the old version are intentional; there are no backward-compatibility shims.
 - Renamed source tree to `flake/` (installable via `pip install -e .`).
 - Module renames: `tool_create_substrate` -> `substrate`, `tool_create_cluster`
   -> `cluster`, `sweep_md` -> `sweep`, `misc` -> `plot`, `slides_io` -> `io`.
-- CLI entry point: `drift` (calls `flake.cli:main`).
+- CLI entry point: `flake` (calls `flake.cli:main`).
 
 ### Substrate (`flake.substrate`)
 
@@ -77,10 +129,10 @@ the old version are intentional; there are no backward-compatibility shims.
 
 ### CLI (`flake.cli`)
 
-- Unified `drift` command: subcommands `map`, `sweep`, `string`,
+- Unified `flake` command: subcommands `map`, `sweep`, `string`,
   `make-params`, `make-sweep`.
 - All subcommands read physics from a single `params.yaml`.
-- `drift sweep` writes informative run directories and supports `--overwrite`.
+- `flake sweep` writes informative run directories and supports `--overwrite`.
 
 ### Tests
 
